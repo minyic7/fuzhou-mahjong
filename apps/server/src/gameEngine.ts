@@ -28,7 +28,7 @@ import type {
   WinContext,
 } from "@fuzhou-mahjong/shared";
 import { ServerGameState, getGame } from "./gameState.js";
-import { findRoomBySocket } from "./room.js";
+import { findRoom, findRoomBySocket } from "./room.js";
 
 type GameServer = Server<ClientEvents, ServerEvents>;
 
@@ -135,7 +135,8 @@ export function handlePlayerAction(
     game = getGame(socketIdOrRoomId);
     if (!game || game.state.phase !== GamePhase.Playing) return;
     playerIndex = botPlayerIndex;
-    room = findRoomBySocket(game.playerSocketIds.find((id) => id && !id.startsWith("bot-")) ?? "");
+    room = findRoom(game.roomId);
+    if (!room) return;
   } else {
     // Human action: resolve by socket ID
     room = findRoomBySocket(socketIdOrRoomId);

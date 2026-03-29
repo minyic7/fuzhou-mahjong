@@ -48,7 +48,10 @@ export class Room {
   }
 
   removeLastBot(): boolean {
-    const botIdx = this.players.findLastIndex((p) => p.isBot);
+    let botIdx = -1;
+    for (let i = this.players.length - 1; i >= 0; i--) {
+      if (this.players[i].isBot) { botIdx = i; break; }
+    }
     if (botIdx === -1) return false;
     this.players.splice(botIdx, 1);
     return true;

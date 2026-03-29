@@ -186,6 +186,34 @@ export function registerRoomHandlers(io: GameServer, socket: GameSocket): void {
       }
     }
 
+    // Check tianhu: dealer wins immediately if hand is complete after gold reveal
+    const nextDealer = game.state.players[game.state.dealerIndex];
+    const nextDealerLastTile = nextDealer.hand[nextDealer.hand.length - 1];
+    if (nextDealerLastTile) {
+      const tianhuResult = checkWin(nextDealer, nextDealerLastTile, game.state.gold, {
+        isSelfDraw: true,
+        isFirstAction: true,
+        isDealer: true,
+        isRobbingKong: false,
+        totalFlowers: nextDealer.flowers.length,
+        totalGangs: 0,
+      });
+      if (tianhuResult.isWin) {
+        game.state.phase = GamePhase.Finished;
+        for (let i = 0; i < 4; i++) {
+          if (!game.isBot(i) && room.players[i].socketId) {
+            io.to(room.players[i].socketId!).emit("gameStateUpdate", game.getClientGameState(i));
+          }
+        }
+        io.to(room.id).emit("gameOver", {
+          winnerId: game.state.dealerIndex,
+          winType: tianhuResult.winType,
+          scores: [0, 0, 0, 0],
+        });
+        return;
+      }
+    }
+
     triggerDealerAction(io, game, room);
   });
 
