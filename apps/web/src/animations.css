@@ -167,3 +167,15 @@
 .tile-claimable {
   animation: tileHighlight 0.8s ease-in-out infinite;
 }
+
+/* Center action animations (discard fly / claim reveal) */
+@keyframes centerActionIn {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.3); }
+  60% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); }
+  100% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+
+@keyframes centerActionOut {
+  0% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(0.5) translateY(20px); }
+}

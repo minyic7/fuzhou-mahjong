@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { socket } from "../socket";
 import { GameTable } from "../components/GameTable";
 import { ActionBar } from "../components/ActionBar";
+import { CenterAction, useCenterAction } from "../components/CenterAction";
 import type { ClientGameState, GameOverResult, AvailableActions, GameAction } from "@fuzhou-mahjong/shared";
 
 interface GameProps {
@@ -16,14 +17,42 @@ export function Game({ initialGameState, onLeave }: GameProps) {
   const [actions, setActions] = useState<AvailableActions | null>(null);
   const [showFlash, setShowFlash] = useState(false);
   const [pendingClaim, setPendingClaim] = useState(false);
+  const { display: centerAction, showDiscard, showClaim } = useCenterAction();
+  const prevStateRef = useRef<ClientGameState | null>(null);
 
   useEffect(() => {
-    // gameStarted is handled by App.tsx (passed as initialGameState prop)
-    // Only listen for subsequent updates here
     socket.on("gameStateUpdate", (state) => {
+      // Detect discard: lastDiscard changed
+      const prev = prevStateRef.current;
+      if (state.lastDiscard && (!prev?.lastDiscard || prev.lastDiscard.tile.id !== state.lastDiscard.tile.id)) {
+        const names = [state.myName || "我", ...(state.otherPlayers?.map(p => p.name) || [])];
+        const relIdx = (state.lastDiscard.playerIndex - state.myIndex + 4) % 4;
+        showDiscard(state.lastDiscard.tile, names[relIdx] || "");
+      }
+
+      // Detect new meld: total melds increased
+      if (prev) {
+        const prevMelds = prev.myMelds.length + prev.otherPlayers.reduce((s, p) => s + p.melds.length, 0);
+        const newMelds = state.myMelds.length + state.otherPlayers.reduce((s, p) => s + p.melds.length, 0);
+        if (newMelds > prevMelds) {
+          // Find which player got a new meld
+          if (state.myMelds.length > prev.myMelds.length) {
+            const meld = state.myMelds[state.myMelds.length - 1];
+            showClaim(meld.tiles, meld.type, state.myName || "我");
+          } else {
+            for (let i = 0; i < state.otherPlayers.length; i++) {
+              if (state.otherPlayers[i].melds.length > (prev.otherPlayers[i]?.melds.length || 0)) {
+                const meld = state.otherPlayers[i].melds[state.otherPlayers[i].melds.length - 1];
+                showClaim(meld.tiles, meld.type, state.otherPlayers[i].name || "");
+                break;
+              }
+            }
+          }
+        }
+      }
+
+      prevStateRef.current = state;
       setGameState(state);
-      // Don't clear actions here — actionRequired is the authoritative source.
-      // Clearing on turn change races with actionRequired and causes buttons to vanish.
     });
     socket.on("actionRequired", (availableActions) => {
       // Don't overwrite claim actions while user is actively choosing (chi picker open)
@@ -199,6 +228,7 @@ export function Game({ initialGameState, onLeave }: GameProps) {
           <div className="border-flash" />
         </>
       )}
+      <CenterAction display={centerAction} gold={gameState.gold} />
       <GameTable
         state={gameState}
         onTileSelect={(tile) => setSelectedTileId(tile?.id ?? null)}
