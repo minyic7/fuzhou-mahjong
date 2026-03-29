@@ -1,5 +1,7 @@
+import { useState } from "react";
 import type { TileInstance, GoldState, SuitedTile, Tile } from "@fuzhou-mahjong/shared";
 import { isGoldTile, isSuitedTile } from "@fuzhou-mahjong/shared";
+import { getTileSvgUrl, TILE_BACK_URL } from "../tileSvg";
 
 interface TileProps {
   tile: TileInstance;
@@ -54,22 +56,18 @@ export function TileView({ tile, faceUp = true, selected, claimable, onClick, on
     return (
       <div style={{
         width: w, height: h,
-        background: "linear-gradient(135deg, #2e7d32 0%, #1b5e20 50%, #2e7d32 100%)",
-        border: "1px solid #1a3c2a",
         borderRadius: 4,
         display: "inline-block",
         margin: 1,
-        boxShadow: "inset 0 0 8px rgba(0,0,0,0.3), 0 2px 4px rgba(0,0,0,0.4)",
-        position: "relative",
+        boxShadow: "0 2px 4px rgba(0,0,0,0.4)",
+        overflow: "hidden",
       }}>
-        {/* Decorative pattern on tile back */}
-        <div style={{
-          position: "absolute", top: "50%", left: "50%",
-          transform: "translate(-50%, -50%)",
-          width: w * 0.5, height: h * 0.5,
-          border: "1px solid rgba(255,255,255,0.15)",
-          borderRadius: 2,
-        }} />
+        <img
+          src={TILE_BACK_URL}
+          alt="tile back"
+          style={{ width: "100%", height: "100%", display: "block" }}
+          loading="lazy"
+        />
       </div>
     );
   }
@@ -116,28 +114,7 @@ export function TileView({ tile, faceUp = true, selected, claimable, onClick, on
         position: "relative",
       }}
     >
-      {/* Main character */}
-      <span style={{
-        fontSize,
-        fontWeight: 900,
-        color,
-        lineHeight: 1,
-        textShadow: "0 1px 0 rgba(255,255,255,0.5)",
-      }}>
-        {value}
-      </span>
-      {/* Suit label */}
-      {suit && (
-        <span style={{
-          fontSize: suitSize,
-          color,
-          opacity: 0.7,
-          lineHeight: 1,
-          marginTop: 1,
-        }}>
-          {suit}
-        </span>
-      )}
+      <TileFace tile={tile.tile} w={w} h={h} value={value} suit={suit} color={color} fontSize={fontSize} suitSize={suitSize} />
       {/* Gold shimmer overlay */}
       {isGold && (
         <div style={{
@@ -148,5 +125,44 @@ export function TileView({ tile, faceUp = true, selected, claimable, onClick, on
         }} />
       )}
     </div>
+  );
+}
+
+function TileFace({ tile, w, h, value, suit, color, fontSize, suitSize }: {
+  tile: Tile; w: number; h: number; value: string; suit: string; color: string; fontSize: number; suitSize: number;
+}) {
+  const [svgFailed, setSvgFailed] = useState(false);
+  const svgUrl = getTileSvgUrl(tile);
+
+  if (svgUrl && !svgFailed) {
+    return (
+      <img
+        src={svgUrl}
+        alt={`${value}${suit}`}
+        onError={() => setSvgFailed(true)}
+        style={{
+          width: w - 6,
+          height: h - 6,
+          objectFit: "contain",
+          pointerEvents: "none",
+        }}
+        loading="lazy"
+        draggable={false}
+      />
+    );
+  }
+
+  // Text fallback
+  return (
+    <>
+      <span style={{ fontSize, fontWeight: 900, color, lineHeight: 1, textShadow: "0 1px 0 rgba(255,255,255,0.5)" }}>
+        {value}
+      </span>
+      {suit && (
+        <span style={{ fontSize: suitSize, color, opacity: 0.7, lineHeight: 1, marginTop: 1 }}>
+          {suit}
+        </span>
+      )}
+    </>
   );
 }
