@@ -26,6 +26,7 @@ export interface ClientGameState {
   myHand: TileInstance[];
   myFlowers: TileInstance[];
   myMelds: Meld[];
+  myName: string;
   myDiscards: TileInstance[];
   otherPlayers: OtherPlayerView[];
   currentTurn: number;

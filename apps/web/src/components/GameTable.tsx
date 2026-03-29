@@ -1,4 +1,3 @@
-import { useState } from "react";
 import type { ClientGameState, TileInstance } from "@fuzhou-mahjong/shared";
 import { PlayerArea } from "./PlayerArea";
 import { GameInfo } from "./GameInfo";
@@ -9,10 +8,9 @@ interface GameTableProps {
   selectedTileId: number | null;
 }
 
-const POSITION_LABELS = ["我 / Me", "右 / Right", "上 / Top", "左 / Left"];
-
 export function GameTable({ state, onTileSelect, selectedTileId }: GameTableProps) {
-  const { myHand, myFlowers, myMelds, myDiscards, otherPlayers, currentTurn, myIndex, gold, dealerIndex, lianZhuangCount, wallRemaining } = state;
+  const { myHand, myFlowers, myMelds, myDiscards, myName, otherPlayers, currentTurn, myIndex, gold, dealerIndex, lianZhuangCount, wallRemaining } = state;
+  const labels = [myName || "我", otherPlayers[0]?.name || "右", otherPlayers[1]?.name || "上", otherPlayers[2]?.name || "左"];
 
   return (
     <div style={{
@@ -39,7 +37,7 @@ export function GameTable({ state, onTileSelect, selectedTileId }: GameTableProp
           isCurrentTurn={currentTurn === (myIndex + 2) % 4}
           isDealer={dealerIndex === (myIndex + 2) % 4}
           gold={gold}
-          label={POSITION_LABELS[2]}
+          label={labels[2]}
         />
       </div>
 
@@ -54,7 +52,7 @@ export function GameTable({ state, onTileSelect, selectedTileId }: GameTableProp
           isCurrentTurn={currentTurn === (myIndex + 3) % 4}
           isDealer={dealerIndex === (myIndex + 3) % 4}
           gold={gold}
-          label={POSITION_LABELS[3]}
+          label={labels[3]}
         />
       </div>
 
@@ -80,7 +78,7 @@ export function GameTable({ state, onTileSelect, selectedTileId }: GameTableProp
           isCurrentTurn={currentTurn === (myIndex + 1) % 4}
           isDealer={dealerIndex === (myIndex + 1) % 4}
           gold={gold}
-          label={POSITION_LABELS[1]}
+          label={labels[1]}
         />
       </div>
 
@@ -97,7 +95,7 @@ export function GameTable({ state, onTileSelect, selectedTileId }: GameTableProp
           gold={gold}
           selectedTileId={selectedTileId}
           onTileClick={(t) => onTileSelect(selectedTileId === t.id ? null : t)}
-          label={POSITION_LABELS[0]}
+          label={labels[0]}
         />
       </div>
     </div>
