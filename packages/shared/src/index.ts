@@ -6,3 +6,4 @@ export interface HealthResponse {
 }
 
 export * from './types/index.js';
+export * from './game/index.js';
