@@ -42,6 +42,7 @@ export type {
 
 export type {
   RoomState,
+  RoomListItem,
   OtherPlayerView,
   ClientGameState,
   AvailableActions,

@@ -62,12 +62,22 @@ export interface GameOverResult {
   scores: number[];
 }
 
+// ─── Room List ───────────────────────────────────────────────────
+
+export interface RoomListItem {
+  roomId: string;
+  playerCount: number;
+  maxPlayers: 4;
+  players: string[];
+}
+
 // ─── Socket.IO event contracts ───────────────────────────────────
 
 export interface ClientEvents {
   createRoom: (playerName: string) => void;
   joinRoom: (roomId: string, playerName: string) => void;
   leaveRoom: () => void;
+  listRooms: () => void;
   startGame: () => void;
   playerAction: (action: GameAction) => void;
 }
@@ -76,6 +86,7 @@ export interface ServerEvents {
   roomCreated: (roomId: string) => void;
   roomJoined: (roomState: RoomState) => void;
   roomUpdated: (roomState: RoomState) => void;
+  roomList: (rooms: RoomListItem[]) => void;
   gameStarted: (gameState: ClientGameState) => void;
   gameStateUpdate: (gameState: ClientGameState) => void;
   actionRequired: (availableActions: AvailableActions) => void;
