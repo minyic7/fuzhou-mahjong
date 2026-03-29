@@ -73,7 +73,14 @@ export function Room({ initialRoomState, onGameStarted }: RoomProps) {
           disabled={room.players.length >= 4}
           style={{ flex: 1, padding: 12, fontSize: 16 }}
         >
-          添加机器人 / Add Bot
+          +机器人 / +Bot
+        </button>
+        <button
+          onClick={() => socket.emit("removeBot")}
+          disabled={!room.players.some((p) => p.isBot)}
+          style={{ padding: 12, fontSize: 16 }}
+        >
+          -机器人
         </button>
         <button
           onClick={handleStart}

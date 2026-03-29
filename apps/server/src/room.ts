@@ -47,6 +47,13 @@ export class Room {
     this.players = this.players.filter((p) => p.socketId !== socketId);
   }
 
+  removeLastBot(): boolean {
+    const botIdx = this.players.findLastIndex((p) => p.isBot);
+    if (botIdx === -1) return false;
+    this.players.splice(botIdx, 1);
+    return true;
+  }
+
   disconnectPlayer(socketId: string): Player | undefined {
     const player = this.players.find((p) => p.socketId === socketId);
     if (player) {
