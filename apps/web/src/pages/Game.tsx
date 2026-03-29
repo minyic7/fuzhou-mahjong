@@ -1,24 +1,47 @@
 import { useEffect, useState } from "react";
 import { socket } from "../socket";
 import { GameTable } from "../components/GameTable";
-import type { ClientGameState, GameOverResult } from "@fuzhou-mahjong/shared";
+import { ActionBar } from "../components/ActionBar";
+import type { ClientGameState, GameOverResult, AvailableActions, GameAction } from "@fuzhou-mahjong/shared";
 
 export function Game() {
   const [gameState, setGameState] = useState<ClientGameState | null>(null);
   const [selectedTileId, setSelectedTileId] = useState<number | null>(null);
   const [gameOver, setGameOver] = useState<GameOverResult | null>(null);
+  const [actions, setActions] = useState<AvailableActions | null>(null);
 
   useEffect(() => {
-    socket.on("gameStarted", (state) => setGameState(state));
-    socket.on("gameStateUpdate", (state) => setGameState(state));
+    socket.on("gameStarted", (state) => {
+      setGameState(state);
+      setActions(null);
+    });
+    socket.on("gameStateUpdate", (state) => {
+      setGameState((prev) => {
+        // Clear actions if turn changed
+        if (prev && prev.currentTurn !== state.currentTurn) {
+          setActions(null);
+        }
+        return state;
+      });
+    });
+    socket.on("actionRequired", (availableActions) => {
+      setActions(availableActions);
+    });
     socket.on("gameOver", (result) => setGameOver(result));
 
     return () => {
       socket.off("gameStarted");
       socket.off("gameStateUpdate");
+      socket.off("actionRequired");
       socket.off("gameOver");
     };
   }, []);
+
+  const handleAction = (action: GameAction) => {
+    socket.emit("playerAction", action);
+    setSelectedTileId(null);
+    setActions(null);
+  };
 
   if (gameOver) {
     return (
@@ -39,10 +62,18 @@ export function Game() {
   }
 
   return (
-    <GameTable
-      state={gameState}
-      onTileSelect={(tile) => setSelectedTileId(tile?.id ?? null)}
-      selectedTileId={selectedTileId}
-    />
+    <div>
+      <GameTable
+        state={gameState}
+        onTileSelect={(tile) => setSelectedTileId(tile?.id ?? null)}
+        selectedTileId={selectedTileId}
+      />
+      <ActionBar
+        actions={actions}
+        selectedTileId={selectedTileId}
+        gameState={gameState}
+        onAction={handleAction}
+      />
+    </div>
   );
 }
