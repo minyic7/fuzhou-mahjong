@@ -46,7 +46,7 @@ export function Lobby({ onJoined }: LobbyProps) {
   };
 
   return (
-    <div style={{ maxWidth: 500, margin: "0 auto", padding: 20 }}>
+    <div className="lobby-page" style={{ maxWidth: 500, margin: "0 auto", padding: 20 }}>
       <h1>福州麻将</h1>
       <h2>Fuzhou Mahjong</h2>
 

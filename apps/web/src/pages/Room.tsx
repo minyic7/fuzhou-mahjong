@@ -33,7 +33,7 @@ export function Room({ initialRoomState }: RoomProps) {
   };
 
   return (
-    <div style={{ maxWidth: 400, margin: "0 auto", padding: 20 }}>
+    <div className="room-page" style={{ maxWidth: 400, margin: "0 auto", padding: 20 }}>
       <h2>房间 / Room</h2>
 
       <div style={{
