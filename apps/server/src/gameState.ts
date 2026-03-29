@@ -19,11 +19,13 @@ export class ServerGameState {
   state!: GameState;
   roomId: string;
   playerSocketIds: string[];
+  botIndices: Set<number> = new Set();
   firstActionTaken = false;
 
-  constructor(roomId: string, playerSocketIds: string[], dealerIndex?: number, lianZhuangCount?: number) {
+  constructor(roomId: string, playerSocketIds: string[], botIndices?: number[], dealerIndex?: number, lianZhuangCount?: number) {
     this.roomId = roomId;
     this.playerSocketIds = playerSocketIds;
+    if (botIndices) this.botIndices = new Set(botIndices);
     this.initRound(dealerIndex ?? Math.floor(Math.random() * 4), lianZhuangCount ?? 0);
   }
 
@@ -148,6 +150,10 @@ export class ServerGameState {
   updateSocketId(playerIndex: number, newSocketId: string): void {
     this.playerSocketIds[playerIndex] = newSocketId;
   }
+
+  isBot(playerIndex: number): boolean {
+    return this.botIndices.has(playerIndex);
+  }
 }
 
 // ─── Game Store ──────────────────────────────────────────────────
@@ -157,8 +163,9 @@ const games = new Map<string, ServerGameState>();
 export function createGame(
   roomId: string,
   playerSocketIds: string[],
+  botIndices?: number[],
 ): ServerGameState {
-  const game = new ServerGameState(roomId, playerSocketIds);
+  const game = new ServerGameState(roomId, playerSocketIds, botIndices);
   games.set(roomId, game);
   return game;
 }
