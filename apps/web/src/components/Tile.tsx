@@ -134,7 +134,7 @@ export function TileView({ tile, faceUp = true, selected, claimable, onClick, on
 }
 
 function TileFace({ tile, w, h, value, suit, color, fontSize, suitSize }: {
-  tile: Tile; w: number; h: number; value: string; suit: string; color: string; fontSize: number; suitSize: number;
+  tile: Tile; w: string; h: string; value: string; suit: string; color: string; fontSize: string; suitSize: string;
 }) {
   const [svgFailed, setSvgFailed] = useState(false);
   const svgUrl = getTileSvgUrl(tile);
