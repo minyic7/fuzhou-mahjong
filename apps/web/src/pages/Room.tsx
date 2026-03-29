@@ -62,7 +62,7 @@ export function Room({ initialRoomState, onGameStarted }: RoomProps) {
         ))}
         {Array.from({ length: 4 - room.players.length }).map((_, i) => (
           <li key={`empty-${i}`} style={{ padding: 8, borderBottom: "1px solid #eee", color: "#ccc" }}>
-            等待加入...
+            空位 — 等待玩家或添加机器人
           </li>
         ))}
       </ul>

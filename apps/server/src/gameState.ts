@@ -103,6 +103,7 @@ export class ServerGameState {
       const p = state.players[idx];
       otherPlayers.push({
         name: this.playerNames[idx] ?? "",
+        isBot: this.botIndices.has(idx),
         flowers: p.flowers,
         melds: p.melds,
         handCount: p.hand.length,

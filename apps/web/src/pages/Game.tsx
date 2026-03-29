@@ -51,14 +51,38 @@ export function Game() {
       setSelectedTileId(null);
     };
 
+    const winTypeNames: Record<string, string> = {
+      normal: "普通胡", tianHu: "天胡 30x", grabGold: "抢金 30x",
+      pingHu0: "平胡(无花) 30x", pingHu1: "平胡(一花) 15x",
+      threeGoldDown: "三金倒 40x", goldSparrow: "金雀 60x", goldDragon: "金龙 120x",
+      duiDuiHu: "对对胡", qingYiSe: "清一色", draw: "流局",
+    };
+
+    const getPlayerName = (idx: number) => {
+      if (!gameState) return `玩家${idx}`;
+      if (idx === gameState.myIndex) return gameState.myName || "我";
+      const other = gameState.otherPlayers.find((_, i) => (gameState.myIndex + i + 1) % 4 === idx);
+      return other?.name || `玩家${idx}`;
+    };
+
     return (
       <div style={{ textAlign: "center", padding: 40 }}>
-        <h2>{gameOver.winnerId !== null ? `玩家 ${gameOver.winnerId} 胡了!` : "流局 / Draw"}</h2>
-        <p>胡法: {gameOver.winType}</p>
-        <p>分数: {gameOver.scores.join(", ")}</p>
+        <h2 style={{ fontSize: 28, marginBottom: 16 }}>
+          {gameOver.winnerId !== null ? `🎉 ${getPlayerName(gameOver.winnerId)} 胡了!` : "流局 / Draw"}
+        </h2>
+        <p style={{ fontSize: 18, color: "#ffd700", marginBottom: 12 }}>
+          {winTypeNames[gameOver.winType] || gameOver.winType}
+        </p>
+        <div style={{ marginBottom: 20 }}>
+          {gameOver.scores.map((score, i) => (
+            <p key={i} style={{ color: score > 0 ? "#4caf50" : score < 0 ? "#f44336" : "#aaa" }}>
+              {getPlayerName(i)}: {score > 0 ? "+" : ""}{score}
+            </p>
+          ))}
+        </div>
         <button
           onClick={handleNextRound}
-          style={{ marginTop: 20, padding: "12px 32px", fontSize: 18, background: "#0f3460", color: "#eee", border: "none", borderRadius: 6, cursor: "pointer" }}
+          style={{ padding: "12px 32px", fontSize: 18, background: "#0f3460", color: "#eee", border: "none", borderRadius: 6, cursor: "pointer" }}
         >
           下一局 / Next Round
         </button>
