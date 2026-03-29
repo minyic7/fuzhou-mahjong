@@ -14,14 +14,17 @@ interface PlayerAreaProps {
   gold: GoldState | null;
   selectedTileId?: number | null;
   onTileClick?: (tile: TileInstance) => void;
+  onTileDoubleClick?: (tile: TileInstance) => void;
   label: string;
   claimableTileIds?: Set<number>;
+  lastDrawnTileId?: number | null;
+  tenpaiTiles?: import("@fuzhou-mahjong/shared").SuitedTile[];
 }
 
 export function PlayerArea({
   isMe, hand, handCount, melds, flowers, discards,
   isCurrentTurn, isDealer, gold, selectedTileId, onTileClick, label,
-  claimableTileIds,
+  claimableTileIds, onTileDoubleClick, lastDrawnTileId, tenpaiTiles,
 }: PlayerAreaProps) {
   return (
     <div
@@ -38,18 +41,20 @@ export function PlayerArea({
       </div>
 
       {/* Hand */}
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 1, marginBottom: 4 }}>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 1, marginBottom: 4, alignItems: "flex-end" }}>
         {isMe && hand ? (
-          hand.map((t) => (
-            <TileView
-              key={t.id}
-              tile={t}
-              faceUp
-              gold={gold}
-              selected={selectedTileId === t.id}
-              claimable={claimableTileIds?.has(t.id)}
-              onClick={() => onTileClick?.(t)}
-            />
+          hand.map((t, idx) => (
+            <div key={t.id} style={{ display: "inline-flex", marginLeft: lastDrawnTileId === t.id ? 12 : 0 }}>
+              <TileView
+                tile={t}
+                faceUp
+                gold={gold}
+                selected={selectedTileId === t.id}
+                claimable={claimableTileIds?.has(t.id)}
+                onClick={() => onTileClick?.(t)}
+                onDoubleClick={() => onTileDoubleClick?.(t)}
+              />
+            </div>
           ))
         ) : (
           Array.from({ length: handCount ?? 0 }).map((_, i) => (
@@ -57,6 +62,13 @@ export function PlayerArea({
           ))
         )}
       </div>
+
+      {/* Tenpai indicator */}
+      {isMe && tenpaiTiles && tenpaiTiles.length > 0 && (
+        <div style={{ fontSize: 12, color: "#4caf50", marginBottom: 4 }}>
+          🀄 听牌！等: {tenpaiTiles.map(t => `${t.value}${{wan:"万",bing:"饼",tiao:"条"}[t.suit]}`).join(" ")}
+        </div>
+      )}
 
       {/* Melds */}
       {melds.length > 0 && (

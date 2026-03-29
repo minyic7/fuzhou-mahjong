@@ -5,6 +5,8 @@ import {
   revealGold,
   GamePhase,
   WindType,
+  sortHand,
+  findTenpaiTiles,
 } from "@fuzhou-mahjong/shared";
 import type {
   GameState,
@@ -21,6 +23,7 @@ export class ServerGameState {
   playerSocketIds: string[];
   playerNames: string[];
   botIndices: Set<number> = new Set();
+  lastDrawnTileIds: (number | null)[] = [null, null, null, null];
   firstActionTaken = false;
 
   constructor(roomId: string, playerSocketIds: string[], playerNames?: string[], botIndices?: number[], dealerIndex?: number, lianZhuangCount?: number) {
@@ -33,6 +36,7 @@ export class ServerGameState {
 
   private initRound(dealerIndex: number, lianZhuangCount: number): void {
     this.firstActionTaken = false;
+    this.lastDrawnTileIds = [null, null, null, null];
 
     const { wall, wallTail } = createWall();
     const { hands, remainingWall } = dealTiles(wall, dealerIndex);
@@ -60,6 +64,11 @@ export class ServerGameState {
 
     if (goldResult.dealerFlowers.length > 0) {
       players[dealerIndex].flowers.push(...goldResult.dealerFlowers);
+    }
+
+    // Sort all hands by suit then value
+    for (const p of players) {
+      p.hand = sortHand(p.hand, goldResult.gold);
     }
 
     this.state = {
@@ -126,6 +135,8 @@ export class ServerGameState {
       gold: state.gold,
       wallRemaining: state.wall.length + state.wallTail.length,
       lastDiscard: state.lastDiscard,
+      tenpaiTiles: findTenpaiTiles(myPlayer.hand, myPlayer.melds, state.gold),
+      lastDrawnTileId: this.lastDrawnTileIds[playerIndex],
     };
   }
 

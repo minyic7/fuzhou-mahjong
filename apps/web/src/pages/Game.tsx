@@ -169,6 +169,11 @@ export function Game({ initialGameState, onLeave }: GameProps) {
       <GameTable
         state={gameState}
         onTileSelect={(tile) => setSelectedTileId(tile?.id ?? null)}
+        onTileDoubleClick={(tile) => {
+          if (actions?.canDiscard) {
+            handleAction({ type: "discard" as any, playerIndex: gameState.myIndex, tile });
+          }
+        }}
         selectedTileId={selectedTileId}
         claimableTileIds={getClaimableTileIds(actions)}
       />

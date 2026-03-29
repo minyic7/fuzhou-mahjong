@@ -37,6 +37,8 @@ export interface ClientGameState {
   gold: GoldState | null;
   wallRemaining: number;
   lastDiscard: { tile: TileInstance; playerIndex: number } | null;
+  tenpaiTiles: import('../types/tile.js').SuitedTile[];
+  lastDrawnTileId: number | null;
 }
 
 // ─── Actions ─────────────────────────────────────────────────────

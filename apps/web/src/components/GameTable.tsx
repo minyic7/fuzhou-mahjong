@@ -5,11 +5,12 @@ import { GameInfo } from "./GameInfo";
 interface GameTableProps {
   state: ClientGameState;
   onTileSelect: (tile: TileInstance | null) => void;
+  onTileDoubleClick?: (tile: TileInstance) => void;
   selectedTileId: number | null;
   claimableTileIds?: Set<number>;
 }
 
-export function GameTable({ state, onTileSelect, selectedTileId, claimableTileIds }: GameTableProps) {
+export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTileId, claimableTileIds }: GameTableProps) {
   const { myHand, myFlowers, myMelds, myDiscards, myName, otherPlayers, currentTurn, myIndex, gold, dealerIndex, lianZhuangCount, wallRemaining } = state;
   const botLabel = (name: string, isBot?: boolean) => isBot ? `${name} 🤖` : name;
   const labels = [
@@ -104,8 +105,11 @@ export function GameTable({ state, onTileSelect, selectedTileId, claimableTileId
           gold={gold}
           selectedTileId={selectedTileId}
           onTileClick={(t) => onTileSelect(selectedTileId === t.id ? null : t)}
+          onTileDoubleClick={onTileDoubleClick}
           label={labels[0]}
           claimableTileIds={claimableTileIds}
+          lastDrawnTileId={(state as any).lastDrawnTileId}
+          tenpaiTiles={(state as any).tenpaiTiles}
         />
       </div>
     </div>
