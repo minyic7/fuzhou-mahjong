@@ -14,6 +14,7 @@ export function Game({ initialGameState, onLeave }: GameProps) {
   const [selectedTileId, setSelectedTileId] = useState<number | null>(null);
   const [gameOver, setGameOver] = useState<GameOverResult | null>(null);
   const [actions, setActions] = useState<AvailableActions | null>(null);
+  const [showFlash, setShowFlash] = useState(false);
 
   useEffect(() => {
     // gameStarted is handled by App.tsx (passed as initialGameState prop)
@@ -29,6 +30,12 @@ export function Game({ initialGameState, onLeave }: GameProps) {
     });
     socket.on("actionRequired", (availableActions) => {
       setActions(availableActions);
+      // Flash screen when claim actions available (chi/peng/gang/hu)
+      const hasClaim = availableActions.canHu || availableActions.canPeng || availableActions.canMingGang || (availableActions.chiOptions?.length > 0);
+      if (hasClaim && !availableActions.canDiscard) {
+        setShowFlash(true);
+        setTimeout(() => setShowFlash(false), 1500);
+      }
     });
     socket.on("gameOver", (result) => setGameOver(result));
 
@@ -38,6 +45,25 @@ export function Game({ initialGameState, onLeave }: GameProps) {
       socket.off("gameOver");
     };
   }, []);
+
+  const getClaimableTileIds = (a: AvailableActions | null): Set<number> => {
+    const ids = new Set<number>();
+    if (!a) return ids;
+    // Chi tiles
+    for (const combo of a.chiOptions ?? []) {
+      for (const t of combo) ids.add(t.id);
+    }
+    // Peng: tiles matching lastDiscard
+    if (a.canPeng && gameState?.lastDiscard && gameState.myHand) {
+      const d = gameState.lastDiscard.tile.tile;
+      if (d.kind === "suited") {
+        for (const t of gameState.myHand) {
+          if (t.tile.kind === "suited" && t.tile.suit === d.suit && t.tile.value === d.value) ids.add(t.id);
+        }
+      }
+    }
+    return ids;
+  };
 
   const handleAction = (action: GameAction) => {
     socket.emit("playerAction", action);
@@ -134,10 +160,17 @@ export function Game({ initialGameState, onLeave }: GameProps) {
 
   return (
     <div>
+      {showFlash && (
+        <>
+          <div className="screen-flash" />
+          <div className="border-flash" />
+        </>
+      )}
       <GameTable
         state={gameState}
         onTileSelect={(tile) => setSelectedTileId(tile?.id ?? null)}
         selectedTileId={selectedTileId}
+        claimableTileIds={getClaimableTileIds(actions)}
       />
       <ActionBar
         actions={actions}

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { ActionType } from "@fuzhou-mahjong/shared";
 import type { AvailableActions, ClientGameState, GameAction, TileInstance } from "@fuzhou-mahjong/shared";
 import { TileView } from "./Tile";
@@ -23,6 +23,7 @@ const BTN = {
 
 export function ActionBar({ actions, selectedTileId, gameState, onAction }: ActionBarProps) {
   const [showChiPicker, setShowChiPicker] = useState(false);
+  const barRef = useRef<HTMLDivElement>(null);
   const myIndex = gameState.myIndex;
 
   if (!actions) {
@@ -50,8 +51,14 @@ export function ActionBar({ actions, selectedTileId, gameState, onAction }: Acti
   const hasClaimAction = actions.canHu || actions.canPeng || actions.canMingGang || actions.chiOptions.length > 0;
   const isClaimWindow = hasClaimAction && !actions.canDiscard;
 
+  useEffect(() => {
+    if (isClaimWindow && barRef.current) {
+      barRef.current.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+  }, [isClaimWindow]);
+
   return (
-    <div style={{
+    <div ref={barRef} style={{
       display: "flex",
       flexWrap: "wrap",
       justifyContent: "center",
