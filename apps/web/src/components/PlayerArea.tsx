@@ -82,7 +82,7 @@ export function PlayerArea({
 
       {/* Discards */}
       {discards.length > 0 && (
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 0, maxWidth: 300 }}>
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 0, maxWidth: "min(300px, 90vw)" }}>
           {discards.map((d) => (
             <TileView key={d.id} tile={d} faceUp gold={gold} small />
           ))}

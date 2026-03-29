@@ -28,7 +28,7 @@ export function GameTable({ state, onTileSelect, selectedTileId }: GameTableProp
       `,
       gridTemplateColumns: "1fr 2fr 1fr",
       gridTemplateRows: "auto 1fr auto",
-      minHeight: "80vh",
+      minHeight: "min(80vh, 600px)",
       gap: 8,
       padding: 8,
     }}>

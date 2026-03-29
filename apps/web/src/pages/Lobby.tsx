@@ -32,14 +32,16 @@ export function Lobby({ onJoined }: LobbyProps) {
 
   const handleCreate = () => {
     if (!name.trim()) return;
+    setError("");
     socket.emit("createRoom", name.trim());
   };
 
   const handleJoin = (code: string) => {
     if (!name.trim()) {
-      setError("Please enter your name first");
+      setError("请先输入名字 / Enter your name first");
       return;
     }
+    setError("");
     socket.emit("joinRoom", code.toUpperCase(), name.trim());
   };
 
