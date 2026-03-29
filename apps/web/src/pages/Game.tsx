@@ -15,6 +15,7 @@ export function Game({ initialGameState, onLeave }: GameProps) {
   const [gameOver, setGameOver] = useState<GameOverResult | null>(null);
   const [actions, setActions] = useState<AvailableActions | null>(null);
   const [showFlash, setShowFlash] = useState(false);
+  const [pendingClaim, setPendingClaim] = useState(false);
 
   useEffect(() => {
     // gameStarted is handled by App.tsx (passed as initialGameState prop)
@@ -25,13 +26,19 @@ export function Game({ initialGameState, onLeave }: GameProps) {
       // Clearing on turn change races with actionRequired and causes buttons to vanish.
     });
     socket.on("actionRequired", (availableActions) => {
-      setActions(availableActions);
-      // Flash screen when claim actions available (chi/peng/gang/hu)
-      const hasClaim = availableActions.canHu || availableActions.canPeng || availableActions.canMingGang || (availableActions.chiOptions?.length > 0);
-      if (hasClaim && !availableActions.canDiscard) {
-        setShowFlash(true);
-        setTimeout(() => setShowFlash(false), 1500);
-      }
+      // Don't overwrite claim actions while user is actively choosing (chi picker open)
+      setPendingClaim((isPending) => {
+        if (isPending) return isPending; // keep current actions, ignore new ones
+        setActions(availableActions);
+        // Flash screen when claim actions available (chi/peng/gang/hu)
+        const hasClaim = availableActions.canHu || availableActions.canPeng || availableActions.canMingGang || (availableActions.chiOptions?.length > 0);
+        if (hasClaim && !availableActions.canDiscard) {
+          setShowFlash(true);
+          setTimeout(() => setShowFlash(false), 1500);
+          return true; // mark as pending claim
+        }
+        return false;
+      });
     });
     socket.on("gameOver", (result) => setGameOver(result));
 
@@ -65,6 +72,7 @@ export function Game({ initialGameState, onLeave }: GameProps) {
     socket.emit("playerAction", action);
     setSelectedTileId(null);
     setActions(null);
+    setPendingClaim(false);
   };
 
   if (gameOver) {
