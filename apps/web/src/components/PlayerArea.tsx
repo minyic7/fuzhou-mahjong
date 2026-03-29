@@ -36,8 +36,19 @@ export function PlayerArea({
         border: isCurrentTurn ? "2px solid #ffd700" : "1px solid transparent",
       }}
     >
-      <div style={{ fontSize: 12, marginBottom: 4, color: "#aaa" }}>
-        {label} {isDealer && "🀄"} {isCurrentTurn && "◀"}
+      {/* Player info panel */}
+      <div style={{
+        display: "flex", alignItems: "center", gap: 8, marginBottom: 6,
+        padding: "4px 8px", background: "rgba(0,0,0,0.2)", borderRadius: 4,
+      }}>
+        <span style={{ fontSize: 14, fontWeight: "bold" }}>
+          {label}
+        </span>
+        {isDealer && <span style={{ fontSize: 11, background: "#c41e3a", color: "#fff", padding: "1px 4px", borderRadius: 3 }}>庄</span>}
+        {isCurrentTurn && <span style={{ fontSize: 11, background: "#ffd700", color: "#000", padding: "1px 4px", borderRadius: 3 }}>出牌中</span>}
+        <span style={{ fontSize: 11, color: "#888", marginLeft: "auto" }}>
+          🌸{flowers.length}
+        </span>
       </div>
 
       {/* Hand */}
@@ -109,9 +120,17 @@ export function PlayerArea({
         </div>
       )}
 
-      {/* Discards */}
+      {/* Discards - grid layout */}
       {discards.length > 0 && (
-        <div style={{ display: "flex", flexWrap: "wrap", gap: 0, maxWidth: "min(300px, 90vw)" }}>
+        <div style={{
+          display: "grid",
+          gridTemplateColumns: "repeat(6, auto)",
+          gap: 1,
+          padding: 4,
+          background: isMe ? "rgba(0,100,200,0.08)" : "rgba(255,255,255,0.03)",
+          borderRadius: 4,
+          maxWidth: "min(300px, 90vw)",
+        }}>
           {discards.map((d) => (
             <TileView key={d.id} tile={d} faceUp gold={gold} small />
           ))}
