@@ -5,11 +5,12 @@ import { ActionBar } from "../components/ActionBar";
 import type { ClientGameState, GameOverResult, AvailableActions, GameAction } from "@fuzhou-mahjong/shared";
 
 interface GameProps {
+  initialGameState?: ClientGameState | null;
   onLeave?: () => void;
 }
 
-export function Game({ onLeave }: GameProps) {
-  const [gameState, setGameState] = useState<ClientGameState | null>(null);
+export function Game({ initialGameState, onLeave }: GameProps) {
+  const [gameState, setGameState] = useState<ClientGameState | null>(initialGameState ?? null);
   const [selectedTileId, setSelectedTileId] = useState<number | null>(null);
   const [gameOver, setGameOver] = useState<GameOverResult | null>(null);
   const [actions, setActions] = useState<AvailableActions | null>(null);
