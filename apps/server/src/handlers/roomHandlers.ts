@@ -126,8 +126,9 @@ export function registerRoomHandlers(io: GameServer, socket: GameSocket): void {
     console.log(`Game starting in room ${room.id}`);
 
     const socketIds = room.players.map((p) => p.socketId ?? `bot-${p.playerId}`);
+    const playerNames = room.players.map((p) => p.name);
     const botIndices = room.players.map((p, i) => p.isBot ? i : -1).filter((i) => i >= 0);
-    const game = createGame(room.id, socketIds, botIndices);
+    const game = createGame(room.id, socketIds, playerNames, botIndices);
 
     for (let i = 0; i < 4; i++) {
       if (!game.isBot(i) && room.players[i].socketId) {

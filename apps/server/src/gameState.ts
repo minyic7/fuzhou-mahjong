@@ -19,12 +19,14 @@ export class ServerGameState {
   state!: GameState;
   roomId: string;
   playerSocketIds: string[];
+  playerNames: string[];
   botIndices: Set<number> = new Set();
   firstActionTaken = false;
 
-  constructor(roomId: string, playerSocketIds: string[], botIndices?: number[], dealerIndex?: number, lianZhuangCount?: number) {
+  constructor(roomId: string, playerSocketIds: string[], playerNames?: string[], botIndices?: number[], dealerIndex?: number, lianZhuangCount?: number) {
     this.roomId = roomId;
     this.playerSocketIds = playerSocketIds;
+    this.playerNames = playerNames ?? playerSocketIds.map((_, i) => `Player ${i + 1}`);
     if (botIndices) this.botIndices = new Set(botIndices);
     this.initRound(dealerIndex ?? Math.floor(Math.random() * 4), lianZhuangCount ?? 0);
   }
@@ -100,7 +102,7 @@ export class ServerGameState {
       const idx = (playerIndex + i) % 4;
       const p = state.players[idx];
       otherPlayers.push({
-        name: "",
+        name: this.playerNames[idx] ?? "",
         flowers: p.flowers,
         melds: p.melds,
         handCount: p.hand.length,
@@ -113,6 +115,7 @@ export class ServerGameState {
       myHand: myPlayer.hand,
       myFlowers: myPlayer.flowers,
       myMelds: myPlayer.melds,
+      myName: this.playerNames[playerIndex] ?? "",
       myDiscards: myPlayer.discards,
       otherPlayers,
       currentTurn: state.currentTurn,
@@ -163,9 +166,10 @@ const games = new Map<string, ServerGameState>();
 export function createGame(
   roomId: string,
   playerSocketIds: string[],
+  playerNames?: string[],
   botIndices?: number[],
 ): ServerGameState {
-  const game = new ServerGameState(roomId, playerSocketIds, botIndices);
+  const game = new ServerGameState(roomId, playerSocketIds, playerNames, botIndices);
   games.set(roomId, game);
   return game;
 }
