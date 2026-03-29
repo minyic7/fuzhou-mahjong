@@ -68,7 +68,8 @@ jobs:
           key: ${{ secrets.DEPLOY_SSH_KEY }}
           command_timeout: 10m
           script: |
-            cd /Users/minyic/fuzhou-mahjong
+            export PATH=/usr/local/bin:/opt/homebrew/bin:$PATH
+            cd /Users/${{ secrets.DEPLOY_USER }}/fuzhou-mahjong
             docker compose down
             docker compose build --no-cache
             docker compose up -d
