@@ -11,6 +11,7 @@ import {
   unregisterPlayerRoom,
 } from "../room.js";
 import { createGame, getGame } from "../gameState.js";
+import { checkWin, MeldType, isGoldTile, GamePhase } from "@fuzhou-mahjong/shared";
 
 type GameSocket = Socket<ClientEvents, ServerEvents>;
 type GameServer = Server<ClientEvents, ServerEvents>;
@@ -102,6 +103,32 @@ export function registerRoomHandlers(io: GameServer, socket: GameSocket): void {
 
     for (let i = 0; i < 4; i++) {
       io.to(socketIds[i]).emit("gameStarted", game.getClientGameState(i));
+    }
+
+    // Check tianhu: dealer wins immediately if hand is complete after gold reveal
+    const dealer = game.state.players[game.state.dealerIndex];
+    const dealerLastTile = dealer.hand[dealer.hand.length - 1];
+    if (dealerLastTile) {
+      const tianhuResult = checkWin(dealer, dealerLastTile, game.state.gold, {
+        isSelfDraw: true,
+        isFirstAction: true,
+        isDealer: true,
+        isRobbingKong: false,
+        totalFlowers: dealer.flowers.length,
+        totalGangs: 0,
+      });
+      if (tianhuResult.isWin) {
+        game.state.phase = GamePhase.Finished;
+        for (let i = 0; i < 4; i++) {
+          io.to(socketIds[i]).emit("gameStateUpdate", game.getClientGameState(i));
+        }
+        io.to(room.id).emit("gameOver", {
+          winnerId: game.state.dealerIndex,
+          winType: tianhuResult.winType,
+          scores: [0, 0, 0, 0],
+        });
+        return;
+      }
     }
 
     const dealerSocketId = game.getSocketId(game.state.dealerIndex);

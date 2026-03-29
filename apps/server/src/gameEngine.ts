@@ -180,6 +180,7 @@ function handleDiscard(
   player.hand.splice(tileIdx, 1);
   player.discards.push(tile);
   state.lastDiscard = { tile, playerIndex };
+  game.firstActionTaken = true;
 
   // Gold discard penalty
   if (state.gold && isGoldTile(tile, state.gold)) {
@@ -317,7 +318,7 @@ function handleBuGang(
     if (i === playerIndex) continue;
     const winResult = checkWin(state.players[i], tile, state.gold, {
       isSelfDraw: false,
-      isFirstAction: false,
+      isFirstAction: !game.firstActionTaken,
       isDealer: state.players[i].isDealer,
       isRobbingKong: true,
       totalFlowers: state.players[i].flowers.length,
@@ -388,7 +389,7 @@ function handleSelfDrawHu(
 
   const winResult = checkWin(player, winningTile, game.state.gold, {
     isSelfDraw: true,
-    isFirstAction: false,
+    isFirstAction: !game.firstActionTaken,
     isDealer: player.isDealer,
     isRobbingKong: false,
     totalFlowers: player.flowers.length,
@@ -564,7 +565,7 @@ function getResponseActions(
   if (!player.hasDiscardedGold) {
     const winResult = checkWin(player, discardTile, gold, {
       isSelfDraw: false,
-      isFirstAction: false,
+      isFirstAction: !game.firstActionTaken,
       isDealer: player.isDealer,
       isRobbingKong: false,
       totalFlowers: player.flowers.length,
@@ -610,7 +611,7 @@ function getPostDrawActions(
   if (lastTile) {
     const winResult = checkWin(player, lastTile, gold, {
       isSelfDraw: true,
-      isFirstAction: false,
+      isFirstAction: !game.firstActionTaken,
       isDealer: player.isDealer,
       isRobbingKong: false,
       totalFlowers: player.flowers.length,
@@ -681,7 +682,7 @@ function endGameWin(
   const winner = state.players[winnerIndex];
   const winResult = checkWin(winner, winningTile, state.gold, {
     isSelfDraw,
-    isFirstAction: false,
+    isFirstAction: !game.firstActionTaken,
     isDealer: winner.isDealer,
     isRobbingKong: false,
     totalFlowers: winner.flowers.length,
