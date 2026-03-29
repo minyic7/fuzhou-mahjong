@@ -28,7 +28,7 @@ import type {
   WinContext,
 } from "@fuzhou-mahjong/shared";
 import { ServerGameState, getGame } from "./gameState.js";
-import { findRoomBySocket } from "./room.js";
+import { findRoom, findRoomBySocket } from "./room.js";
 
 type GameServer = Server<ClientEvents, ServerEvents>;
 
@@ -122,17 +122,30 @@ const activeWindows = new Map<string, ActionWindow>();
 
 export function handlePlayerAction(
   io: GameServer,
-  socketId: string,
+  socketIdOrRoomId: string,
   action: GameAction,
+  botPlayerIndex?: number,
 ): void {
-  const room = findRoomBySocket(socketId);
-  if (!room) return;
+  let room: ReturnType<typeof findRoomBySocket>;
+  let game: ReturnType<typeof getGame>;
+  let playerIndex: number;
 
-  const game = getGame(room.id);
-  if (!game || game.state.phase !== GamePhase.Playing) return;
-
-  const playerIndex = game.getPlayerIndex(socketId);
-  if (playerIndex === -1) return;
+  if (botPlayerIndex !== undefined) {
+    // Bot action: resolve by room ID directly
+    game = getGame(socketIdOrRoomId);
+    if (!game || game.state.phase !== GamePhase.Playing) return;
+    playerIndex = botPlayerIndex;
+    room = findRoom(game.roomId);
+    if (!room) return;
+  } else {
+    // Human action: resolve by socket ID
+    room = findRoomBySocket(socketIdOrRoomId);
+    if (!room) return;
+    game = getGame(room.id);
+    if (!game || game.state.phase !== GamePhase.Playing) return;
+    playerIndex = game.getPlayerIndex(socketIdOrRoomId);
+    if (playerIndex === -1) return;
+  }
 
   // Check if there's an active action window
   const window = activeWindows.get(room.id);
@@ -767,7 +780,7 @@ function emitOrBotAction(
     setTimeout(() => {
       const player = game.state.players[playerIndex];
       const botAction = decideBotAction(player.hand, player.melds, actions, playerIndex, game.state.gold, lastDiscardTile);
-      handlePlayerAction(io, game.getSocketId(playerIndex), botAction);
+      handlePlayerAction(io, game.roomId, botAction, playerIndex);
     }, 300 + Math.random() * 500);
   } else {
     io.to(game.getSocketId(playerIndex)).emit("actionRequired", actions);

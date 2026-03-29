@@ -98,6 +98,18 @@ export function registerRoomHandlers(io: GameServer, socket: GameSocket): void {
     console.log(`Bot ${bot.name} added to room ${room.id}`);
   });
 
+  socket.on("removeBot", () => {
+    const room = findRoomBySocket(socket.id);
+    if (!room) { socket.emit("error", "Not in a room"); return; }
+    if (room.gameStarted) { socket.emit("error", "Game already started"); return; }
+
+    if (room.removeLastBot()) {
+      io.to(room.id).emit("roomUpdated", room.getState());
+      broadcastRoomList(io);
+      console.log(`Bot removed from room ${room.id}`);
+    }
+  });
+
   socket.on("leaveRoom", () => {
     leaveCurrentRoom(io, socket);
     broadcastRoomList(io);
@@ -138,7 +150,9 @@ export function registerRoomHandlers(io: GameServer, socket: GameSocket): void {
       if (tianhuResult.isWin) {
         game.state.phase = GamePhase.Finished;
         for (let i = 0; i < 4; i++) {
-          io.to(socketIds[i]).emit("gameStateUpdate", game.getClientGameState(i));
+          if (!game.isBot(i) && room.players[i].socketId) {
+            io.to(room.players[i].socketId!).emit("gameStateUpdate", game.getClientGameState(i));
+          }
         }
         io.to(room.id).emit("gameOver", {
           winnerId: game.state.dealerIndex,
@@ -166,9 +180,38 @@ export function registerRoomHandlers(io: GameServer, socket: GameSocket): void {
     game.startNextRound();
     console.log(`Next round in room ${room.id}, dealer: ${game.state.dealerIndex}`);
 
-    const socketIds = room.players.map((p) => p.socketId!);
     for (let i = 0; i < 4; i++) {
-      io.to(socketIds[i]).emit("gameStarted", game.getClientGameState(i));
+      if (!game.isBot(i) && room.players[i].socketId) {
+        io.to(room.players[i].socketId!).emit("gameStarted", game.getClientGameState(i));
+      }
+    }
+
+    // Check tianhu: dealer wins immediately if hand is complete after gold reveal
+    const nextDealer = game.state.players[game.state.dealerIndex];
+    const nextDealerLastTile = nextDealer.hand[nextDealer.hand.length - 1];
+    if (nextDealerLastTile) {
+      const tianhuResult = checkWin(nextDealer, nextDealerLastTile, game.state.gold, {
+        isSelfDraw: true,
+        isFirstAction: true,
+        isDealer: true,
+        isRobbingKong: false,
+        totalFlowers: nextDealer.flowers.length,
+        totalGangs: 0,
+      });
+      if (tianhuResult.isWin) {
+        game.state.phase = GamePhase.Finished;
+        for (let i = 0; i < 4; i++) {
+          if (!game.isBot(i) && room.players[i].socketId) {
+            io.to(room.players[i].socketId!).emit("gameStateUpdate", game.getClientGameState(i));
+          }
+        }
+        io.to(room.id).emit("gameOver", {
+          winnerId: game.state.dealerIndex,
+          winType: tianhuResult.winType,
+          scores: [0, 0, 0, 0],
+        });
+        return;
+      }
     }
 
     triggerDealerAction(io, game, room);
@@ -220,7 +263,7 @@ function triggerDealerAction(io: GameServer, game: import("../gameState.js").Ser
       const actions = game.getInitialDealerActions();
       const player = game.state.players[dealerIdx];
       const botAction = decideBotAction(player.hand, player.melds, actions, dealerIdx, game.state.gold);
-      handlePlayerAction(io, game.getSocketId(dealerIdx), botAction);
+      handlePlayerAction(io, game.roomId, botAction, dealerIdx);
     }, 500);
   } else if (room.players[dealerIdx].socketId) {
     io.to(room.players[dealerIdx].socketId!).emit("actionRequired", game.getInitialDealerActions());

@@ -83,6 +83,7 @@ export interface ClientEvents {
   rejoinGame: (playerId: string) => void;
   nextRound: () => void;
   addBot: () => void;
+  removeBot: () => void;
 }
 
 export interface ServerEvents {
