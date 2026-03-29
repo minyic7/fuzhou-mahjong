@@ -7,7 +7,7 @@ import type { Meld } from './meld.js';
 
 export interface RoomState {
   roomId: string;
-  players: { name: string; ready: boolean }[];
+  players: { name: string; ready: boolean; isBot?: boolean }[];
   maxPlayers: 4;
 }
 
@@ -82,6 +82,7 @@ export interface ClientEvents {
   playerAction: (action: GameAction) => void;
   rejoinGame: (playerId: string) => void;
   nextRound: () => void;
+  addBot: () => void;
 }
 
 export interface ServerEvents {

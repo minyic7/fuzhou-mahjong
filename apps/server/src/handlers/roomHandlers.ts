@@ -11,7 +11,8 @@ import {
   unregisterPlayerRoom,
 } from "../room.js";
 import { createGame, getGame } from "../gameState.js";
-import { checkWin, MeldType, isGoldTile, GamePhase } from "@fuzhou-mahjong/shared";
+import { checkWin, MeldType, isGoldTile, GamePhase, decideBotAction } from "@fuzhou-mahjong/shared";
+import { handlePlayerAction } from "../gameEngine.js";
 
 type GameSocket = Socket<ClientEvents, ServerEvents>;
 type GameServer = Server<ClientEvents, ServerEvents>;
@@ -83,6 +84,20 @@ export function registerRoomHandlers(io: GameServer, socket: GameSocket): void {
     }
   });
 
+  socket.on("addBot", () => {
+    const room = findRoomBySocket(socket.id);
+    if (!room) { socket.emit("error", "Not in a room"); return; }
+    if (room.isFull()) { socket.emit("error", "Room is full"); return; }
+    if (room.gameStarted) { socket.emit("error", "Game already started"); return; }
+
+    const bot = room.addBot();
+    if (!bot) { socket.emit("error", "Failed to add bot"); return; }
+
+    io.to(room.id).emit("roomUpdated", room.getState());
+    broadcastRoomList(io);
+    console.log(`Bot ${bot.name} added to room ${room.id}`);
+  });
+
   socket.on("leaveRoom", () => {
     leaveCurrentRoom(io, socket);
     broadcastRoomList(io);
@@ -98,11 +113,14 @@ export function registerRoomHandlers(io: GameServer, socket: GameSocket): void {
     broadcastRoomList(io);
     console.log(`Game starting in room ${room.id}`);
 
-    const socketIds = room.players.map((p) => p.socketId!);
-    const game = createGame(room.id, socketIds);
+    const socketIds = room.players.map((p) => p.socketId ?? `bot-${p.playerId}`);
+    const botIndices = room.players.map((p, i) => p.isBot ? i : -1).filter((i) => i >= 0);
+    const game = createGame(room.id, socketIds, botIndices);
 
     for (let i = 0; i < 4; i++) {
-      io.to(socketIds[i]).emit("gameStarted", game.getClientGameState(i));
+      if (!game.isBot(i) && room.players[i].socketId) {
+        io.to(room.players[i].socketId!).emit("gameStarted", game.getClientGameState(i));
+      }
     }
 
     // Check tianhu: dealer wins immediately if hand is complete after gold reveal
@@ -131,8 +149,7 @@ export function registerRoomHandlers(io: GameServer, socket: GameSocket): void {
       }
     }
 
-    const dealerSocketId = game.getSocketId(game.state.dealerIndex);
-    io.to(dealerSocketId).emit("actionRequired", game.getInitialDealerActions());
+    triggerDealerAction(io, game, room);
   });
 
   socket.on("nextRound", () => {
@@ -154,8 +171,7 @@ export function registerRoomHandlers(io: GameServer, socket: GameSocket): void {
       io.to(socketIds[i]).emit("gameStarted", game.getClientGameState(i));
     }
 
-    const dealerSocketId = game.getSocketId(game.state.dealerIndex);
-    io.to(dealerSocketId).emit("actionRequired", game.getInitialDealerActions());
+    triggerDealerAction(io, game, room);
   });
 
   socket.on("disconnect", () => {
@@ -195,6 +211,20 @@ export function registerRoomHandlers(io: GameServer, socket: GameSocket): void {
     }
     broadcastRoomList(io);
   });
+}
+
+function triggerDealerAction(io: GameServer, game: import("../gameState.js").ServerGameState, room: import("../room.js").Room): void {
+  const dealerIdx = game.state.dealerIndex;
+  if (game.isBot(dealerIdx)) {
+    setTimeout(() => {
+      const actions = game.getInitialDealerActions();
+      const player = game.state.players[dealerIdx];
+      const botAction = decideBotAction(player.hand, player.melds, actions, dealerIdx, game.state.gold);
+      handlePlayerAction(io, game.getSocketId(dealerIdx), botAction);
+    }, 500);
+  } else if (room.players[dealerIdx].socketId) {
+    io.to(room.players[dealerIdx].socketId!).emit("actionRequired", game.getInitialDealerActions());
+  }
 }
 
 function leaveCurrentRoom(io: GameServer, socket: GameSocket): void {

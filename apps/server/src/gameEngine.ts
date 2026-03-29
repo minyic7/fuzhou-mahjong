@@ -17,6 +17,7 @@ import {
   calculateScore,
   getNextDealer,
   WinType,
+  decideBotAction,
 } from "@fuzhou-mahjong/shared";
 import type {
   GameAction,
@@ -196,7 +197,7 @@ function handleDiscard(
     const actions = getResponseActions(game, i, tile, playerIndex);
     if (actions.canHu || actions.canPeng || actions.canMingGang || actions.chiOptions.length > 0) {
       pendingPlayers.push(i);
-      io.to(game.getSocketId(i)).emit("actionRequired", actions);
+      emitOrBotAction(io, game, i, actions, tile);
     }
   }
 
@@ -258,7 +259,7 @@ function handleDraw(
   const inFinalDraws = isInFinalDraws(state.wall.length, state.wallTail.length, state.retainCount);
 
   const actions = getPostDrawActions(game, playerIndex, inFinalDraws);
-  io.to(game.getSocketId(playerIndex)).emit("actionRequired", actions);
+  emitOrBotAction(io, game, playerIndex, actions);
 }
 
 function handleAnGang(
@@ -336,7 +337,7 @@ function handleBuGang(
         canDraw: false, canDiscard: false, chiOptions: [], canPeng: false,
         canMingGang: false, anGangOptions: [], buGangOptions: [], canHu: true, canPass: true,
       };
-      io.to(game.getSocketId(i)).emit("actionRequired", actions);
+      emitOrBotAction(io, game, i, actions, tile);
     }
 
     const window = new ActionWindow(canRob, playerIndex, (winner) => {
@@ -429,7 +430,7 @@ function gangDraw(
 
   // After gang draw, player gets actions (discard, check hu/gang)
   const actions = getPostDrawActions(game, playerIndex, false);
-  io.to(game.getSocketId(playerIndex)).emit("actionRequired", actions);
+  emitOrBotAction(io, game, playerIndex, actions);
 }
 
 // ─── Action Resolution ──────────────────────────────────────────
@@ -479,7 +480,7 @@ function resolveActionWindow(
       state.lastDiscard = null;
       broadcastState(io, game);
       // Player must discard
-      io.to(game.getSocketId(winner.playerIndex)).emit("actionRequired",
+      emitOrBotAction(io, game, winner.playerIndex,
         getPostClaimActions(game, winner.playerIndex));
       break;
     }
@@ -527,7 +528,7 @@ function resolveActionWindow(
       state.currentTurn = winner.playerIndex;
       state.lastDiscard = null;
       broadcastState(io, game);
-      io.to(game.getSocketId(winner.playerIndex)).emit("actionRequired",
+      emitOrBotAction(io, game, winner.playerIndex,
         getPostClaimActions(game, winner.playerIndex));
       break;
     }
@@ -746,6 +747,29 @@ function endGameDraw(io: GameServer, game: ServerGameState): void {
 
 function broadcastState(io: GameServer, game: ServerGameState): void {
   for (let i = 0; i < 4; i++) {
-    io.to(game.getSocketId(i)).emit("gameStateUpdate", game.getClientGameState(i));
+    if (!game.isBot(i)) {
+      io.to(game.getSocketId(i)).emit("gameStateUpdate", game.getClientGameState(i));
+    }
+  }
+}
+
+/**
+ * Emit actionRequired to a player, or auto-respond if bot.
+ */
+function emitOrBotAction(
+  io: GameServer,
+  game: ServerGameState,
+  playerIndex: number,
+  actions: import("@fuzhou-mahjong/shared").AvailableActions,
+  lastDiscardTile?: TileInstance,
+): void {
+  if (game.isBot(playerIndex)) {
+    setTimeout(() => {
+      const player = game.state.players[playerIndex];
+      const botAction = decideBotAction(player.hand, player.melds, actions, playerIndex, game.state.gold, lastDiscardTile);
+      handlePlayerAction(io, game.getSocketId(playerIndex), botAction);
+    }, 300 + Math.random() * 500);
+  } else {
+    io.to(game.getSocketId(playerIndex)).emit("actionRequired", actions);
   }
 }

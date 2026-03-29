@@ -57,7 +57,7 @@ export function Room({ initialRoomState, onGameStarted }: RoomProps) {
       <ul style={{ listStyle: "none", padding: 0 }}>
         {room.players.map((p, i) => (
           <li key={i} style={{ padding: 8, borderBottom: "1px solid #eee" }}>
-            {p.name}
+            {p.name} {p.isBot && <span style={{ color: "#888", fontSize: 12 }}>🤖</span>}
           </li>
         ))}
         {Array.from({ length: 4 - room.players.length }).map((_, i) => (
@@ -67,7 +67,14 @@ export function Room({ initialRoomState, onGameStarted }: RoomProps) {
         ))}
       </ul>
 
-      <div style={{ marginTop: 20, display: "flex", gap: 10 }}>
+      <div style={{ marginTop: 20, display: "flex", gap: 10, flexWrap: "wrap" }}>
+        <button
+          onClick={() => socket.emit("addBot")}
+          disabled={room.players.length >= 4}
+          style={{ flex: 1, padding: 12, fontSize: 16 }}
+        >
+          添加机器人 / Add Bot
+        </button>
         <button
           onClick={handleStart}
           disabled={room.players.length < 4}

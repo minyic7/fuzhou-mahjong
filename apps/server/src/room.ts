@@ -5,8 +5,11 @@ export interface Player {
   socketId: string | null;
   playerId: string;
   name: string;
+  isBot?: boolean;
   disconnectedAt?: number;
 }
+
+const BOT_NAMES = ["Bot 东", "Bot 南", "Bot 西", "Bot 北"];
 
 export class Room {
   readonly id: string;
@@ -22,6 +25,20 @@ export class Room {
   addPlayer(socketId: string, name: string): Player {
     const playerId = crypto.randomUUID();
     const player: Player = { socketId, playerId, name };
+    this.players.push(player);
+    return player;
+  }
+
+  addBot(): Player | null {
+    if (this.isFull()) return null;
+    const botIndex = this.players.filter((p) => p.isBot).length;
+    const name = BOT_NAMES[botIndex] ?? `Bot ${botIndex + 1}`;
+    const player: Player = {
+      socketId: null,
+      playerId: crypto.randomUUID(),
+      name,
+      isBot: true,
+    };
     this.players.push(player);
     return player;
   }
@@ -80,7 +97,7 @@ export class Room {
   getState(): RoomState {
     return {
       roomId: this.id,
-      players: this.players.map((p) => ({ name: p.name, ready: p.socketId !== null })),
+      players: this.players.map((p) => ({ name: p.name, ready: p.isBot || p.socketId !== null, isBot: p.isBot })),
       maxPlayers: this.maxPlayers,
     };
   }
