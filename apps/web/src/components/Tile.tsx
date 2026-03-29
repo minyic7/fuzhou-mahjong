@@ -58,9 +58,11 @@ export function TileView({ tile, faceUp = true, selected, claimable, onClick, on
       <div style={{
         width: w, height: h,
         borderRadius: 4,
+        borderBottom: "3px solid #1a3c2a",
+        borderRight: "2px solid #1e4530",
         display: "inline-block",
         margin: 1,
-        boxShadow: "0 2px 4px rgba(0,0,0,0.4)",
+        boxShadow: "0 3px 6px rgba(0,0,0,0.4), 0 1px 2px rgba(0,0,0,0.2)",
         overflow: "hidden",
       }}>
         <img
@@ -103,6 +105,8 @@ export function TileView({ tile, faceUp = true, selected, claimable, onClick, on
           ? "2px solid #00e676"
           : "1px solid #bbb",
         borderRadius: 5,
+        borderBottom: selected ? "2px solid #ff8f00" : "3px solid #a09880",
+        borderRight: selected ? "2px solid #ff8f00" : "2px solid #b0a890",
         display: "inline-flex",
         flexDirection: "column",
         alignItems: "center",
@@ -110,11 +114,14 @@ export function TileView({ tile, faceUp = true, selected, claimable, onClick, on
         cursor: onClick ? "pointer" : "default",
         margin: 1,
         boxShadow: selected
-          ? "0 6px 16px rgba(255,143,0,0.4), 0 2px 4px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.8)"
+          ? "0 8px 20px rgba(255,143,0,0.4), 0 4px 6px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.8)"
           : isGold
-          ? "0 0 8px rgba(255,215,0,0.6), 0 2px 4px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.8)"
-          : "0 2px 4px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.8)",
-        transform: selected ? "translateY(-10px) scale(1.12)" : "none",
+          ? "0 0 8px rgba(255,215,0,0.6), 0 3px 6px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.8)"
+          : "0 3px 6px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.8)",
+        transform: selected
+          ? "translateY(-10px) translateZ(20px) scale(1.12)"
+          : "translateZ(0)",
+        transformStyle: "preserve-3d" as any,
         transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
         position: "relative",
       }}
