@@ -793,7 +793,7 @@ function emitOrBotAction(
       const player = game.state.players[playerIndex];
       const botAction = decideBotAction(player.hand, player.melds, actions, playerIndex, game.state.gold, lastDiscardTile);
       handlePlayerAction(io, game.roomId, botAction, playerIndex);
-    }, 1000 + Math.random() * 1000);
+    }, 300 + Math.random() * 500);
   } else {
     io.to(game.getSocketId(playerIndex)).emit("actionRequired", actions);
   }
