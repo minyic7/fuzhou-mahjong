@@ -14,6 +14,9 @@ import {
   isInFinalDraws,
   calculateRetainCount,
   isSuitedTile,
+  calculateScore,
+  getNextDealer,
+  WinType,
 } from "@fuzhou-mahjong/shared";
 import type {
   GameAction,
@@ -672,18 +675,65 @@ function endGameWin(
   winningTile: TileInstance,
   isSelfDraw: boolean,
 ): void {
-  game.state.phase = GamePhase.Finished;
+  const state = game.state;
+  state.phase = GamePhase.Finished;
+
+  const winner = state.players[winnerIndex];
+  const winResult = checkWin(winner, winningTile, state.gold, {
+    isSelfDraw,
+    isFirstAction: false,
+    isDealer: winner.isDealer,
+    isRobbingKong: false,
+    totalFlowers: winner.flowers.length,
+    totalGangs: winner.melds.filter(
+      (m) => m.type === MeldType.MingGang || m.type === MeldType.AnGang || m.type === MeldType.BuGang,
+    ).length,
+  });
+
+  const discarderIndex = isSelfDraw ? null : (state.lastDiscard?.playerIndex ?? null);
+
+  const scoreResult = calculateScore(
+    winner,
+    winnerIndex,
+    winResult.winType,
+    winResult.multiplier,
+    state.gold,
+    isSelfDraw,
+    discarderIndex,
+    state.lianZhuangCount,
+  );
+
+  // Dealer rotation
+  const { nextDealer, nextLianZhuang } = getNextDealer(
+    state.dealerIndex,
+    winnerIndex,
+    state.lianZhuangCount,
+  );
+  state.dealerIndex = nextDealer;
+  state.lianZhuangCount = nextLianZhuang;
+
   broadcastState(io, game);
 
   io.to(game.roomId).emit("gameOver", {
     winnerId: winnerIndex,
-    winType: isSelfDraw ? "selfDraw" : "discardWin",
-    scores: [0, 0, 0, 0], // Scoring in next ticket
+    winType: winResult.winType,
+    scores: scoreResult.payments,
   });
 }
 
 function endGameDraw(io: GameServer, game: ServerGameState): void {
-  game.state.phase = GamePhase.Draw;
+  const state = game.state;
+  state.phase = GamePhase.Draw;
+
+  // Dealer rotation on draw
+  const { nextDealer, nextLianZhuang } = getNextDealer(
+    state.dealerIndex,
+    null,
+    state.lianZhuangCount,
+  );
+  state.dealerIndex = nextDealer;
+  state.lianZhuangCount = nextLianZhuang;
+
   broadcastState(io, game);
 
   io.to(game.roomId).emit("gameOver", {

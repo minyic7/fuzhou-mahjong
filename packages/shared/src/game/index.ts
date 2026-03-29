@@ -27,3 +27,5 @@ export {
   isDraw,
   isInFinalDraws,
 } from './retention.js';
+export { calculateScore, getNextDealer } from './scoring.js';
+export type { ScoreResult } from './scoring.js';
