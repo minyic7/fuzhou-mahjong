@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useSocket } from "./hooks/useSocket";
 import { socket } from "./socket";
+import type { RoomState } from "@fuzhou-mahjong/shared";
 import { Lobby } from "./pages/Lobby";
 import { Room } from "./pages/Room";
 import { Game } from "./pages/Game";
@@ -13,6 +14,7 @@ export function App() {
   const { connected } = useSocket();
   const [view, setView] = useState<View>("lobby");
   const [reconnecting, setReconnecting] = useState(false);
+  const [initialRoomState, setInitialRoomState] = useState<RoomState | null>(null);
 
   // Store playerId when assigned
   useEffect(() => {
@@ -84,9 +86,9 @@ export function App() {
 
   switch (view) {
     case "lobby":
-      return <Lobby onJoined={() => setView("room")} />;
+      return <Lobby onJoined={(roomState) => { setInitialRoomState(roomState); setView("room"); }} />;
     case "room":
-      return <Room onGameStarted={() => setView("game")} />;
+      return <Room initialRoomState={initialRoomState} onGameStarted={() => setView("game")} />;
     case "game":
       return <Game />;
   }

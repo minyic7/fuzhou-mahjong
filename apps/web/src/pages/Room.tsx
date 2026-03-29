@@ -3,21 +3,26 @@ import { socket } from "../socket";
 import type { RoomState } from "@fuzhou-mahjong/shared";
 
 interface RoomProps {
+  initialRoomState: RoomState | null;
   onGameStarted: () => void;
 }
 
-export function Room({ onGameStarted }: RoomProps) {
-  const [room, setRoom] = useState<RoomState | null>(null);
+export function Room({ initialRoomState, onGameStarted }: RoomProps) {
+  const [room, setRoom] = useState<RoomState | null>(initialRoomState);
 
   useEffect(() => {
-    socket.on("roomJoined", (state) => setRoom(state));
-    socket.on("roomUpdated", (state) => setRoom(state));
-    socket.on("gameStarted", () => onGameStarted());
+    const onRoomJoined = (state: RoomState) => setRoom(state);
+    const onRoomUpdated = (state: RoomState) => setRoom(state);
+    const onGameStart = () => onGameStarted();
+
+    socket.on("roomJoined", onRoomJoined);
+    socket.on("roomUpdated", onRoomUpdated);
+    socket.on("gameStarted", onGameStart);
 
     return () => {
-      socket.off("roomJoined");
-      socket.off("roomUpdated");
-      socket.off("gameStarted");
+      socket.off("roomJoined", onRoomJoined);
+      socket.off("roomUpdated", onRoomUpdated);
+      socket.off("gameStarted", onGameStart);
     };
   }, [onGameStarted]);
 
