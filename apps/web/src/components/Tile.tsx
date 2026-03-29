@@ -2,6 +2,7 @@ import { useState } from "react";
 import type { TileInstance, GoldState, SuitedTile, Tile } from "@fuzhou-mahjong/shared";
 import { isGoldTile, isSuitedTile } from "@fuzhou-mahjong/shared";
 import { getTileSvgUrl, TILE_BACK_URL } from "../tileSvg";
+import { getTileName } from "./TileTooltip";
 
 interface TileProps {
   tile: TileInstance;
@@ -77,8 +78,12 @@ export function TileView({ tile, faceUp = true, selected, claimable, onClick, on
   return (
     <div
       className={className || (claimable ? "tile-claimable" : undefined)}
+      role={onClick ? "button" : undefined}
+      tabIndex={onClick ? 0 : undefined}
+      aria-label={getTileName(tile.tile) + (isGold ? " (金牌)" : "") + (selected ? " (已选)" : "")}
       onClick={onClick}
       onDoubleClick={onDoubleClick}
+      onKeyDown={onClick ? (e) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); onClick(); } } : undefined}
       onTouchStart={onTouchStart}
       onTouchEnd={onTouchEnd}
       onMouseEnter={onMouseEnter}

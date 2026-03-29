@@ -60,7 +60,7 @@ export function ActionBar({ actions, selectedTileId, gameState, onAction }: Acti
     : null;
 
   return (
-    <div ref={barRef} style={{
+    <div ref={barRef} role="toolbar" aria-label="游戏操作" aria-live="polite" style={{
       display: "flex",
       flexWrap: "wrap",
       justifyContent: "center",
