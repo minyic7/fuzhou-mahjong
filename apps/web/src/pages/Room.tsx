@@ -7,24 +7,21 @@ interface RoomProps {
   onGameStarted: () => void;
 }
 
-export function Room({ initialRoomState, onGameStarted }: RoomProps) {
+export function Room({ initialRoomState }: RoomProps) {
   const [room, setRoom] = useState<RoomState | null>(initialRoomState);
 
   useEffect(() => {
     const onRoomJoined = (state: RoomState) => setRoom(state);
     const onRoomUpdated = (state: RoomState) => setRoom(state);
-    const onGameStart = () => onGameStarted();
 
     socket.on("roomJoined", onRoomJoined);
     socket.on("roomUpdated", onRoomUpdated);
-    socket.on("gameStarted", onGameStart);
 
     return () => {
       socket.off("roomJoined", onRoomJoined);
       socket.off("roomUpdated", onRoomUpdated);
-      socket.off("gameStarted", onGameStart);
     };
-  }, [onGameStarted]);
+  }, []);
 
   if (!room) return <p>Loading...</p>;
 
