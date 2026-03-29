@@ -10,32 +10,29 @@ import type {
   GameState,
   PlayerState,
   ClientGameState,
-  AvailableActions,
   TileInstance,
 } from "@fuzhou-mahjong/shared";
 
 const SEAT_WINDS = [WindType.East, WindType.South, WindType.West, WindType.North];
 
 export class ServerGameState {
-  state: GameState;
+  state!: GameState;
   roomId: string;
   playerSocketIds: string[];
   firstActionTaken = false;
 
-  constructor(roomId: string, playerSocketIds: string[]) {
+  constructor(roomId: string, playerSocketIds: string[], dealerIndex?: number, lianZhuangCount?: number) {
     this.roomId = roomId;
     this.playerSocketIds = playerSocketIds;
+    this.initRound(dealerIndex ?? Math.floor(Math.random() * 4), lianZhuangCount ?? 0);
+  }
 
-    // 1. Create and shuffle wall
+  private initRound(dealerIndex: number, lianZhuangCount: number): void {
+    this.firstActionTaken = false;
+
     const { wall, wallTail } = createWall();
-
-    // 2. Random dealer
-    const dealerIndex = Math.floor(Math.random() * 4);
-
-    // 3. Deal tiles
     const { hands, remainingWall } = dealTiles(wall, dealerIndex);
 
-    // 4. Initialize player states
     const players: [PlayerState, PlayerState, PlayerState, PlayerState] = [
       this.createPlayer(0, dealerIndex),
       this.createPlayer(1, dealerIndex),
@@ -43,7 +40,6 @@ export class ServerGameState {
       this.createPlayer(3, dealerIndex),
     ];
 
-    // 5. Flower replacement
     const flowerResult = replaceFlowers(
       hands as TileInstance[][],
       wallTail,
@@ -51,33 +47,34 @@ export class ServerGameState {
       dealerIndex,
     );
 
-    // Update player hands and flowers
     for (let i = 0; i < 4; i++) {
       players[i].hand = flowerResult.hands[i];
       players[i].flowers = flowerResult.players[i].flowers;
     }
 
-    // 6. Reveal gold
     const goldResult = revealGold(flowerResult.wallTail);
 
-    // 7. Add dealer flowers from gold reveal
     if (goldResult.dealerFlowers.length > 0) {
       players[dealerIndex].flowers.push(...goldResult.dealerFlowers);
     }
 
-    // 8. Build game state
     this.state = {
       wall: remainingWall,
       wallTail: goldResult.wallTail,
       players,
       currentTurn: dealerIndex,
       dealerIndex,
-      lianZhuangCount: 0,
+      lianZhuangCount,
       phase: GamePhase.Playing,
       gold: goldResult.gold,
       lastDiscard: null,
       retainCount: 18,
     };
+  }
+
+  startNextRound(): void {
+    const { dealerIndex, lianZhuangCount } = this.state;
+    this.initRound(dealerIndex, lianZhuangCount);
   }
 
   private createPlayer(index: number, dealerIndex: number): PlayerState {
@@ -126,12 +123,10 @@ export class ServerGameState {
     };
   }
 
-  getAvailableActions(playerIndex: number): AvailableActions {
-    const isMyTurn = this.state.currentTurn === playerIndex;
-
+  getInitialDealerActions(): import("@fuzhou-mahjong/shared").AvailableActions {
     return {
       canDraw: false,
-      canDiscard: isMyTurn && this.state.phase === GamePhase.Playing,
+      canDiscard: true,
       chiOptions: [],
       canPeng: false,
       canMingGang: false,

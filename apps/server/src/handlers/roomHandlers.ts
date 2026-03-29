@@ -132,7 +132,30 @@ export function registerRoomHandlers(io: GameServer, socket: GameSocket): void {
     }
 
     const dealerSocketId = game.getSocketId(game.state.dealerIndex);
-    io.to(dealerSocketId).emit("actionRequired", game.getAvailableActions(game.state.dealerIndex));
+    io.to(dealerSocketId).emit("actionRequired", game.getInitialDealerActions());
+  });
+
+  socket.on("nextRound", () => {
+    const room = findRoomBySocket(socket.id);
+    if (!room) { socket.emit("error", "Not in a room"); return; }
+
+    const game = getGame(room.id);
+    if (!game) { socket.emit("error", "No active game"); return; }
+    if (game.state.phase !== GamePhase.Finished && game.state.phase !== GamePhase.Draw) {
+      socket.emit("error", "Game is still in progress");
+      return;
+    }
+
+    game.startNextRound();
+    console.log(`Next round in room ${room.id}, dealer: ${game.state.dealerIndex}`);
+
+    const socketIds = room.players.map((p) => p.socketId!);
+    for (let i = 0; i < 4; i++) {
+      io.to(socketIds[i]).emit("gameStarted", game.getClientGameState(i));
+    }
+
+    const dealerSocketId = game.getSocketId(game.state.dealerIndex);
+    io.to(dealerSocketId).emit("actionRequired", game.getInitialDealerActions());
   });
 
   socket.on("disconnect", () => {

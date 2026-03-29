@@ -81,6 +81,7 @@ export interface ClientEvents {
   startGame: () => void;
   playerAction: (action: GameAction) => void;
   rejoinGame: (playerId: string) => void;
+  nextRound: () => void;
 }
 
 export interface ServerEvents {
