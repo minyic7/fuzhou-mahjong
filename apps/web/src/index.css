@@ -12,15 +12,15 @@ body {
   overflow-x: hidden;
 }
 
-/* Tile sizing CSS variables */
+/* Tile sizing CSS variables — small sizes derived via calc() */
 :root {
   --tile-w: 44px;
   --tile-h: 60px;
   --tile-font: 18px;
-  --tile-w-sm: 30px;
-  --tile-h-sm: 40px;
-  --tile-font-sm: 13px;
   --tile-suit-font: 11px;
+  --tile-w-sm: calc(var(--tile-w) * 0.68);
+  --tile-h-sm: calc(var(--tile-h) * 0.67);
+  --tile-font-sm: calc(var(--tile-font) * 0.72);
 }
 
 @media (max-width: 480px) {
@@ -28,9 +28,6 @@ body {
     --tile-w: 34px;
     --tile-h: 48px;
     --tile-font: 14px;
-    --tile-w-sm: 24px;
-    --tile-h-sm: 32px;
-    --tile-font-sm: 10px;
     --tile-suit-font: 9px;
   }
 }
@@ -40,9 +37,6 @@ body {
     --tile-w: 28px;
     --tile-h: 40px;
     --tile-font: 12px;
-    --tile-w-sm: 20px;
-    --tile-h-sm: 28px;
-    --tile-font-sm: 9px;
     --tile-suit-font: 8px;
   }
 }
