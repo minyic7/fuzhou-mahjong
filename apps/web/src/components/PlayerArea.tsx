@@ -1,6 +1,7 @@
 import type { TileInstance, Meld, GoldState } from "@fuzhou-mahjong/shared";
 import { MeldType } from "@fuzhou-mahjong/shared";
 import { TileView } from "./Tile";
+import { useLongPress } from "./TileTooltip";
 
 interface PlayerAreaProps {
   isMe: boolean;
@@ -26,7 +27,11 @@ export function PlayerArea({
   isCurrentTurn, isDealer, gold, selectedTileId, onTileClick, label,
   claimableTileIds, onTileDoubleClick, lastDrawnTileId, tenpaiTiles,
 }: PlayerAreaProps) {
+  const { onTouchStart, onTouchEnd, onMouseEnter, onMouseLeave, Tooltip } = useLongPress(gold);
+
   return (
+    <>
+    <Tooltip />
     <div
       className={isCurrentTurn ? "current-turn" : ""}
       style={{
@@ -73,6 +78,10 @@ export function PlayerArea({
                 selected={selectedTileId === t.id}
                 claimable={claimableTileIds?.has(t.id)}
                 className={lastDrawnTileId === t.id ? "tile-new" : undefined}
+                onTouchStart={(e) => onTouchStart(t, e)}
+                onTouchEnd={onTouchEnd}
+                onMouseEnter={(e) => onMouseEnter(t, e)}
+                onMouseLeave={onMouseLeave}
                 onClick={() => onTileClick?.(t)}
                 onDoubleClick={() => onTileDoubleClick?.(t)}
               />
@@ -137,5 +146,6 @@ export function PlayerArea({
         </div>
       )}
     </div>
+    </>
   );
 }

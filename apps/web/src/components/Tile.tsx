@@ -11,6 +11,10 @@ interface TileProps {
   gold?: GoldState | null;
   small?: boolean;
   className?: string;
+  onTouchStart?: (e: React.TouchEvent) => void;
+  onTouchEnd?: () => void;
+  onMouseEnter?: (e: React.MouseEvent) => void;
+  onMouseLeave?: () => void;
 }
 
 const SUIT_CHARS: Record<string, string> = { wan: "万", bing: "饼", tiao: "条" };
@@ -39,7 +43,7 @@ function getTileText(tile: Tile): { text: string; color: string } {
   }
 }
 
-export function TileView({ tile, faceUp = true, selected, claimable, onClick, onDoubleClick, gold, small, className }: TileProps) {
+export function TileView({ tile, faceUp = true, selected, claimable, onClick, onDoubleClick, gold, small, className, onTouchStart, onTouchEnd, onMouseEnter, onMouseLeave }: TileProps) {
   const size = small ? { width: 28, height: 38, fontSize: 11 } : { width: 40, height: 56, fontSize: 15 };
   const isGold = gold && isSuitedTile(tile.tile) && isGoldTile(tile, gold);
 
@@ -63,6 +67,10 @@ export function TileView({ tile, faceUp = true, selected, claimable, onClick, on
       className={className || (claimable ? "tile-claimable" : undefined)}
       onClick={onClick}
       onDoubleClick={onDoubleClick}
+      onTouchStart={onTouchStart}
+      onTouchEnd={onTouchEnd}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
       style={{
         ...size,
         background: selected ? "#ffe4b5" : claimable ? "#e0ffe8" : "#f5f0e0",
