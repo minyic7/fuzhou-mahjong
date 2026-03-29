@@ -259,11 +259,7 @@ export function Game({ initialGameState, onLeave }: GameProps) {
   }
 
   if (!gameState) {
-    return (
-      <div style={{ textAlign: "center", padding: 40 }}>
-        <p>等待游戏数据... / Loading game...</p>
-      </div>
-    );
+    return <div className="loading-state" style={{ minHeight: "80vh" }}><div className="spinner" />等待游戏数据...</div>;
   }
 
   return (

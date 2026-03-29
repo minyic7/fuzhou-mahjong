@@ -22,7 +22,7 @@ export function Room({ initialRoomState }: RoomProps) {
     };
   }, []);
 
-  if (!room) return <p>Loading...</p>;
+  if (!room) return <div className="loading-state"><div className="spinner" />加载房间...</div>;
 
   const handleStart = () => {
     socket.emit("startGame");
