@@ -16,8 +16,8 @@ const BTN = {
   gang: { background: "#d4760a", color: "#fff" },
   peng: { background: "#1e6ec4", color: "#fff" },
   chi: { background: "#2e8b57", color: "#fff" },
-  discard: { background: "#555", color: "#fff" },
-  pass: { background: "#444", color: "#aaa" },
+  discard: { background: "#2980b9", color: "#fff" },
+  pass: { background: "#333", color: "#888" },
   draw: { background: "#6a5acd", color: "#fff" },
 };
 
@@ -66,6 +66,11 @@ export function ActionBar({ actions, selectedTileId, gameState, onAction }: Acti
       {isClaimWindow && (
         <div style={{ width: "100%", textAlign: "center", color: "#ffa500", fontWeight: "bold", fontSize: 14, marginBottom: 4 }}>
           可以操作！请选择 👇
+        </div>
+      )}
+      {actions.canDiscard && !isClaimWindow && (
+        <div style={{ width: "100%", textAlign: "center", color: "#4fc3f7", fontWeight: "bold", fontSize: 14, marginBottom: 4 }}>
+          🎯 轮到你了 — {selectedTile ? "点击「出牌」确认" : "请点击一张牌选择出牌"}
         </div>
       )}
       {actions.canDraw && (
