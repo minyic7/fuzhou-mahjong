@@ -135,7 +135,7 @@ export function Lobby({ onJoined }: LobbyProps) {
         </button>
       </div>
 
-      {error && <p style={{ color: "red", marginTop: 10 }}>{error}</p>}
+      {error && <p className="error-msg">{error}</p>}
     </div>
   );
 }

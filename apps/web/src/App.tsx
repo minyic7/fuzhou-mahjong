@@ -81,8 +81,9 @@ export function App() {
 
   if (!connected) {
     return (
-      <div style={{ textAlign: "center", padding: 40 }}>
-        <p>{reconnecting ? "重新连接中... / Reconnecting..." : "连接服务器中... / Connecting..."}</p>
+      <div className="loading-state" style={{ minHeight: "80vh" }}>
+        <div className="spinner" />
+        {reconnecting ? "重新连接中... / Reconnecting..." : "连接服务器中... / Connecting..."}
       </div>
     );
   }
