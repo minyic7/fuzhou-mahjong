@@ -12,6 +12,35 @@ body {
   overflow-x: hidden;
 }
 
+/* Tile sizing CSS variables — small sizes derived via calc() */
+:root {
+  --tile-w: 44px;
+  --tile-h: 60px;
+  --tile-font: 18px;
+  --tile-suit-font: 11px;
+  --tile-w-sm: calc(var(--tile-w) * 0.68);
+  --tile-h-sm: calc(var(--tile-h) * 0.67);
+  --tile-font-sm: calc(var(--tile-font) * 0.72);
+}
+
+@media (max-width: 480px) {
+  :root {
+    --tile-w: 34px;
+    --tile-h: 48px;
+    --tile-font: 14px;
+    --tile-suit-font: 9px;
+  }
+}
+
+@media (max-width: 360px) {
+  :root {
+    --tile-w: 28px;
+    --tile-h: 40px;
+    --tile-font: 12px;
+    --tile-suit-font: 8px;
+  }
+}
+
 /* Game area gets felt table background */
 .game-table {
   background: radial-gradient(ellipse at center, #1a4a2e 0%, #0d3320 60%, #082818 100%);

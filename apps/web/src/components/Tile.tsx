@@ -47,10 +47,10 @@ function getTileDisplay(tile: Tile): { value: string; suit: string; color: strin
 }
 
 export function TileView({ tile, faceUp = true, selected, claimable, onClick, onDoubleClick, gold, small, className, onTouchStart, onTouchEnd, onMouseEnter, onMouseLeave }: TileProps) {
-  const w = small ? 30 : 44;
-  const h = small ? 40 : 60;
-  const fontSize = small ? 13 : 18;
-  const suitSize = small ? 9 : 11;
+  const w = small ? "var(--tile-w-sm)" : "var(--tile-w)";
+  const h = small ? "var(--tile-h-sm)" : "var(--tile-h)";
+  const fontSize = small ? "var(--tile-font-sm)" : "var(--tile-font)";
+  const suitSize = small ? "var(--tile-suit-font)" : "var(--tile-suit-font)";
   const isGold = gold && isSuitedTile(tile.tile) && isGoldTile(tile, gold);
 
   if (!faceUp) {
@@ -134,7 +134,7 @@ export function TileView({ tile, faceUp = true, selected, claimable, onClick, on
 }
 
 function TileFace({ tile, w, h, value, suit, color, fontSize, suitSize }: {
-  tile: Tile; w: number; h: number; value: string; suit: string; color: string; fontSize: number; suitSize: number;
+  tile: Tile; w: string; h: string; value: string; suit: string; color: string; fontSize: string; suitSize: string;
 }) {
   const [svgFailed, setSvgFailed] = useState(false);
   const svgUrl = getTileSvgUrl(tile);
@@ -146,8 +146,8 @@ function TileFace({ tile, w, h, value, suit, color, fontSize, suitSize }: {
         alt={`${value}${suit}`}
         onError={() => setSvgFailed(true)}
         style={{
-          width: w - 6,
-          height: h - 6,
+          width: `calc(${w} - 6px)`,
+          height: `calc(${h} - 6px)`,
           objectFit: "contain",
           pointerEvents: "none",
         }}
