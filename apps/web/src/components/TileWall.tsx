@@ -81,8 +81,8 @@ export function TileWall({ wallRemaining, gold }: TileWallProps) {
       </div>
 
       {/* Labels */}
-      <div style={{ position: "absolute", top: 18, left: "50%", transform: "translateX(-50%)", fontSize: 9, color: "#666" }}>摸牌 →</div>
-      <div style={{ position: "absolute", bottom: 18, left: "50%", transform: "translateX(-50%)", fontSize: 9, color: "#666" }}>← 补牌</div>
+      <div style={{ position: "absolute", top: 18, left: "50%", transform: "translateX(-50%)", fontSize: 9, color: "#8a9a8a" }}>摸牌 →</div>
+      <div style={{ position: "absolute", bottom: 18, left: "50%", transform: "translateX(-50%)", fontSize: 9, color: "#8a9a8a" }}>← 补牌</div>
     </div>
   );
 }

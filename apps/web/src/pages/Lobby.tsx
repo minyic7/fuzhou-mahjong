@@ -68,7 +68,7 @@ export function Lobby({ onJoined }: LobbyProps) {
         >
           创建房间 / Create Room
         </button>
-        <p style={{ color: "#888", fontSize: 13, marginTop: 8, textAlign: "center" }}>
+        <p style={{ color: "#aab4a0", fontSize: 13, marginTop: 8, textAlign: "center" }}>
           一个人也能玩！创建房间后可添加机器人凑满 4 人
         </p>
       </div>
@@ -77,7 +77,7 @@ export function Lobby({ onJoined }: LobbyProps) {
 
       <h3>可用房间 / Available Rooms</h3>
       {rooms.length === 0 ? (
-        <p style={{ color: "#888" }}>暂无房间 / No rooms available</p>
+        <p style={{ color: "#aab4a0" }}>暂无房间 / No rooms available</p>
       ) : (
         <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: 20 }}>
           <thead>

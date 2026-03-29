@@ -53,7 +53,7 @@ export function Room({ initialRoomState }: RoomProps) {
       <ul style={{ listStyle: "none", padding: 0 }}>
         {room.players.map((p, i) => (
           <li key={i} style={{ padding: 8, borderBottom: "1px solid #eee" }}>
-            {p.name} {p.isBot && <span style={{ color: "#888", fontSize: 12 }}>🤖</span>}
+            {p.name} {p.isBot && <span style={{ color: "#aab4a0", fontSize: 12 }}>🤖</span>}
           </li>
         ))}
         {Array.from({ length: 4 - room.players.length }).map((_, i) => (
