@@ -78,7 +78,7 @@ export function useLongPress(gold: GoldState | null) {
       }}>
         <div style={{ fontSize: 28, marginBottom: 4 }}>{name}</div>
         {isGold && <div style={{ fontSize: 12, color: "#ffd700" }}>金牌 (百搭)</div>}
-        {!isSuitedTile(tile.tile) && <div style={{ fontSize: 12, color: "#888" }}>花牌</div>}
+        {!isSuitedTile(tile.tile) && <div style={{ fontSize: 12, color: "#aab4a0" }}>花牌</div>}
       </div>
     );
   };

@@ -17,7 +17,7 @@ const BTN = {
   peng: { background: "#1e6ec4", color: "#fff" },
   chi: { background: "#2e8b57", color: "#fff" },
   discard: { background: "#00b894", color: "#fff", boxShadow: "0 0 8px rgba(0,184,148,0.5)" },
-  pass: { background: "#333", color: "#888" },
+  pass: { background: "#333", color: "#aab4a0" },
   draw: { background: "#6a5acd", color: "#fff" },
 };
 
