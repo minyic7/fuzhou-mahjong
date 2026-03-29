@@ -16,7 +16,7 @@ import type {
 const SEAT_WINDS = [WindType.East, WindType.South, WindType.West, WindType.North];
 
 export class ServerGameState {
-  state: GameState;
+  state!: GameState;
   roomId: string;
   playerSocketIds: string[];
   firstActionTaken = false;
