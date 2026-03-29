@@ -124,18 +124,15 @@ export function registerRoomHandlers(io: GameServer, socket: GameSocket): void {
 
       room.gameStarted = true;
       broadcastRoomList(io);
-      console.log(`Game starting in room ${room.id}, players: ${room.players.map(p => `${p.name}(${p.isBot ? 'bot' : p.socketId})`).join(', ')}`);
+      console.log(`Game starting in room ${room.id}`);
 
       const socketIds = room.players.map((p) => p.socketId ?? `bot-${p.playerId}`);
       const playerNames = room.players.map((p) => p.name);
       const botIndices = room.players.map((p, i) => p.isBot ? i : -1).filter((i) => i >= 0);
-      console.log(`Creating game: botIndices=${JSON.stringify(botIndices)}`);
       const game = createGame(room.id, socketIds, playerNames, botIndices);
-      console.log(`Game created, dealer=${game.state.dealerIndex}, phase=${game.state.phase}`);
 
       for (let i = 0; i < 4; i++) {
         if (!game.isBot(i) && room.players[i].socketId) {
-          console.log(`Emitting gameStarted to player ${i} (${room.players[i].socketId})`);
           io.to(room.players[i].socketId!).emit("gameStarted", game.getClientGameState(i));
         }
       }
