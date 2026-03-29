@@ -39,3 +39,14 @@ export type {
   PassAction,
   GameAction,
 } from './action.js';
+
+export type {
+  RoomState,
+  OtherPlayerView,
+  ClientGameState,
+  AvailableActions,
+  ActionResult,
+  GameOverResult,
+  ClientEvents,
+  ServerEvents,
+} from './events.js';
