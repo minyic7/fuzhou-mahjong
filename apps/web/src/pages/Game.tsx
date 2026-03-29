@@ -16,10 +16,8 @@ export function Game({ initialGameState, onLeave }: GameProps) {
   const [actions, setActions] = useState<AvailableActions | null>(null);
 
   useEffect(() => {
-    socket.on("gameStarted", (state) => {
-      setGameState(state);
-      setActions(null);
-    });
+    // gameStarted is handled by App.tsx (passed as initialGameState prop)
+    // Only listen for subsequent updates here
     socket.on("gameStateUpdate", (state) => {
       setGameState((prev) => {
         // Clear actions if turn changed
@@ -35,7 +33,6 @@ export function Game({ initialGameState, onLeave }: GameProps) {
     socket.on("gameOver", (result) => setGameOver(result));
 
     return () => {
-      socket.off("gameStarted");
       socket.off("gameStateUpdate");
       socket.off("actionRequired");
       socket.off("gameOver");

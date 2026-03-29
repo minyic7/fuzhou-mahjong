@@ -116,55 +116,35 @@ export function registerRoomHandlers(io: GameServer, socket: GameSocket): void {
   });
 
   socket.on("startGame", () => {
-    const room = findRoomBySocket(socket.id);
-    if (!room) { socket.emit("error", "Not in a room"); return; }
-    if (!room.isFull()) { socket.emit("error", `Need ${room.maxPlayers} players to start (have ${room.players.length})`); return; }
-    if (room.gameStarted) { socket.emit("error", "Game already started"); return; }
+    try {
+      const room = findRoomBySocket(socket.id);
+      if (!room) { socket.emit("error", "Not in a room"); return; }
+      if (!room.isFull()) { socket.emit("error", `Need ${room.maxPlayers} players to start (have ${room.players.length})`); return; }
+      if (room.gameStarted) { socket.emit("error", "Game already started"); return; }
 
-    room.gameStarted = true;
-    broadcastRoomList(io);
-    console.log(`Game starting in room ${room.id}`);
+      room.gameStarted = true;
+      broadcastRoomList(io);
+      console.log(`Game starting in room ${room.id}, players: ${room.players.map(p => `${p.name}(${p.isBot ? 'bot' : p.socketId})`).join(', ')}`);
 
-    const socketIds = room.players.map((p) => p.socketId ?? `bot-${p.playerId}`);
-    const playerNames = room.players.map((p) => p.name);
-    const botIndices = room.players.map((p, i) => p.isBot ? i : -1).filter((i) => i >= 0);
-    const game = createGame(room.id, socketIds, playerNames, botIndices);
+      const socketIds = room.players.map((p) => p.socketId ?? `bot-${p.playerId}`);
+      const playerNames = room.players.map((p) => p.name);
+      const botIndices = room.players.map((p, i) => p.isBot ? i : -1).filter((i) => i >= 0);
+      console.log(`Creating game: botIndices=${JSON.stringify(botIndices)}`);
+      const game = createGame(room.id, socketIds, playerNames, botIndices);
+      console.log(`Game created, dealer=${game.state.dealerIndex}, phase=${game.state.phase}`);
 
-    for (let i = 0; i < 4; i++) {
-      if (!game.isBot(i) && room.players[i].socketId) {
-        io.to(room.players[i].socketId!).emit("gameStarted", game.getClientGameState(i));
-      }
-    }
-
-    // Check tianhu: dealer wins immediately if hand is complete after gold reveal
-    const dealer = game.state.players[game.state.dealerIndex];
-    const dealerLastTile = dealer.hand[dealer.hand.length - 1];
-    if (dealerLastTile) {
-      const tianhuResult = checkWin(dealer, dealerLastTile, game.state.gold, {
-        isSelfDraw: true,
-        isFirstAction: true,
-        isDealer: true,
-        isRobbingKong: false,
-        totalFlowers: dealer.flowers.length,
-        totalGangs: 0,
-      });
-      if (tianhuResult.isWin) {
-        game.state.phase = GamePhase.Finished;
-        for (let i = 0; i < 4; i++) {
-          if (!game.isBot(i) && room.players[i].socketId) {
-            io.to(room.players[i].socketId!).emit("gameStateUpdate", game.getClientGameState(i));
-          }
+      for (let i = 0; i < 4; i++) {
+        if (!game.isBot(i) && room.players[i].socketId) {
+          console.log(`Emitting gameStarted to player ${i} (${room.players[i].socketId})`);
+          io.to(room.players[i].socketId!).emit("gameStarted", game.getClientGameState(i));
         }
-        io.to(room.id).emit("gameOver", {
-          winnerId: game.state.dealerIndex,
-          winType: tianhuResult.winType,
-          scores: [0, 0, 0, 0],
-        });
-        return;
       }
-    }
 
-    triggerDealerAction(io, game, room);
+      triggerDealerAction(io, game, room);
+    } catch (err) {
+      console.error("startGame error:", err);
+      socket.emit("error", "Failed to start game");
+    }
   });
 
   socket.on("nextRound", () => {
