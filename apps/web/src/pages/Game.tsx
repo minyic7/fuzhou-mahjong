@@ -20,13 +20,9 @@ export function Game({ initialGameState, onLeave }: GameProps) {
     // gameStarted is handled by App.tsx (passed as initialGameState prop)
     // Only listen for subsequent updates here
     socket.on("gameStateUpdate", (state) => {
-      setGameState((prev) => {
-        // Clear actions if turn changed
-        if (prev && prev.currentTurn !== state.currentTurn) {
-          setActions(null);
-        }
-        return state;
-      });
+      setGameState(state);
+      // Don't clear actions here — actionRequired is the authoritative source.
+      // Clearing on turn change races with actionRequired and causes buttons to vanish.
     });
     socket.on("actionRequired", (availableActions) => {
       setActions(availableActions);
