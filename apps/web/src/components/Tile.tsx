@@ -71,8 +71,8 @@ export function TileView({ tile, faceUp = true, selected, onClick, gold, small }
         fontWeight: "bold",
         margin: 1,
         boxShadow: isGold ? "0 0 4px #ffd700" : "0 1px 2px rgba(0,0,0,0.3)",
-        transform: selected ? "translateY(-8px)" : "none",
-        transition: "transform 0.1s",
+        transform: selected ? "translateY(-8px) scale(1.1)" : "none",
+        transition: "all 0.15s ease",
       }}
     >
       {text}

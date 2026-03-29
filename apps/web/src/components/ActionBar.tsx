@@ -25,7 +25,17 @@ export function ActionBar({ actions, selectedTileId, gameState, onAction }: Acti
   const [showChiPicker, setShowChiPicker] = useState(false);
   const myIndex = gameState.myIndex;
 
-  if (!actions) return null;
+  if (!actions) {
+    const isMyTurn = gameState.currentTurn === gameState.myIndex;
+    return (
+      <div style={{
+        textAlign: "center", padding: 12, color: "#aaa", fontSize: 14,
+        background: "rgba(0,0,0,0.3)", borderRadius: 8, marginTop: 8,
+      }}>
+        {isMyTurn ? "等待服务器响应..." : "等待其他玩家操作... ⏳"}
+      </div>
+    );
+  }
 
   const hasAnyAction = actions.canDraw || actions.canDiscard || actions.canHu ||
     actions.canPeng || actions.canMingGang || actions.chiOptions.length > 0 ||
