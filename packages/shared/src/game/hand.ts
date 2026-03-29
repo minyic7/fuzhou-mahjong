@@ -35,7 +35,7 @@ export function findTenpaiTiles(
 ): SuitedTile[] {
   const setsNeeded = 5 - melds.length;
   const waitingTiles: SuitedTile[] = [];
-  const suits = [Suit.Wan, Suit.Bing, Suit.Tiao] as const;
+  const suits: Suit[] = [Suit.Wan, Suit.Bing, Suit.Tiao];
 
   // Try adding each possible suited tile and check if hand wins
   for (const suit of suits) {
