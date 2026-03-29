@@ -44,13 +44,24 @@ export function PlayerArea({
       <div style={{ display: "flex", flexWrap: "wrap", gap: 1, marginBottom: 4, alignItems: "flex-end" }}>
         {isMe && hand ? (
           hand.map((t, idx) => (
-            <div key={t.id} style={{ display: "inline-flex", marginLeft: lastDrawnTileId === t.id ? 12 : 0 }}>
+            <div key={t.id} style={{
+              display: "inline-flex",
+              marginLeft: lastDrawnTileId === t.id ? 16 : 0,
+              position: "relative",
+            }}>
+              {lastDrawnTileId === t.id && (
+                <div style={{
+                  position: "absolute", top: -14, left: "50%", transform: "translateX(-50%)",
+                  fontSize: 10, color: "#4fc3f7", whiteSpace: "nowrap",
+                }}>新牌</div>
+              )}
               <TileView
                 tile={t}
                 faceUp
                 gold={gold}
                 selected={selectedTileId === t.id}
                 claimable={claimableTileIds?.has(t.id)}
+                className={lastDrawnTileId === t.id ? "tile-new" : undefined}
                 onClick={() => onTileClick?.(t)}
                 onDoubleClick={() => onTileDoubleClick?.(t)}
               />
