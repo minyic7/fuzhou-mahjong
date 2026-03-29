@@ -17,6 +17,7 @@ jobs:
         with:
           oauth-client-id: ${{ secrets.TS_OAUTH_CLIENT_ID }}
           oauth-secret: ${{ secrets.TS_OAUTH_SECRET }}
+          tags: tag:ci
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
@@ -36,12 +37,26 @@ jobs:
       - name: Build all
         run: npm run build
 
+      - name: Wait for Tailscale connectivity
+        run: |
+          for i in $(seq 1 30); do
+            if tailscale ping --timeout=2s ${{ secrets.DEPLOY_HOST }} >/dev/null 2>&1; then
+              echo "Tailscale connectivity confirmed"
+              exit 0
+            fi
+            echo "Waiting for Tailscale connection... ($i/30)"
+            sleep 2
+          done
+          echo "Failed to establish Tailscale connectivity"
+          exit 1
+
       - name: Copy files to deploy host
         uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.DEPLOY_HOST }}
           username: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.DEPLOY_SSH_KEY }}
+          timeout: 120s
           source: "apps/,packages/,package.json,package-lock.json,docker-compose.yml,.dockerignore,tsconfig.json"
           target: /Users/minyic/fuzhou-mahjong/
 
@@ -51,6 +66,7 @@ jobs:
           host: ${{ secrets.DEPLOY_HOST }}
           username: ${{ secrets.DEPLOY_USER }}
           key: ${{ secrets.DEPLOY_SSH_KEY }}
+          command_timeout: 10m
           script: |
             cd /Users/minyic/fuzhou-mahjong
             docker compose down
