@@ -53,14 +53,6 @@ export function App() {
     };
   }, [view]);
 
-  if (!connected) {
-    return (
-      <div style={{ textAlign: "center", padding: 40 }}>
-        <p>{reconnecting ? "重新连接中... / Reconnecting..." : "连接服务器中... / Connecting..."}</p>
-      </div>
-    );
-  }
-
   // Try reconnect on first load if we have a saved playerId
   useEffect(() => {
     if (connected) {
@@ -70,6 +62,14 @@ export function App() {
       }
     }
   }, [connected]);
+
+  if (!connected) {
+    return (
+      <div style={{ textAlign: "center", padding: 40 }}>
+        <p>{reconnecting ? "重新连接中... / Reconnecting..." : "连接服务器中... / Connecting..."}</p>
+      </div>
+    );
+  }
 
   switch (view) {
     case "lobby":
