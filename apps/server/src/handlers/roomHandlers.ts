@@ -6,6 +6,7 @@ import {
   findRoomBySocket,
   deleteRoomIfEmpty,
 } from "../room.js";
+import { createGame } from "../gameState.js";
 
 type GameSocket = Socket<ClientEvents, ServerEvents>;
 type GameServer = Server<ClientEvents, ServerEvents>;
@@ -71,7 +72,18 @@ export function registerRoomHandlers(io: GameServer, socket: GameSocket): void {
 
     room.gameStarted = true;
     console.log(`Game starting in room ${room.id}`);
-    // Actual game initialization will be implemented in the next ticket
+
+    const game = createGame(room.id, room.players.map((p) => p.socketId));
+
+    // Send each player their personalized game state
+    for (let i = 0; i < 4; i++) {
+      const socketId = room.players[i].socketId;
+      io.to(socketId).emit("gameStarted", game.getClientGameState(i));
+    }
+
+    // Tell dealer to discard
+    const dealerSocketId = game.getSocketId(game.state.dealerIndex);
+    io.to(dealerSocketId).emit("actionRequired", game.getAvailableActions(game.state.dealerIndex));
   });
 
   socket.on("disconnect", () => {
