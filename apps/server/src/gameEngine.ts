@@ -249,20 +249,19 @@ function handleDraw(
     return;
   }
 
-  const tile = state.wall.shift()!;
+  let tile = state.wall.shift()!;
   const player = state.players[playerIndex];
 
-  // If flower, add to flowers and draw again
-  if (!isSuitedTile(tile.tile)) {
+  // If flower, keep drawing replacements from tail until a suited tile is found
+  while (!isSuitedTile(tile.tile)) {
     player.flowers.push(tile);
-    // Draw replacement from tail
-    if (state.wallTail.length > 0) {
-      const replacement = state.wallTail.pop()!;
-      player.hand.push(replacement);
+    if (state.wallTail.length === 0) {
+      endGameDraw(io, game);
+      return;
     }
-  } else {
-    player.hand.push(tile);
+    tile = state.wallTail.pop()!;
   }
+  player.hand.push(tile);
 
   state.lastDiscard = null;
 
