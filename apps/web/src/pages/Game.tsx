@@ -4,7 +4,11 @@ import { GameTable } from "../components/GameTable";
 import { ActionBar } from "../components/ActionBar";
 import type { ClientGameState, GameOverResult, AvailableActions, GameAction } from "@fuzhou-mahjong/shared";
 
-export function Game() {
+interface GameProps {
+  onLeave?: () => void;
+}
+
+export function Game({ onLeave }: GameProps) {
   const [gameState, setGameState] = useState<ClientGameState | null>(null);
   const [selectedTileId, setSelectedTileId] = useState<number | null>(null);
   const [gameOver, setGameOver] = useState<GameOverResult | null>(null);
@@ -86,6 +90,14 @@ export function Game() {
         >
           下一局 / Next Round
         </button>
+        {onLeave && (
+          <button
+            onClick={() => { socket.emit("leaveRoom"); onLeave(); }}
+            style={{ marginLeft: 10, padding: "12px 32px", fontSize: 18, background: "#444", color: "#eee", border: "none", borderRadius: 6, cursor: "pointer" }}
+          >
+            离开 / Leave
+          </button>
+        )}
       </div>
     );
   }
