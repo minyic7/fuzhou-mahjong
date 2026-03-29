@@ -77,6 +77,9 @@ export function decideBotAction(
  * Never discard gold tiles.
  */
 function chooseBotDiscard(hand: TileInstance[], gold: GoldState | null): TileInstance {
+  if (hand.length === 0) throw new Error("Bot has no tiles to discard");
+  if (hand.length === 1) return hand[0];
+
   let bestTile = hand[0];
   let bestScore = Infinity;
 

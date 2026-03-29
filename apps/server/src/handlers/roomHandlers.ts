@@ -264,7 +264,7 @@ function triggerDealerAction(io: GameServer, game: import("../gameState.js").Ser
       const player = game.state.players[dealerIdx];
       const botAction = decideBotAction(player.hand, player.melds, actions, dealerIdx, game.state.gold);
       handlePlayerAction(io, game.roomId, botAction, dealerIdx);
-    }, 500);
+    }, 1500);
   } else if (room.players[dealerIdx].socketId) {
     io.to(room.players[dealerIdx].socketId!).emit("actionRequired", game.getInitialDealerActions());
   }
