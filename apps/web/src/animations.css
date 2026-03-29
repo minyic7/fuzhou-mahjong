@@ -83,6 +83,16 @@
   animation: pulse 1.5s ease-in-out infinite;
 }
 
+/* Wall remaining low pulse */
+@keyframes wallLowPulse {
+  0%, 100% { opacity: 0.7; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.08); }
+}
+
+.wall-low-pulse {
+  animation: wallLowPulse 1.5s ease-in-out infinite;
+}
+
 /* Turn indicator glow */
 @keyframes turnGlow {
   0%, 100% { border-color: rgba(255, 215, 0, 0.4); }

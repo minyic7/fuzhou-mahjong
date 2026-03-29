@@ -4,6 +4,7 @@ import { GameTable } from "../components/GameTable";
 import { ActionBar } from "../components/ActionBar";
 import { CenterAction, useCenterAction } from "../components/CenterAction";
 import { sounds, setMuted, isMuted } from "../sounds";
+import { TileCounter } from "../components/TileCounter";
 import type { ClientGameState, GameOverResult, AvailableActions, GameAction } from "@fuzhou-mahjong/shared";
 
 const MUTE_KEY = "fuzhou-mahjong-muted";
@@ -288,6 +289,7 @@ export function Game({ initialGameState, onLeave }: GameProps) {
         gameState={gameState}
         onAction={handleAction}
       />
+      <TileCounter gameState={gameState} />
     </div>
   );
 }

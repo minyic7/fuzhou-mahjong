@@ -39,6 +39,7 @@ export function PlayerArea({
         background: isCurrentTurn ? "rgba(255,255,255,0.08)" : "transparent",
         borderRadius: 8,
         border: isCurrentTurn ? "2px solid #ffd700" : "1px solid transparent",
+        overflow: "visible",
       }}
     >
       {/* Player info panel */}
@@ -60,7 +61,7 @@ export function PlayerArea({
       </div>
 
       {/* Hand */}
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 1, marginBottom: 4, alignItems: "flex-end" }}>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 1, marginBottom: 4, alignItems: "flex-end", paddingTop: isMe ? 18 : 0, overflow: "visible", position: "relative" }}>
         {isMe && hand ? (
           hand.map((t, idx) => (
             <div key={t.id} style={{
