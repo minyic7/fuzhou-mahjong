@@ -36,7 +36,7 @@ export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTile
       padding: 8,
     }}>
       {/* Top player (index 2 in otherPlayers = across from me) */}
-      <div style={{ gridArea: "top" }}>
+      <div style={{ gridArea: "top", position: "relative", zIndex: 1 }}>
         <PlayerArea
           isMe={false}
           handCount={otherPlayers[1]?.handCount ?? 0}
@@ -51,7 +51,7 @@ export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTile
       </div>
 
       {/* Left player */}
-      <div style={{ gridArea: "left" }}>
+      <div style={{ gridArea: "left", position: "relative", zIndex: 1 }}>
         <PlayerArea
           isMe={false}
           handCount={otherPlayers[2]?.handCount ?? 0}
@@ -66,7 +66,7 @@ export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTile
       </div>
 
       {/* Center - game info */}
-      <div style={{ gridArea: "center", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <div style={{ gridArea: "center", display: "flex", alignItems: "center", justifyContent: "center", position: "relative", zIndex: 1 }}>
         <TileWall wallRemaining={wallRemaining} gold={gold} />
         <GameInfo
           gold={null}
@@ -80,7 +80,7 @@ export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTile
       </div>
 
       {/* Right player */}
-      <div style={{ gridArea: "right" }}>
+      <div style={{ gridArea: "right", position: "relative", zIndex: 1 }}>
         <PlayerArea
           isMe={false}
           handCount={otherPlayers[0]?.handCount ?? 0}
@@ -95,7 +95,7 @@ export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTile
       </div>
 
       {/* Bottom - my area */}
-      <div style={{ gridArea: "bottom" }}>
+      <div style={{ gridArea: "bottom", position: "relative", zIndex: 1 }}>
         <PlayerArea
           isMe
           hand={myHand}
