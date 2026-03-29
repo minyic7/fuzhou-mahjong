@@ -4,7 +4,6 @@ import type { RoomState } from "@fuzhou-mahjong/shared";
 
 interface RoomProps {
   initialRoomState: RoomState | null;
-  onGameStarted: () => void;
 }
 
 export function Room({ initialRoomState }: RoomProps) {

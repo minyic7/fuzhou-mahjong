@@ -91,7 +91,7 @@ export function App() {
     case "lobby":
       return <Lobby onJoined={(roomState) => { setInitialRoomState(roomState); setView("room"); }} />;
     case "room":
-      return <Room initialRoomState={initialRoomState} onGameStarted={() => { /* handled by gameStarted listener above */ }} />;
+      return <Room initialRoomState={initialRoomState} />;
     case "game":
       return <Game initialGameState={initialGameState} onLeave={() => { localStorage.removeItem(PLAYER_ID_KEY); setInitialGameState(null); setView("lobby"); }} />;
   }
