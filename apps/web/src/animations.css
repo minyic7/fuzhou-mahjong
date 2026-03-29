@@ -103,6 +103,16 @@
   animation: claimPulse 1s ease-in-out infinite;
 }
 
+/* Your turn prompt pulse */
+@keyframes turnTextPulse {
+  0%, 100% { opacity: 0.8; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.05); }
+}
+
+.your-turn-prompt {
+  animation: turnTextPulse 1.5s ease-in-out infinite;
+}
+
 /* Last discard highlight */
 @keyframes discardHighlight {
   0%, 100% { box-shadow: 0 0 8px rgba(255, 165, 0, 0.4); }

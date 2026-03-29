@@ -16,7 +16,7 @@ const BTN = {
   gang: { background: "#d4760a", color: "#fff" },
   peng: { background: "#1e6ec4", color: "#fff" },
   chi: { background: "#2e8b57", color: "#fff" },
-  discard: { background: "#2980b9", color: "#fff" },
+  discard: { background: "#00b894", color: "#fff", boxShadow: "0 0 8px rgba(0,184,148,0.5)" },
   pass: { background: "#333", color: "#888" },
   draw: { background: "#6a5acd", color: "#fff" },
 };
@@ -68,9 +68,16 @@ export function ActionBar({ actions, selectedTileId, gameState, onAction }: Acti
           可以操作！请选择 👇
         </div>
       )}
-      {actions.canDiscard && !isClaimWindow && (
-        <div style={{ width: "100%", textAlign: "center", color: "#4fc3f7", fontWeight: "bold", fontSize: 14, marginBottom: 4 }}>
-          🎯 轮到你了 — {selectedTile ? "点击「出牌」确认" : "请点击一张牌选择出牌"}
+      {!isClaimWindow && (actions.canDiscard || actions.canDraw) && (
+        <div className="your-turn-prompt" style={{ width: "100%", textAlign: "center", marginBottom: 4 }}>
+          <span style={{ color: "#ffd700", fontWeight: "bold", fontSize: 18, textShadow: "0 0 8px rgba(255,215,0,0.6)" }}>
+            YOUR TURN — 轮到你了
+          </span>
+          {actions.canDiscard && (
+            <div style={{ color: "#4fc3f7", fontSize: 14, marginTop: 2 }}>
+              {selectedTile ? "点击「出牌」确认" : "👆 请先选择一张手牌"}
+            </div>
+          )}
         </div>
       )}
       {actions.canDraw && (
