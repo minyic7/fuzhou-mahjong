@@ -44,14 +44,17 @@ export function PlayerArea({
       {/* Player info panel */}
       <div style={{
         display: "flex", alignItems: "center", gap: 8, marginBottom: 6,
-        padding: "4px 8px", background: "rgba(0,0,0,0.2)", borderRadius: 4,
+        padding: "4px 10px",
+        background: "rgba(0,0,0,0.3)",
+        borderRadius: 4,
+        borderLeft: isCurrentTurn ? "3px solid #ffd700" : "3px solid transparent",
       }}>
-        <span style={{ fontSize: 14, fontWeight: "bold" }}>
+        <span style={{ fontSize: 14, fontWeight: "bold", color: "#e8d5a3" }}>
           {label}
         </span>
-        {isDealer && <span style={{ fontSize: 11, background: "#c41e3a", color: "#fff", padding: "1px 4px", borderRadius: 3 }}>庄</span>}
-        {isCurrentTurn && <span style={{ fontSize: 11, background: "#ffd700", color: "#000", padding: "1px 4px", borderRadius: 3 }}>出牌中</span>}
-        <span style={{ fontSize: 11, color: "#888", marginLeft: "auto" }}>
+        {isDealer && <span style={{ fontSize: 10, background: "#b71c1c", color: "#ffd700", padding: "1px 5px", borderRadius: 3, fontWeight: "bold" }}>庄</span>}
+        {isCurrentTurn && <span style={{ fontSize: 10, background: "rgba(255,215,0,0.2)", color: "#ffd700", padding: "1px 5px", borderRadius: 3, border: "1px solid #ffd700" }}>出牌</span>}
+        <span style={{ fontSize: 11, color: "#8fbc8f", marginLeft: "auto" }}>
           🌸{flowers.length}
         </span>
       </div>

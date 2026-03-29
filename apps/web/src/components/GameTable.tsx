@@ -22,7 +22,7 @@ export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTile
   ];
 
   return (
-    <div style={{
+    <div className="game-table" style={{
       display: "grid",
       gridTemplateAreas: `
         ". top ."
