@@ -10,7 +10,7 @@ import {
   registerPlayerRoom,
   unregisterPlayerRoom,
 } from "../room.js";
-import { createGame, getGame } from "../gameState.js";
+import { createGame, getGame, deleteGame } from "../gameState.js";
 import { checkWin, MeldType, isGoldTile, GamePhase, decideBotAction } from "@fuzhou-mahjong/shared";
 import { handlePlayerAction } from "../gameEngine.js";
 
@@ -235,7 +235,14 @@ export function registerRoomHandlers(io: GameServer, socket: GameSocket): void {
       const timer = setTimeout(() => {
         room.disconnectTimers.delete(player.playerId);
         console.log(`Reconnect timeout for ${player.name} in room ${room.id}`);
-        // Player stays in game but auto-passes all actions (handled by action timeout in gameEngine)
+
+        // If no humans left connected, clean up room and game
+        if (!room.hasConnectedPlayers()) {
+          deleteGame(room.id);
+          room.players = [];
+          deleteRoomIfEmpty(room.id);
+          console.log(`Room ${room.id} cleaned up (all humans disconnected)`);
+        }
       }, RECONNECT_TIMEOUT_MS);
       room.disconnectTimers.set(player.playerId, timer);
     } else {
@@ -281,7 +288,13 @@ function leaveCurrentRoom(io: GameServer, socket: GameSocket): void {
   room.removePlayer(socket.id);
   socket.leave(room.id);
 
-  if (room.isEmpty()) {
+  // Remove bots if no humans left (prevent zombie rooms)
+  const hasHumans = room.players.some((p) => !p.isBot && p.socketId);
+  if (!hasHumans) {
+    room.players = [];
+    deleteRoomIfEmpty(room.id);
+    console.log(`Room ${room.id} deleted (no humans left)`);
+  } else if (room.isEmpty()) {
     deleteRoomIfEmpty(room.id);
     console.log(`Room ${room.id} deleted (empty)`);
   } else {

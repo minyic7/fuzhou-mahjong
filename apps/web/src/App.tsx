@@ -90,6 +90,6 @@ export function App() {
     case "room":
       return <Room initialRoomState={initialRoomState} onGameStarted={() => setView("game")} />;
     case "game":
-      return <Game />;
+      return <Game onLeave={() => { localStorage.removeItem(PLAYER_ID_KEY); setView("lobby"); }} />;
   }
 }
