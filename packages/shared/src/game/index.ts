@@ -21,3 +21,9 @@ export {
   checkWin,
 } from './winning.js';
 export type { WinResult, WinContext } from './winning.js';
+export {
+  countFlowerGangs,
+  calculateRetainCount,
+  isDraw,
+  isInFinalDraws,
+} from './retention.js';
