@@ -1,9 +1,9 @@
 import { useState, useEffect } from "react";
-import type { RoomListItem } from "@fuzhou-mahjong/shared";
+import type { RoomListItem, RoomState } from "@fuzhou-mahjong/shared";
 import { socket } from "../socket";
 
 interface LobbyProps {
-  onJoined: () => void;
+  onJoined: (roomState: RoomState) => void;
 }
 
 export function Lobby({ onJoined }: LobbyProps) {
@@ -15,7 +15,7 @@ export function Lobby({ onJoined }: LobbyProps) {
   useEffect(() => {
     socket.emit("listRooms");
 
-    const onRoomJoined = () => onJoined();
+    const onRoomJoined = (state: RoomState) => onJoined(state);
     const onError = (msg: string) => setError(msg);
     const onRoomList = (list: RoomListItem[]) => setRooms(list);
 
