@@ -3,6 +3,7 @@ import { createServer } from "node:http";
 import { Server } from "socket.io";
 import type { HealthResponse, ClientEvents, ServerEvents } from "@fuzhou-mahjong/shared";
 import { registerRoomHandlers } from "./handlers/roomHandlers.js";
+import { registerGameHandlers } from "./handlers/gameHandlers.js";
 
 const app = express();
 const httpServer = createServer(app);
@@ -24,6 +25,7 @@ app.get("/api/health", (_req, res) => {
 io.on("connection", (socket) => {
   console.log(`Client connected: ${socket.id}`);
   registerRoomHandlers(io, socket);
+  registerGameHandlers(io, socket);
 });
 
 httpServer.listen(PORT, () => {
