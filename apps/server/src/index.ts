@@ -11,7 +11,7 @@ const PORT = process.env.PORT || 7701;
 
 const io = new Server<ClientEvents, ServerEvents>(httpServer, {
   cors: { origin: "*" },
-  path: "/socket.io",
+  path: "/api/socket.io",
 });
 
 app.get("/api/health", (_req, res) => {
