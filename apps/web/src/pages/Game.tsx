@@ -3,7 +3,10 @@ import { socket } from "../socket";
 import { GameTable } from "../components/GameTable";
 import { ActionBar } from "../components/ActionBar";
 import { CenterAction, useCenterAction } from "../components/CenterAction";
+import { sounds, setMuted, isMuted } from "../sounds";
 import type { ClientGameState, GameOverResult, AvailableActions, GameAction } from "@fuzhou-mahjong/shared";
+
+const MUTE_KEY = "fuzhou-mahjong-muted";
 
 interface GameProps {
   initialGameState?: ClientGameState | null;
@@ -19,15 +22,40 @@ export function Game({ initialGameState, onLeave }: GameProps) {
   const [pendingClaim, setPendingClaim] = useState(false);
   const { display: centerAction, showDiscard, showClaim } = useCenterAction();
   const prevStateRef = useRef<ClientGameState | null>(null);
+  const [soundMuted, setSoundMuted] = useState(() => {
+    const stored = localStorage.getItem(MUTE_KEY);
+    if (stored === "true") { setMuted(true); return true; }
+    return false;
+  });
+  const gameStartedRef = useRef(false);
+
+  const toggleMute = () => {
+    const next = !soundMuted;
+    setSoundMuted(next);
+    setMuted(next);
+    localStorage.setItem(MUTE_KEY, String(next));
+  };
 
   useEffect(() => {
     socket.on("gameStateUpdate", (state) => {
+      // Play game start sound on first state update
+      if (!gameStartedRef.current) {
+        gameStartedRef.current = true;
+        sounds.gameStart();
+      }
+
       // Detect discard: lastDiscard changed
       const prev = prevStateRef.current;
       if (state.lastDiscard && (!prev?.lastDiscard || prev.lastDiscard.tile.id !== state.lastDiscard.tile.id)) {
         const names = [state.myName || "我", ...(state.otherPlayers?.map(p => p.name) || [])];
         const relIdx = (state.lastDiscard.playerIndex - state.myIndex + 4) % 4;
         showDiscard(state.lastDiscard.tile, names[relIdx] || "");
+        sounds.discard();
+      }
+
+      // Detect draw: my hand grew without a new meld
+      if (prev && state.myHand.length > prev.myHand.length && state.myMelds.length === prev.myMelds.length) {
+        sounds.draw();
       }
 
       // Detect new meld: total melds increased
@@ -39,11 +67,17 @@ export function Game({ initialGameState, onLeave }: GameProps) {
           if (state.myMelds.length > prev.myMelds.length) {
             const meld = state.myMelds[state.myMelds.length - 1];
             showClaim(meld.tiles, meld.type, state.myName || "我");
+            if (meld.type === "chi") sounds.chi();
+            else if (meld.type === "peng") sounds.peng();
+            else sounds.gang();
           } else {
             for (let i = 0; i < state.otherPlayers.length; i++) {
               if (state.otherPlayers[i].melds.length > (prev.otherPlayers[i]?.melds.length || 0)) {
                 const meld = state.otherPlayers[i].melds[state.otherPlayers[i].melds.length - 1];
                 showClaim(meld.tiles, meld.type, state.otherPlayers[i].name || "");
+                if (meld.type === "chi") sounds.chi();
+                else if (meld.type === "peng") sounds.peng();
+                else sounds.gang();
                 break;
               }
             }
@@ -64,12 +98,17 @@ export function Game({ initialGameState, onLeave }: GameProps) {
         if (hasClaim && !availableActions.canDiscard) {
           setShowFlash(true);
           setTimeout(() => setShowFlash(false), 1500);
+          sounds.claim();
           return true; // mark as pending claim
         }
+        if (availableActions.canDiscard) sounds.yourTurn();
         return false;
       });
     });
-    socket.on("gameOver", (result) => setGameOver(result));
+    socket.on("gameOver", (result) => {
+      setGameOver(result);
+      if (result.winnerId !== null) sounds.hu();
+    });
 
     return () => {
       socket.off("gameStateUpdate");

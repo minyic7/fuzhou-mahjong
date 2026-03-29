@@ -1,5 +1,7 @@
+import { useState } from "react";
 import type { GoldState, TileInstance } from "@fuzhou-mahjong/shared";
 import { TileView } from "./Tile";
+import { isMuted, setMuted } from "../sounds";
 
 interface GameInfoProps {
   gold: GoldState | null;
@@ -44,9 +46,27 @@ export function GameInfo({ gold, wallRemaining, dealerIndex, lianZhuangCount, my
         </div>
       )}
 
-      <div style={{ fontSize: 12, color: "#aaa" }}>
-        剩余: {wallRemaining} | 庄: {posLabel(dealerIndex)} | 连庄: {lianZhuangCount}
+      <div style={{ fontSize: 12, color: "#8fbc8f" }}>
+        余{wallRemaining} | 庄:{posLabel(dealerIndex)} | 连庄:{lianZhuangCount}
       </div>
+      <MuteButton />
     </div>
+  );
+}
+
+function MuteButton() {
+  const [muted, setMutedState] = useState(isMuted());
+  return (
+    <button
+      onClick={() => { setMuted(!muted); setMutedState(!muted); }}
+      style={{
+        marginTop: 6, padding: "2px 8px", fontSize: 12,
+        background: "transparent", border: "1px solid #555",
+        color: "#8fbc8f", borderRadius: 4, minHeight: "auto",
+        cursor: "pointer",
+      }}
+    >
+      {muted ? "🔇 静音" : "🔊 音效"}
+    </button>
   );
 }
