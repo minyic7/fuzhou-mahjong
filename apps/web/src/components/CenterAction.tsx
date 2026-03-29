@@ -1,0 +1,86 @@
+import { useEffect, useState } from "react";
+import type { TileInstance, GoldState } from "@fuzhou-mahjong/shared";
+import { TileView } from "./Tile";
+
+interface CenterActionProps {
+  gold: GoldState | null;
+}
+
+interface ActionDisplay {
+  tiles: TileInstance[];
+  label: string;
+  color: string;
+  id: number;
+}
+
+let actionId = 0;
+
+export function useCenterAction() {
+  const [display, setDisplay] = useState<ActionDisplay | null>(null);
+
+  const showDiscard = (tile: TileInstance, playerName: string) => {
+    setDisplay({ tiles: [tile], label: `${playerName} 打`, color: "#e8d5a3", id: ++actionId });
+  };
+
+  const showClaim = (tiles: TileInstance[], type: string, playerName: string) => {
+    const labels: Record<string, string> = { chi: "吃!", peng: "碰!", mingGang: "杠!", anGang: "暗杠!", buGang: "补杠!", hu: "胡!" };
+    const colors: Record<string, string> = { chi: "#4caf50", peng: "#2196f3", mingGang: "#ff9800", anGang: "#ff9800", buGang: "#ff9800", hu: "#f44336" };
+    setDisplay({
+      tiles,
+      label: `${playerName} ${labels[type] || type}`,
+      color: colors[type] || "#fff",
+      id: ++actionId,
+    });
+  };
+
+  // Auto-dismiss after animation
+  useEffect(() => {
+    if (!display) return;
+    const timer = setTimeout(() => setDisplay(null), 1200);
+    return () => clearTimeout(timer);
+  }, [display?.id]);
+
+  return { display, showDiscard, showClaim };
+}
+
+export function CenterAction({ display, gold }: { display: ActionDisplay | null; gold: GoldState | null }) {
+  if (!display) return null;
+
+  return (
+    <div
+      key={display.id}
+      style={{
+        position: "absolute",
+        top: "50%",
+        left: "50%",
+        transform: "translate(-50%, -50%)",
+        zIndex: 30,
+        textAlign: "center",
+        animation: "centerActionIn 0.3s ease-out, centerActionOut 0.4s ease-in 0.8s forwards",
+        pointerEvents: "none",
+      }}
+    >
+      <div style={{
+        display: "flex",
+        gap: 4,
+        justifyContent: "center",
+        marginBottom: 8,
+        filter: "drop-shadow(0 4px 12px rgba(0,0,0,0.5))",
+      }}>
+        {display.tiles.map((t) => (
+          <div key={t.id} style={{ transform: "scale(1.8)" }}>
+            <TileView tile={t} faceUp gold={gold} />
+          </div>
+        ))}
+      </div>
+      <div style={{
+        fontSize: 20,
+        fontWeight: "bold",
+        color: display.color,
+        textShadow: `0 0 20px ${display.color}, 0 2px 4px rgba(0,0,0,0.5)`,
+      }}>
+        {display.label}
+      </div>
+    </div>
+  );
+}
