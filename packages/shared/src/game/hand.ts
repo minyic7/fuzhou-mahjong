@@ -1,4 +1,4 @@
-import { isSuitedTile } from '../types/tile.js';
+import { isSuitedTile, Suit } from '../types/tile.js';
 import type { TileInstance, SuitedTile } from '../types/tile.js';
 import type { GoldState } from '../types/game.js';
 import type { Meld } from '../types/meld.js';
@@ -35,7 +35,7 @@ export function findTenpaiTiles(
 ): SuitedTile[] {
   const setsNeeded = 5 - melds.length;
   const waitingTiles: SuitedTile[] = [];
-  const suits = ['wan', 'bing', 'tiao'] as const;
+  const suits = [Suit.Wan, Suit.Bing, Suit.Tiao] as const;
 
   // Try adding each possible suited tile and check if hand wins
   for (const suit of suits) {
