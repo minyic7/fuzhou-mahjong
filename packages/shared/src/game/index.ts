@@ -13,3 +13,11 @@ export {
   findAnGang,
   findBuGang,
 } from './actions.js';
+export {
+  WinType,
+  isValidHand,
+  isDuiDuiHu,
+  isQingYiSe,
+  checkWin,
+} from './winning.js';
+export type { WinResult, WinContext } from './winning.js';
