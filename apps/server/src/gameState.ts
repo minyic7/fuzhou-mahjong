@@ -148,6 +148,10 @@ export class ServerGameState {
   getPlayerIndex(socketId: string): number {
     return this.playerSocketIds.indexOf(socketId);
   }
+
+  updateSocketId(playerIndex: number, newSocketId: string): void {
+    this.playerSocketIds[playerIndex] = newSocketId;
+  }
 }
 
 // ─── Game Store ──────────────────────────────────────────────────

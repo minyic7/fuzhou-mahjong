@@ -1,8 +1,11 @@
+import crypto from "node:crypto";
 import type { RoomState, RoomListItem } from "@fuzhou-mahjong/shared";
 
 export interface Player {
-  socketId: string;
+  socketId: string | null;
+  playerId: string;
   name: string;
+  disconnectedAt?: number;
 }
 
 export class Room {
@@ -10,20 +13,48 @@ export class Room {
   players: Player[] = [];
   readonly maxPlayers = 4 as const;
   gameStarted = false;
+  disconnectTimers = new Map<string, ReturnType<typeof setTimeout>>();
 
   constructor(id: string) {
     this.id = id;
   }
 
-  addPlayer(socketId: string, name: string): boolean {
-    if (this.isFull()) return false;
-    if (this.players.some((p) => p.socketId === socketId)) return false;
-    this.players.push({ socketId, name });
-    return true;
+  addPlayer(socketId: string, name: string): Player {
+    const playerId = crypto.randomUUID();
+    const player: Player = { socketId, playerId, name };
+    this.players.push(player);
+    return player;
   }
 
   removePlayer(socketId: string): void {
     this.players = this.players.filter((p) => p.socketId !== socketId);
+  }
+
+  disconnectPlayer(socketId: string): Player | undefined {
+    const player = this.players.find((p) => p.socketId === socketId);
+    if (player) {
+      player.socketId = null;
+      player.disconnectedAt = Date.now();
+    }
+    return player;
+  }
+
+  reconnectPlayer(playerId: string, newSocketId: string): Player | undefined {
+    const player = this.players.find((p) => p.playerId === playerId);
+    if (player) {
+      player.socketId = newSocketId;
+      player.disconnectedAt = undefined;
+      const timer = this.disconnectTimers.get(playerId);
+      if (timer) {
+        clearTimeout(timer);
+        this.disconnectTimers.delete(playerId);
+      }
+    }
+    return player;
+  }
+
+  findByPlayerId(playerId: string): Player | undefined {
+    return this.players.find((p) => p.playerId === playerId);
   }
 
   isFull(): boolean {
@@ -34,14 +65,22 @@ export class Room {
     return this.players.length === 0;
   }
 
+  hasConnectedPlayers(): boolean {
+    return this.players.some((p) => p.socketId !== null);
+  }
+
   getPlayerIndex(socketId: string): number {
     return this.players.findIndex((p) => p.socketId === socketId);
+  }
+
+  getPlayerIndexByPlayerId(playerId: string): number {
+    return this.players.findIndex((p) => p.playerId === playerId);
   }
 
   getState(): RoomState {
     return {
       roomId: this.id,
-      players: this.players.map((p) => ({ name: p.name, ready: true })),
+      players: this.players.map((p) => ({ name: p.name, ready: p.socketId !== null })),
       maxPlayers: this.maxPlayers,
     };
   }
@@ -50,6 +89,7 @@ export class Room {
 // ─── Room Store ──────────────────────────────────────────────────
 
 const rooms = new Map<string, Room>();
+const playerRoomMap = new Map<string, string>(); // playerId → roomId
 
 const CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
 
@@ -82,9 +122,25 @@ export function findRoomBySocket(socketId: string): Room | undefined {
   return undefined;
 }
 
+export function findRoomByPlayerId(playerId: string): Room | undefined {
+  const roomId = playerRoomMap.get(playerId);
+  return roomId ? rooms.get(roomId) : undefined;
+}
+
+export function registerPlayerRoom(playerId: string, roomId: string): void {
+  playerRoomMap.set(playerId, roomId);
+}
+
+export function unregisterPlayerRoom(playerId: string): void {
+  playerRoomMap.delete(playerId);
+}
+
 export function deleteRoomIfEmpty(roomId: string): void {
   const room = rooms.get(roomId);
   if (room && room.isEmpty()) {
+    for (const p of room.players) {
+      playerRoomMap.delete(p.playerId);
+    }
     rooms.delete(roomId);
   }
 }

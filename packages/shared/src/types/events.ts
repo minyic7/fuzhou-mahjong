@@ -80,6 +80,7 @@ export interface ClientEvents {
   listRooms: () => void;
   startGame: () => void;
   playerAction: (action: GameAction) => void;
+  rejoinGame: (playerId: string) => void;
 }
 
 export interface ServerEvents {
@@ -93,4 +94,7 @@ export interface ServerEvents {
   actionResult: (result: ActionResult) => void;
   gameOver: (result: GameOverResult) => void;
   error: (message: string) => void;
+  playerIdAssigned: (playerId: string) => void;
+  playerDisconnected: (playerIndex: number) => void;
+  playerReconnected: (playerIndex: number) => void;
 }
