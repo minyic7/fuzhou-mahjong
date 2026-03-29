@@ -70,6 +70,8 @@ export function GameTable({ state, onTileSelect, selectedTileId }: GameTableProp
           dealerIndex={dealerIndex}
           lianZhuangCount={lianZhuangCount}
           myIndex={myIndex}
+          lastDiscard={state.lastDiscard}
+          playerNames={[myName || "我", ...otherPlayers.map(p => p.name || "")]}
         />
       </div>
 

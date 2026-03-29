@@ -47,18 +47,27 @@ export function ActionBar({ actions, selectedTileId, gameState, onAction }: Acti
     ? gameState.myHand.find((t) => t.id === selectedTileId) ?? null
     : null;
 
+  const hasClaimAction = actions.canHu || actions.canPeng || actions.canMingGang || actions.chiOptions.length > 0;
+  const isClaimWindow = hasClaimAction && !actions.canDiscard;
+
   return (
     <div style={{
       display: "flex",
       flexWrap: "wrap",
       justifyContent: "center",
       alignItems: "center",
-      gap: 4,
-      padding: 12,
-      background: "rgba(0,0,0,0.5)",
+      gap: 8,
+      padding: isClaimWindow ? 16 : 12,
+      background: isClaimWindow ? "rgba(255,140,0,0.2)" : "rgba(0,0,0,0.5)",
+      border: isClaimWindow ? "2px solid #ffa500" : "none",
       borderRadius: 8,
       marginTop: 8,
     }}>
+      {isClaimWindow && (
+        <div style={{ width: "100%", textAlign: "center", color: "#ffa500", fontWeight: "bold", fontSize: 14, marginBottom: 4 }}>
+          可以操作！请选择 👇
+        </div>
+      )}
       {actions.canDraw && (
         <button
           style={{ ...BTN.base, ...BTN.draw }}

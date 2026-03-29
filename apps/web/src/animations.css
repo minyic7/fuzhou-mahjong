@@ -92,3 +92,23 @@
 .current-turn {
   animation: turnGlow 1.5s ease-in-out infinite;
 }
+
+/* Claim action alert */
+@keyframes claimPulse {
+  0%, 100% { border-color: rgba(255, 165, 0, 0.4); background: rgba(255, 140, 0, 0.1); }
+  50% { border-color: rgba(255, 165, 0, 1); background: rgba(255, 140, 0, 0.25); }
+}
+
+.claim-alert {
+  animation: claimPulse 1s ease-in-out infinite;
+}
+
+/* Last discard highlight */
+@keyframes discardHighlight {
+  0%, 100% { box-shadow: 0 0 8px rgba(255, 165, 0, 0.4); }
+  50% { box-shadow: 0 0 16px rgba(255, 165, 0, 0.8); }
+}
+
+.last-discard {
+  animation: discardHighlight 1.2s ease-in-out infinite;
+}
