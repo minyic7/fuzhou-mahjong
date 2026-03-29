@@ -34,6 +34,8 @@ export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTile
       minHeight: "min(80vh, 600px)",
       gap: 8,
       padding: 8,
+      perspective: "1200px",
+      perspectiveOrigin: "50% 60%",
     }}>
       {/* Top player (index 2 in otherPlayers = across from me) */}
       <div style={{ gridArea: "top", position: "relative", zIndex: 1 }}>
