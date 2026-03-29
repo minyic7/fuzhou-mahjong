@@ -15,11 +15,13 @@ interface PlayerAreaProps {
   selectedTileId?: number | null;
   onTileClick?: (tile: TileInstance) => void;
   label: string;
+  claimableTileIds?: Set<number>;
 }
 
 export function PlayerArea({
   isMe, hand, handCount, melds, flowers, discards,
   isCurrentTurn, isDealer, gold, selectedTileId, onTileClick, label,
+  claimableTileIds,
 }: PlayerAreaProps) {
   return (
     <div
@@ -45,6 +47,7 @@ export function PlayerArea({
               faceUp
               gold={gold}
               selected={selectedTileId === t.id}
+              claimable={claimableTileIds?.has(t.id)}
               onClick={() => onTileClick?.(t)}
             />
           ))

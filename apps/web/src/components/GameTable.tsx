@@ -6,9 +6,10 @@ interface GameTableProps {
   state: ClientGameState;
   onTileSelect: (tile: TileInstance | null) => void;
   selectedTileId: number | null;
+  claimableTileIds?: Set<number>;
 }
 
-export function GameTable({ state, onTileSelect, selectedTileId }: GameTableProps) {
+export function GameTable({ state, onTileSelect, selectedTileId, claimableTileIds }: GameTableProps) {
   const { myHand, myFlowers, myMelds, myDiscards, myName, otherPlayers, currentTurn, myIndex, gold, dealerIndex, lianZhuangCount, wallRemaining } = state;
   const botLabel = (name: string, isBot?: boolean) => isBot ? `${name} 🤖` : name;
   const labels = [
@@ -104,6 +105,7 @@ export function GameTable({ state, onTileSelect, selectedTileId }: GameTableProp
           selectedTileId={selectedTileId}
           onTileClick={(t) => onTileSelect(selectedTileId === t.id ? null : t)}
           label={labels[0]}
+          claimableTileIds={claimableTileIds}
         />
       </div>
     </div>
