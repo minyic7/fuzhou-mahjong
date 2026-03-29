@@ -46,8 +46,18 @@ button:disabled {
   cursor: not-allowed;
 }
 
+button:hover:not(:disabled) {
+  filter: brightness(1.2);
+}
+
 button:active:not(:disabled) {
   transform: scale(0.97);
+  filter: brightness(0.9);
+}
+
+/* Action button transitions */
+button {
+  transition: filter 0.15s ease, transform 0.1s ease;
 }
 
 input {
