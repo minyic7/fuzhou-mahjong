@@ -1,5 +1,5 @@
 import { useState, useMemo } from "react";
-import type { ClientGameState, TileInstance, GoldState } from "@fuzhou-mahjong/shared";
+import type { ClientGameState, TileInstance } from "@fuzhou-mahjong/shared";
 import { isSuitedTile } from "@fuzhou-mahjong/shared";
 
 interface TileCounterProps {
@@ -8,62 +8,91 @@ interface TileCounterProps {
 
 const SUITS = ["wan", "bing", "tiao"] as const;
 const SUIT_LABELS: Record<string, string> = { wan: "万", bing: "饼", tiao: "条" };
-const SUIT_COLORS: Record<string, string> = { wan: "#b71c1c", bing: "#0d47a1", tiao: "#1b5e20" };
+const SUIT_COLORS: Record<string, string> = { wan: "#e57373", bing: "#64b5f6", tiao: "#81c784" };
+const CN_NUMS = ["", "一", "二", "三", "四", "五", "六", "七", "八", "九"];
 
-/**
- * Count all tiles visible to the current player:
- * - Own hand
- * - Own flowers
- * - Own melds
- * - Own discards
- * - Other players' discards
- * - Other players' melds (face-up)
- * - Other players' flowers
- * - Gold indicator tile
- */
 function countVisibleTiles(state: ClientGameState): Map<string, number> {
   const counts = new Map<string, number>();
-
-  const countTile = (t: TileInstance) => {
+  const count = (t: TileInstance) => {
     if (!isSuitedTile(t.tile)) return;
     const key = `${t.tile.suit}-${t.tile.value}`;
     counts.set(key, (counts.get(key) ?? 0) + 1);
   };
 
-  // My tiles
-  state.myHand.forEach(countTile);
-  state.myDiscards.forEach(countTile);
-  state.myMelds.forEach(m => m.tiles.forEach(countTile));
-  state.myFlowers.forEach(countTile);
-
-  // Other players' visible tiles
+  state.myHand.forEach(count);
+  state.myDiscards.forEach(count);
+  state.myMelds.forEach(m => m.tiles.forEach(count));
+  state.myFlowers.forEach(count);
   for (const p of state.otherPlayers) {
-    p.discards.forEach(countTile);
-    p.melds.forEach(m => m.tiles.forEach(countTile));
-    p.flowers.forEach(countTile);
+    p.discards.forEach(count);
+    p.melds.forEach(m => m.tiles.forEach(count));
+    p.flowers.forEach(count);
   }
-
-  // Gold indicator
-  if (state.gold) countTile(state.gold.indicatorTile);
-
+  if (state.gold) count(state.gold.indicatorTile);
   return counts;
+}
+
+/** Render 4 dots: ● for remaining, ○ for seen */
+function Dots({ total, remaining }: { total: number; remaining: number }) {
+  return (
+    <div style={{ display: "flex", gap: 1, justifyContent: "center", marginTop: 2 }}>
+      {Array.from({ length: total }).map((_, i) => (
+        <span key={i} style={{
+          fontSize: 6,
+          color: i < remaining ? "#4caf50" : "rgba(255,255,255,0.2)",
+        }}>
+          ●
+        </span>
+      ))}
+    </div>
+  );
+}
+
+function TileCell({ label, remaining, total, color }: {
+  label: string; remaining: number; total: number; color: string;
+}) {
+  const allGone = remaining === 0;
+  return (
+    <div style={{
+      width: 32,
+      height: 40,
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "center",
+      borderRadius: 4,
+      background: allGone ? "rgba(255,255,255,0.03)" : "rgba(255,255,255,0.08)",
+      border: "1px solid rgba(255,255,255,0.1)",
+      opacity: allGone ? 0.35 : 1,
+      textDecoration: allGone ? "line-through" : "none",
+    }}>
+      <span style={{
+        fontSize: 14,
+        fontWeight: "bold",
+        color: allGone ? "#666" : color,
+        lineHeight: 1,
+      }}>
+        {label}
+      </span>
+      <Dots total={total} remaining={remaining} />
+    </div>
+  );
 }
 
 export function TileCounter({ gameState }: TileCounterProps) {
   const [expanded, setExpanded] = useState(false);
-
   const visible = useMemo(() => countVisibleTiles(gameState), [gameState]);
 
   return (
-    <div style={{ marginTop: 8 }}>
+    <div style={{ marginTop: 4, flexShrink: 0 }}>
       <button
         onClick={() => setExpanded(!expanded)}
         style={{
           width: "100%",
-          padding: "6px 12px",
+          padding: "4px 12px",
           fontSize: 12,
-          background: "rgba(0,0,0,0.3)",
-          border: "1px solid rgba(184,134,11,0.3)",
+          background: expanded ? "rgba(255,215,0,0.1)" : "rgba(0,0,0,0.3)",
+          border: `1px solid ${expanded ? "rgba(255,215,0,0.4)" : "rgba(184,134,11,0.3)"}`,
           color: "#e8d5a3",
           borderRadius: 4,
           minHeight: "auto",
@@ -79,51 +108,33 @@ export function TileCounter({ gameState }: TileCounterProps) {
           padding: 8,
           background: "rgba(0,0,0,0.4)",
           borderRadius: 6,
-          fontSize: 12,
+          border: "1px solid rgba(255,255,255,0.08)",
         }}>
           {SUITS.map(suit => (
             <div key={suit} style={{ marginBottom: 6 }}>
-              <div style={{ color: SUIT_COLORS[suit], fontWeight: "bold", marginBottom: 2 }}>
+              <div style={{ color: SUIT_COLORS[suit], fontWeight: "bold", fontSize: 10, marginBottom: 2 }}>
                 {SUIT_LABELS[suit]}
               </div>
-              <div style={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
+              <div style={{ display: "flex", gap: 3, flexWrap: "wrap" }}>
                 {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(value => {
                   const key = `${suit}-${value}`;
                   const seen = visible.get(key) ?? 0;
-                  const remaining = 4 - seen;
                   return (
-                    <div
+                    <TileCell
                       key={value}
-                      style={{
-                        width: 28,
-                        height: 28,
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "center",
-                        borderRadius: 3,
-                        fontSize: 11,
-                        fontWeight: "bold",
-                        background: remaining === 0
-                          ? "rgba(244,67,54,0.2)"
-                          : remaining <= 1
-                          ? "rgba(255,167,38,0.15)"
-                          : "rgba(255,255,255,0.05)",
-                        color: remaining === 0
-                          ? "#f44336"
-                          : remaining <= 1
-                          ? "#ffa726"
-                          : "#8fbc8f",
-                        border: remaining === 0 ? "1px solid rgba(244,67,54,0.3)" : "1px solid rgba(255,255,255,0.1)",
-                      }}
-                      title={`${value}${SUIT_LABELS[suit]}: 已见${seen}/4 剩余${remaining}`}
-                    >
-                      {value}<sub style={{ fontSize: 8 }}>{remaining}</sub>
-                    </div>
+                      label={CN_NUMS[value]}
+                      remaining={4 - seen}
+                      total={4}
+                      color={SUIT_COLORS[suit]}
+                    />
                   );
                 })}
               </div>
             </div>
           ))}
+          <div style={{ fontSize: 9, color: "rgba(255,255,255,0.3)", marginTop: 4, textAlign: "center" }}>
+            ● 剩余 &nbsp; ○ 已见
+          </div>
         </div>
       )}
     </div>
