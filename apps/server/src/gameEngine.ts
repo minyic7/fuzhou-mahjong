@@ -201,6 +201,9 @@ function handleDiscard(
     player.hasDiscardedGold = true;
   }
 
+  // Broadcast state before action prompts so clients have updated lastDiscard
+  broadcastState(io, game);
+
   // Check if anyone can act on this discard
   const pendingPlayers: number[] = [];
 
@@ -225,8 +228,6 @@ function handleDiscard(
     });
     activeWindows.set(game.roomId, window);
   }
-
-  broadcastState(io, game);
 }
 
 function handleDraw(
