@@ -264,7 +264,7 @@ export function Game({ initialGameState, onLeave }: GameProps) {
   }
 
   return (
-    <div>
+    <div className="game-wrapper">
       {showFlash && (
         <>
           <div className="screen-flash" />
