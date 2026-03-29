@@ -120,12 +120,41 @@ export function Game({ initialGameState, onLeave }: GameProps) {
         <p style={{ fontSize: 18, color: "#ffd700", marginBottom: 12 }}>
           {winTypeNames[gameOver.winType] || gameOver.winType}
         </p>
+
+        {/* Score breakdown */}
+        {gameOver.breakdown && isWin && (
+          <div style={{ marginBottom: 12, padding: 10, background: "rgba(255,255,255,0.05)", borderRadius: 6, display: "inline-block" }}>
+            <div style={{ fontSize: 12, color: "#aaa", marginBottom: 4 }}>得分明细</div>
+            <div style={{ fontSize: 13, color: "#ccc" }}>
+              花分: {gameOver.breakdown.flowerScore} | 金: {gameOver.breakdown.goldScore} | 连庄: {gameOver.breakdown.lianZhuangCount} | 特殊: {gameOver.breakdown.specialMultiplier}x
+            </div>
+            <div style={{ fontSize: 14, color: "#ffd700", marginTop: 4 }}>
+              总分: {gameOver.breakdown.totalScore}
+            </div>
+          </div>
+        )}
+
+        {/* Player ranking */}
         <div style={{ marginBottom: 20 }}>
-          {gameOver.scores.map((score, i) => (
-            <p key={i} style={{ color: score > 0 ? "#4caf50" : score < 0 ? "#f44336" : "#aaa" }}>
-              {getPlayerName(i)}: {score > 0 ? "+" : ""}{score}
-            </p>
-          ))}
+          {gameOver.scores
+            .map((score, i) => ({ name: (gameOver.playerNames ?? [])[i] || getPlayerName(i), score, i }))
+            .sort((a, b) => b.score - a.score)
+            .map((p, rank) => (
+              <div key={p.i} style={{
+                display: "flex", justifyContent: "space-between", alignItems: "center",
+                padding: "6px 16px", marginBottom: 4, borderRadius: 4,
+                background: p.score > 0 ? "rgba(76,175,80,0.15)" : p.score < 0 ? "rgba(244,67,54,0.1)" : "transparent",
+                border: rank === 0 && p.score > 0 ? "1px solid #4caf50" : "1px solid transparent",
+              }}>
+                <span>
+                  {rank === 0 && p.score > 0 ? "🏆 " : `${rank + 1}. `}
+                  {p.name}
+                </span>
+                <span style={{ fontWeight: "bold", color: p.score > 0 ? "#4caf50" : p.score < 0 ? "#f44336" : "#aaa" }}>
+                  {p.score > 0 ? "+" : ""}{p.score}
+                </span>
+              </div>
+            ))}
         </div>
         <button
           onClick={handleNextRound}
