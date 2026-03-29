@@ -85,6 +85,13 @@ export function Game({ initialGameState, onLeave }: GameProps) {
         }
       }
 
+      // Clear pendingClaim when the game state moves on (turn changed or lastDiscard cleared)
+      // so stale claim actions don't block future actionRequired events
+      if (prev && (state.currentTurn !== prev.currentTurn || (!state.lastDiscard && prev.lastDiscard))) {
+        setPendingClaim(false);
+        setActions(null);
+      }
+
       prevStateRef.current = state;
       setGameState(state);
     });
