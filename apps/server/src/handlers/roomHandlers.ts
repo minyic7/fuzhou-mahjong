@@ -5,6 +5,7 @@ import {
   findRoom,
   findRoomBySocket,
   deleteRoomIfEmpty,
+  getAvailableRooms,
 } from "../room.js";
 import { createGame } from "../gameState.js";
 
@@ -22,6 +23,7 @@ export function registerRoomHandlers(io: GameServer, socket: GameSocket): void {
 
     socket.emit("roomCreated", room.id);
     socket.emit("roomJoined", room.getState());
+    io.emit("roomList", getAvailableRooms());
     console.log(`Room ${room.id} created by ${playerName} (${socket.id})`);
   });
 
@@ -48,11 +50,17 @@ export function registerRoomHandlers(io: GameServer, socket: GameSocket): void {
 
     socket.emit("roomJoined", room.getState());
     io.to(room.id).emit("roomUpdated", room.getState());
+    io.emit("roomList", getAvailableRooms());
     console.log(`${playerName} (${socket.id}) joined room ${room.id}`);
+  });
+
+  socket.on("listRooms", () => {
+    socket.emit("roomList", getAvailableRooms());
   });
 
   socket.on("leaveRoom", () => {
     leaveCurrentRoom(io, socket);
+    io.emit("roomList", getAvailableRooms());
   });
 
   socket.on("startGame", () => {
@@ -71,6 +79,7 @@ export function registerRoomHandlers(io: GameServer, socket: GameSocket): void {
     }
 
     room.gameStarted = true;
+    io.emit("roomList", getAvailableRooms());
     console.log(`Game starting in room ${room.id}`);
 
     const game = createGame(room.id, room.players.map((p) => p.socketId));
@@ -88,6 +97,7 @@ export function registerRoomHandlers(io: GameServer, socket: GameSocket): void {
 
   socket.on("disconnect", () => {
     leaveCurrentRoom(io, socket);
+    io.emit("roomList", getAvailableRooms());
   });
 }
 

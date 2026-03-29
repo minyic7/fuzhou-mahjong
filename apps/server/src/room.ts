@@ -1,4 +1,4 @@
-import type { RoomState } from "@fuzhou-mahjong/shared";
+import type { RoomState, RoomListItem } from "@fuzhou-mahjong/shared";
 
 export interface Player {
   socketId: string;
@@ -87,4 +87,19 @@ export function deleteRoomIfEmpty(roomId: string): void {
   if (room && room.isEmpty()) {
     rooms.delete(roomId);
   }
+}
+
+export function getAvailableRooms(): RoomListItem[] {
+  const result: RoomListItem[] = [];
+  for (const room of rooms.values()) {
+    if (!room.isFull() && !room.gameStarted) {
+      result.push({
+        roomId: room.id,
+        playerCount: room.players.length,
+        maxPlayers: room.maxPlayers,
+        players: room.players.map((p) => p.name),
+      });
+    }
+  }
+  return result;
 }
