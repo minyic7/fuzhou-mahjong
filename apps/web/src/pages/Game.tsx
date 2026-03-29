@@ -67,10 +67,33 @@ export function Game({ initialGameState, onLeave }: GameProps) {
       return other?.name || `玩家${idx}`;
     };
 
+    const isWin = gameOver.winnerId !== null;
+    const confettiColors = ["#ff6b6b", "#ffd700", "#4caf50", "#2196f3", "#ff9800", "#e91e63"];
+
     return (
-      <div style={{ textAlign: "center", padding: 40 }}>
+      <div>
+        {isWin && (
+          <div className="confetti-container">
+            {Array.from({ length: 30 }).map((_, i) => (
+              <div
+                key={i}
+                className="confetti"
+                style={{
+                  left: `${Math.random() * 100}%`,
+                  background: confettiColors[i % confettiColors.length],
+                  borderRadius: Math.random() > 0.5 ? "50%" : "0",
+                  width: 8 + Math.random() * 8,
+                  height: 8 + Math.random() * 8,
+                  animationDelay: `${Math.random() * 2}s`,
+                  animationDuration: `${2 + Math.random() * 2}s`,
+                }}
+              />
+            ))}
+          </div>
+        )}
+      <div className={isWin ? "hu-celebration" : ""} style={{ textAlign: "center", padding: 40 }}>
         <h2 style={{ fontSize: 28, marginBottom: 16 }}>
-          {gameOver.winnerId !== null ? `🎉 ${getPlayerName(gameOver.winnerId)} 胡了!` : "流局 / Draw"}
+          {isWin ? `🎉 ${getPlayerName(gameOver.winnerId!)} 胡了!` : "流局 / Draw"}
         </h2>
         <p style={{ fontSize: 18, color: "#ffd700", marginBottom: 12 }}>
           {winTypeNames[gameOver.winType] || gameOver.winType}
@@ -96,6 +119,7 @@ export function Game({ initialGameState, onLeave }: GameProps) {
             离开 / Leave
           </button>
         )}
+      </div>
       </div>
     );
   }

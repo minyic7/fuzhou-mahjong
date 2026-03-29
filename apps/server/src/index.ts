@@ -23,7 +23,6 @@ app.get("/api/health", (_req, res) => {
 });
 
 io.on("connection", (socket) => {
-  console.log(`Client connected: ${socket.id}`);
   registerRoomHandlers(io, socket);
   registerGameHandlers(io, socket);
 });

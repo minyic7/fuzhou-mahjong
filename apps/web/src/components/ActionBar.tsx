@@ -28,7 +28,7 @@ export function ActionBar({ actions, selectedTileId, gameState, onAction }: Acti
   if (!actions) {
     const isMyTurn = gameState.currentTurn === gameState.myIndex;
     return (
-      <div style={{
+      <div className="waiting-pulse" style={{
         textAlign: "center", padding: 12, color: "#aaa", fontSize: 14,
         background: "rgba(0,0,0,0.3)", borderRadius: 8, marginTop: 8,
       }}>

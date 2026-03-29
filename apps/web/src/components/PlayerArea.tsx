@@ -22,12 +22,15 @@ export function PlayerArea({
   isCurrentTurn, isDealer, gold, selectedTileId, onTileClick, label,
 }: PlayerAreaProps) {
   return (
-    <div style={{
-      padding: 8,
-      background: isCurrentTurn ? "rgba(255,255,255,0.08)" : "transparent",
-      borderRadius: 8,
-      border: isCurrentTurn ? "1px solid #ffd700" : "1px solid transparent",
-    }}>
+    <div
+      className={isCurrentTurn ? "current-turn" : ""}
+      style={{
+        padding: 8,
+        background: isCurrentTurn ? "rgba(255,255,255,0.08)" : "transparent",
+        borderRadius: 8,
+        border: isCurrentTurn ? "2px solid #ffd700" : "1px solid transparent",
+      }}
+    >
       <div style={{ fontSize: 12, marginBottom: 4, color: "#aaa" }}>
         {label} {isDealer && "🀄"} {isCurrentTurn && "◀"}
       </div>
