@@ -75,7 +75,24 @@ export function TileWall({ wallRemaining, gold }: TileWallProps) {
             <TileView tile={gold.indicatorTile} faceUp gold={null} small />
           </div>
         )}
-        <div style={{ fontSize: 12, color: "#aaa" }}>
+        <div
+          className={wallRemaining <= 20 ? "wall-low-pulse" : ""}
+          style={{
+            fontSize: wallRemaining <= 10 ? 22 : wallRemaining <= 20 ? 20 : 18,
+            fontWeight: "bold",
+            color: wallRemaining <= 10 ? "#f44336" : wallRemaining <= 20 ? "#ffa726" : "#8fbc8f",
+            padding: "4px 12px",
+            borderRadius: 6,
+            background: wallRemaining <= 10
+              ? "rgba(244,67,54,0.15)"
+              : wallRemaining <= 20
+              ? "rgba(255,167,38,0.12)"
+              : "transparent",
+            border: wallRemaining <= 20
+              ? `1px solid ${wallRemaining <= 10 ? "rgba(244,67,54,0.4)" : "rgba(255,167,38,0.3)"}`
+              : "1px solid transparent",
+          }}
+        >
           余 {wallRemaining}
         </div>
       </div>
