@@ -18,6 +18,7 @@ import {
   getNextDealer,
   WinType,
   decideBotAction,
+  sortHand,
 } from "@fuzhou-mahjong/shared";
 import type {
   GameAction,
@@ -195,6 +196,7 @@ function handleDiscard(
   player.discards.push(tile);
   state.lastDiscard = { tile, playerIndex };
   game.firstActionTaken = true;
+  game.lastDrawnTileIds[playerIndex] = null;
 
   // Gold discard penalty
   if (state.gold && isGoldTile(tile, state.gold)) {
@@ -263,6 +265,8 @@ function handleDraw(
     tile = state.wallTail.pop()!;
   }
   player.hand.push(tile);
+  player.hand = sortHand(player.hand, state.gold);
+  game.lastDrawnTileIds[playerIndex] = tile.id;
 
   state.lastDiscard = null;
 
@@ -398,8 +402,11 @@ function handleSelfDrawHu(
   const player = game.state.players[playerIndex];
   if (player.hand.length === 0) return;
 
-  // The last tile in hand is the winning tile (just drawn)
-  const winningTile = player.hand[player.hand.length - 1];
+  // Find the drawn tile by tracked ID (hand is sorted, so it may not be last)
+  const drawnId = game.lastDrawnTileIds[playerIndex];
+  const winningTile = drawnId != null
+    ? player.hand.find((t) => t.id === drawnId) ?? player.hand[player.hand.length - 1]
+    : player.hand[player.hand.length - 1];
 
   const winResult = checkWin(player, winningTile, game.state.gold, {
     isSelfDraw: true,
@@ -439,6 +446,8 @@ function gangDraw(
   }
 
   player.hand.push(tile);
+  player.hand = sortHand(player.hand, state.gold);
+  game.lastDrawnTileIds[playerIndex] = tile.id;
   broadcastState(io, game);
 
   // After gang draw, player gets actions (discard, check hu/gang)
@@ -619,8 +628,11 @@ function getPostDrawActions(
   const player = state.players[playerIndex];
   const gold = state.gold;
 
-  // Check self-draw hu
-  const lastTile = player.hand[player.hand.length - 1];
+  // Check self-draw hu (find drawn tile by tracked ID, since hand is sorted)
+  const drawnId = game.lastDrawnTileIds[playerIndex];
+  const lastTile = drawnId != null
+    ? player.hand.find((t) => t.id === drawnId) ?? player.hand[player.hand.length - 1]
+    : player.hand[player.hand.length - 1];
   let canHuFlag = false;
   if (lastTile) {
     const winResult = checkWin(player, lastTile, gold, {

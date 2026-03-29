@@ -7,8 +7,10 @@ interface TileProps {
   selected?: boolean;
   claimable?: boolean;
   onClick?: () => void;
+  onDoubleClick?: () => void;
   gold?: GoldState | null;
   small?: boolean;
+  className?: string;
 }
 
 const SUIT_CHARS: Record<string, string> = { wan: "万", bing: "饼", tiao: "条" };
@@ -37,7 +39,7 @@ function getTileText(tile: Tile): { text: string; color: string } {
   }
 }
 
-export function TileView({ tile, faceUp = true, selected, claimable, onClick, gold, small }: TileProps) {
+export function TileView({ tile, faceUp = true, selected, claimable, onClick, onDoubleClick, gold, small, className }: TileProps) {
   const size = small ? { width: 28, height: 38, fontSize: 11 } : { width: 40, height: 56, fontSize: 15 };
   const isGold = gold && isSuitedTile(tile.tile) && isGoldTile(tile, gold);
 
@@ -58,8 +60,9 @@ export function TileView({ tile, faceUp = true, selected, claimable, onClick, go
 
   return (
     <div
-      className={claimable ? "tile-claimable" : undefined}
+      className={className || (claimable ? "tile-claimable" : undefined)}
       onClick={onClick}
+      onDoubleClick={onDoubleClick}
       style={{
         ...size,
         background: selected ? "#ffe4b5" : claimable ? "#e0ffe8" : "#f5f0e0",

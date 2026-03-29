@@ -30,3 +30,4 @@ export {
 export { calculateScore, getNextDealer } from './scoring.js';
 export type { ScoreResult } from './scoring.js';
 export { decideBotAction } from './bot.js';
+export { sortHand, findTenpaiTiles } from './hand.js';
