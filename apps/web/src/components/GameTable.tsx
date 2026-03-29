@@ -10,7 +10,13 @@ interface GameTableProps {
 
 export function GameTable({ state, onTileSelect, selectedTileId }: GameTableProps) {
   const { myHand, myFlowers, myMelds, myDiscards, myName, otherPlayers, currentTurn, myIndex, gold, dealerIndex, lianZhuangCount, wallRemaining } = state;
-  const labels = [myName || "我", otherPlayers[0]?.name || "右", otherPlayers[1]?.name || "上", otherPlayers[2]?.name || "左"];
+  const botLabel = (name: string, isBot?: boolean) => isBot ? `${name} 🤖` : name;
+  const labels = [
+    myName || "我",
+    botLabel(otherPlayers[0]?.name || "右", otherPlayers[0]?.isBot),
+    botLabel(otherPlayers[1]?.name || "上", otherPlayers[1]?.isBot),
+    botLabel(otherPlayers[2]?.name || "左", otherPlayers[2]?.isBot),
+  ];
 
   return (
     <div style={{

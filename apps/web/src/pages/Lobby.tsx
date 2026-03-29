@@ -66,6 +66,9 @@ export function Lobby({ onJoined }: LobbyProps) {
         >
           创建房间 / Create Room
         </button>
+        <p style={{ color: "#888", fontSize: 13, marginTop: 8, textAlign: "center" }}>
+          一个人也能玩！创建房间后可添加机器人凑满 4 人
+        </p>
       </div>
 
       <hr />

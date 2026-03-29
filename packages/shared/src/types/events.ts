@@ -15,6 +15,7 @@ export interface RoomState {
 
 export interface OtherPlayerView {
   name: string;
+  isBot?: boolean;
   flowers: TileInstance[];
   melds: Meld[];
   handCount: number;
