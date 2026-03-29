@@ -1,0 +1,82 @@
+import { useEffect, useState } from "react";
+import { socket } from "../socket";
+import type { RoomState } from "@fuzhou-mahjong/shared";
+
+interface RoomProps {
+  onGameStarted: () => void;
+}
+
+export function Room({ onGameStarted }: RoomProps) {
+  const [room, setRoom] = useState<RoomState | null>(null);
+
+  useEffect(() => {
+    socket.on("roomJoined", (state) => setRoom(state));
+    socket.on("roomUpdated", (state) => setRoom(state));
+    socket.on("gameStarted", () => onGameStarted());
+
+    return () => {
+      socket.off("roomJoined");
+      socket.off("roomUpdated");
+      socket.off("gameStarted");
+    };
+  }, [onGameStarted]);
+
+  if (!room) return <p>Loading...</p>;
+
+  const handleStart = () => {
+    socket.emit("startGame");
+  };
+
+  const handleLeave = () => {
+    socket.emit("leaveRoom");
+  };
+
+  return (
+    <div style={{ maxWidth: 400, margin: "0 auto", padding: 20 }}>
+      <h2>房间 / Room</h2>
+
+      <div style={{
+        fontSize: 32,
+        fontWeight: "bold",
+        textAlign: "center",
+        padding: 20,
+        background: "#f0f0f0",
+        borderRadius: 8,
+        marginBottom: 20,
+        letterSpacing: 8,
+      }}>
+        {room.roomId}
+      </div>
+
+      <h3>玩家 / Players ({room.players.length}/4)</h3>
+      <ul style={{ listStyle: "none", padding: 0 }}>
+        {room.players.map((p, i) => (
+          <li key={i} style={{ padding: 8, borderBottom: "1px solid #eee" }}>
+            {p.name}
+          </li>
+        ))}
+        {Array.from({ length: 4 - room.players.length }).map((_, i) => (
+          <li key={`empty-${i}`} style={{ padding: 8, borderBottom: "1px solid #eee", color: "#ccc" }}>
+            等待加入...
+          </li>
+        ))}
+      </ul>
+
+      <div style={{ marginTop: 20, display: "flex", gap: 10 }}>
+        <button
+          onClick={handleStart}
+          disabled={room.players.length < 4}
+          style={{ flex: 1, padding: 12, fontSize: 16 }}
+        >
+          开始游戏 / Start
+        </button>
+        <button
+          onClick={handleLeave}
+          style={{ padding: 12, fontSize: 16 }}
+        >
+          离开 / Leave
+        </button>
+      </div>
+    </div>
+  );
+}
