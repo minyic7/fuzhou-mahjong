@@ -47,6 +47,7 @@ export type {
   ClientGameState,
   AvailableActions,
   ActionResult,
+  ScoreBreakdown,
   GameOverResult,
   ClientEvents,
   ServerEvents,

@@ -745,6 +745,14 @@ function endGameWin(
     winnerId: winnerIndex,
     winType: winResult.winType,
     scores: scoreResult.payments,
+    breakdown: {
+      flowerScore: scoreResult.flowerScore,
+      goldScore: scoreResult.goldScore,
+      specialMultiplier: scoreResult.specialMultiplier,
+      lianZhuangCount: state.lianZhuangCount,
+      totalScore: scoreResult.totalScore,
+    },
+    playerNames: game.playerNames,
   });
 }
 

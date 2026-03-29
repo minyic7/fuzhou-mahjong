@@ -60,10 +60,20 @@ export interface ActionResult {
   message?: string;
 }
 
+export interface ScoreBreakdown {
+  flowerScore: number;
+  goldScore: number;
+  specialMultiplier: number;
+  lianZhuangCount: number;
+  totalScore: number;
+}
+
 export interface GameOverResult {
   winnerId: number | null;
   winType: string;
   scores: number[];
+  breakdown?: ScoreBreakdown;
+  playerNames?: string[];
 }
 
 // ─── Room List ───────────────────────────────────────────────────
