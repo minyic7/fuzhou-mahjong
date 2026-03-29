@@ -20,6 +20,7 @@ export class ServerGameState {
   state: GameState;
   roomId: string;
   playerSocketIds: string[];
+  firstActionTaken = false;
 
   constructor(roomId: string, playerSocketIds: string[]) {
     this.roomId = roomId;
