@@ -26,6 +26,17 @@ export function ActionBar({ actions, selectedTileId, gameState, onAction }: Acti
   const barRef = useRef<HTMLDivElement>(null);
   const myIndex = gameState.myIndex;
 
+  const hasClaimAction = actions
+    ? actions.canHu || actions.canPeng || actions.canMingGang || actions.chiOptions.length > 0
+    : false;
+  const isClaimWindow = hasClaimAction && actions ? !actions.canDiscard : false;
+
+  useEffect(() => {
+    if (isClaimWindow && barRef.current) {
+      barRef.current.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }
+  }, [isClaimWindow]);
+
   if (!actions) {
     const isMyTurn = gameState.currentTurn === gameState.myIndex;
     return (
@@ -47,15 +58,6 @@ export function ActionBar({ actions, selectedTileId, gameState, onAction }: Acti
   const selectedTile = selectedTileId !== null
     ? gameState.myHand.find((t) => t.id === selectedTileId) ?? null
     : null;
-
-  const hasClaimAction = actions.canHu || actions.canPeng || actions.canMingGang || actions.chiOptions.length > 0;
-  const isClaimWindow = hasClaimAction && !actions.canDiscard;
-
-  useEffect(() => {
-    if (isClaimWindow && barRef.current) {
-      barRef.current.scrollIntoView({ behavior: "smooth", block: "nearest" });
-    }
-  }, [isClaimWindow]);
 
   return (
     <div ref={barRef} style={{
