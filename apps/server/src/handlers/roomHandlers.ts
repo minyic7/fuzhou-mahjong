@@ -4,107 +4,156 @@ import {
   createRoom,
   findRoom,
   findRoomBySocket,
+  findRoomByPlayerId,
   deleteRoomIfEmpty,
   getAvailableRooms,
+  registerPlayerRoom,
+  unregisterPlayerRoom,
 } from "../room.js";
-import { createGame } from "../gameState.js";
+import { createGame, getGame } from "../gameState.js";
 
 type GameSocket = Socket<ClientEvents, ServerEvents>;
 type GameServer = Server<ClientEvents, ServerEvents>;
 
+const RECONNECT_TIMEOUT_MS = 60_000;
+
+function broadcastRoomList(io: GameServer): void {
+  io.emit("roomList", getAvailableRooms());
+}
+
 export function registerRoomHandlers(io: GameServer, socket: GameSocket): void {
+  socket.on("listRooms", () => {
+    socket.emit("roomList", getAvailableRooms());
+  });
+
   socket.on("createRoom", (playerName: string) => {
-    // Leave any existing room first
     leaveCurrentRoom(io, socket);
 
     const room = createRoom();
-    room.addPlayer(socket.id, playerName);
+    const player = room.addPlayer(socket.id, playerName);
+    registerPlayerRoom(player.playerId, room.id);
     socket.join(room.id);
 
+    socket.emit("playerIdAssigned", player.playerId);
     socket.emit("roomCreated", room.id);
     socket.emit("roomJoined", room.getState());
-    io.emit("roomList", getAvailableRooms());
+    broadcastRoomList(io);
     console.log(`Room ${room.id} created by ${playerName} (${socket.id})`);
   });
 
   socket.on("joinRoom", (roomId: string, playerName: string) => {
     const room = findRoom(roomId);
-    if (!room) {
-      socket.emit("error", `Room ${roomId} not found`);
-      return;
-    }
-    if (room.isFull()) {
-      socket.emit("error", `Room ${roomId} is full`);
-      return;
-    }
-    if (room.gameStarted) {
-      socket.emit("error", `Game already in progress in room ${roomId}`);
-      return;
-    }
+    if (!room) { socket.emit("error", `Room ${roomId} not found`); return; }
+    if (room.isFull()) { socket.emit("error", `Room ${roomId} is full`); return; }
+    if (room.gameStarted) { socket.emit("error", `Game already in progress in room ${roomId}`); return; }
 
-    // Leave any existing room first
     leaveCurrentRoom(io, socket);
 
-    room.addPlayer(socket.id, playerName);
+    const player = room.addPlayer(socket.id, playerName);
+    registerPlayerRoom(player.playerId, room.id);
     socket.join(room.id);
 
+    socket.emit("playerIdAssigned", player.playerId);
     socket.emit("roomJoined", room.getState());
     io.to(room.id).emit("roomUpdated", room.getState());
-    io.emit("roomList", getAvailableRooms());
+    broadcastRoomList(io);
     console.log(`${playerName} (${socket.id}) joined room ${room.id}`);
   });
 
-  socket.on("listRooms", () => {
-    socket.emit("roomList", getAvailableRooms());
+  socket.on("rejoinGame", (playerId: string) => {
+    const room = findRoomByPlayerId(playerId);
+    if (!room) { socket.emit("error", "No active game found"); return; }
+
+    const player = room.reconnectPlayer(playerId, socket.id);
+    if (!player) { socket.emit("error", "Player not found in room"); return; }
+
+    socket.join(room.id);
+
+    const game = getGame(room.id);
+    if (game) {
+      const playerIndex = room.getPlayerIndexByPlayerId(playerId);
+      game.updateSocketId(playerIndex, socket.id);
+      socket.emit("playerIdAssigned", playerId);
+      socket.emit("gameStarted", game.getClientGameState(playerIndex));
+      io.to(room.id).emit("playerReconnected", playerIndex);
+      console.log(`Player ${player.name} reconnected to room ${room.id}`);
+    } else {
+      socket.emit("roomJoined", room.getState());
+    }
   });
 
   socket.on("leaveRoom", () => {
     leaveCurrentRoom(io, socket);
-    io.emit("roomList", getAvailableRooms());
+    broadcastRoomList(io);
   });
 
   socket.on("startGame", () => {
     const room = findRoomBySocket(socket.id);
-    if (!room) {
-      socket.emit("error", "Not in a room");
-      return;
-    }
-    if (!room.isFull()) {
-      socket.emit("error", `Need ${room.maxPlayers} players to start (have ${room.players.length})`);
-      return;
-    }
-    if (room.gameStarted) {
-      socket.emit("error", "Game already started");
-      return;
-    }
+    if (!room) { socket.emit("error", "Not in a room"); return; }
+    if (!room.isFull()) { socket.emit("error", `Need ${room.maxPlayers} players to start (have ${room.players.length})`); return; }
+    if (room.gameStarted) { socket.emit("error", "Game already started"); return; }
 
     room.gameStarted = true;
-    io.emit("roomList", getAvailableRooms());
+    broadcastRoomList(io);
     console.log(`Game starting in room ${room.id}`);
 
-    const game = createGame(room.id, room.players.map((p) => p.socketId));
+    const socketIds = room.players.map((p) => p.socketId!);
+    const game = createGame(room.id, socketIds);
 
-    // Send each player their personalized game state
     for (let i = 0; i < 4; i++) {
-      const socketId = room.players[i].socketId;
-      io.to(socketId).emit("gameStarted", game.getClientGameState(i));
+      io.to(socketIds[i]).emit("gameStarted", game.getClientGameState(i));
     }
 
-    // Tell dealer to discard
     const dealerSocketId = game.getSocketId(game.state.dealerIndex);
     io.to(dealerSocketId).emit("actionRequired", game.getAvailableActions(game.state.dealerIndex));
   });
 
   socket.on("disconnect", () => {
-    leaveCurrentRoom(io, socket);
-    io.emit("roomList", getAvailableRooms());
+    const room = findRoomBySocket(socket.id);
+    if (!room) return;
+
+    if (room.gameStarted) {
+      // During game: keep slot, start reconnect timer
+      const player = room.disconnectPlayer(socket.id);
+      if (!player) return;
+
+      const playerIndex = room.getPlayerIndexByPlayerId(player.playerId);
+      io.to(room.id).emit("playerDisconnected", playerIndex);
+      io.to(room.id).emit("roomUpdated", room.getState());
+      console.log(`Player ${player.name} disconnected from game in room ${room.id}`);
+
+      const timer = setTimeout(() => {
+        room.disconnectTimers.delete(player.playerId);
+        console.log(`Reconnect timeout for ${player.name} in room ${room.id}`);
+        // Player stays in game but auto-passes all actions (handled by action timeout in gameEngine)
+      }, RECONNECT_TIMEOUT_MS);
+      room.disconnectTimers.set(player.playerId, timer);
+    } else {
+      // Not in game: remove normally
+      const player = room.players.find((p) => p.socketId === socket.id);
+      if (player) unregisterPlayerRoom(player.playerId);
+      room.removePlayer(socket.id);
+      socket.leave(room.id);
+
+      if (room.isEmpty()) {
+        deleteRoomIfEmpty(room.id);
+        console.log(`Room ${room.id} deleted (empty)`);
+      } else {
+        io.to(room.id).emit("roomUpdated", room.getState());
+        console.log(`Player ${socket.id} left room ${room.id}`);
+      }
+    }
+    broadcastRoomList(io);
   });
 }
 
 function leaveCurrentRoom(io: GameServer, socket: GameSocket): void {
   const room = findRoomBySocket(socket.id);
   if (!room) return;
+  if (room.gameStarted) return; // Can't leave during game
 
+  const player = room.players.find((p) => p.socketId === socket.id);
+  if (player) unregisterPlayerRoom(player.playerId);
   room.removePlayer(socket.id);
   socket.leave(room.id);
 
