@@ -1,4 +1,4 @@
-import type { GoldState } from "@fuzhou-mahjong/shared";
+import type { GoldState, TileInstance } from "@fuzhou-mahjong/shared";
 import { TileView } from "./Tile";
 
 interface GameInfoProps {
@@ -7,12 +7,15 @@ interface GameInfoProps {
   dealerIndex: number;
   lianZhuangCount: number;
   myIndex: number;
+  lastDiscard: { tile: TileInstance; playerIndex: number } | null;
+  playerNames: string[];
 }
 
-const POSITION_LABELS = ["下 (我)", "右", "上", "左"];
-
-export function GameInfo({ gold, wallRemaining, dealerIndex, lianZhuangCount, myIndex }: GameInfoProps) {
-  const dealerLabel = POSITION_LABELS[(dealerIndex - myIndex + 4) % 4];
+export function GameInfo({ gold, wallRemaining, dealerIndex, lianZhuangCount, myIndex, lastDiscard, playerNames }: GameInfoProps) {
+  const posLabel = (idx: number) => {
+    const rel = (idx - myIndex + 4) % 4;
+    return rel === 0 ? "我" : (playerNames[rel] || ["我", "右", "上", "左"][rel]);
+  };
 
   return (
     <div style={{
@@ -22,11 +25,27 @@ export function GameInfo({ gold, wallRemaining, dealerIndex, lianZhuangCount, my
       borderRadius: 8,
     }}>
       <div style={{ marginBottom: 8 }}>
-        <span style={{ color: "#aaa", fontSize: 12 }}>金牌 / Gold: </span>
+        <span style={{ color: "#aaa", fontSize: 12 }}>金牌: </span>
         {gold && <TileView tile={gold.indicatorTile} faceUp gold={null} small />}
       </div>
+
+      {lastDiscard && (
+        <div style={{
+          marginBottom: 8,
+          padding: 8,
+          background: "rgba(255,165,0,0.15)",
+          borderRadius: 6,
+          border: "1px solid rgba(255,165,0,0.4)",
+        }}>
+          <div style={{ fontSize: 11, color: "#ffa500", marginBottom: 4 }}>
+            {posLabel(lastDiscard.playerIndex)} 打出:
+          </div>
+          <TileView tile={lastDiscard.tile} faceUp gold={gold} />
+        </div>
+      )}
+
       <div style={{ fontSize: 12, color: "#aaa" }}>
-        剩余: {wallRemaining} | 庄: {dealerLabel} | 连庄: {lianZhuangCount}
+        剩余: {wallRemaining} | 庄: {posLabel(dealerIndex)} | 连庄: {lianZhuangCount}
       </div>
     </div>
   );
