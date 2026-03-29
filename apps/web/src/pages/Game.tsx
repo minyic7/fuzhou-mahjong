@@ -44,11 +44,24 @@ export function Game() {
   };
 
   if (gameOver) {
+    const handleNextRound = () => {
+      socket.emit("nextRound");
+      setGameOver(null);
+      setActions(null);
+      setSelectedTileId(null);
+    };
+
     return (
       <div style={{ textAlign: "center", padding: 40 }}>
         <h2>{gameOver.winnerId !== null ? `玩家 ${gameOver.winnerId} 胡了!` : "流局 / Draw"}</h2>
         <p>胡法: {gameOver.winType}</p>
         <p>分数: {gameOver.scores.join(", ")}</p>
+        <button
+          onClick={handleNextRound}
+          style={{ marginTop: 20, padding: "12px 32px", fontSize: 18, background: "#0f3460", color: "#eee", border: "none", borderRadius: 6, cursor: "pointer" }}
+        >
+          下一局 / Next Round
+        </button>
       </div>
     );
   }
