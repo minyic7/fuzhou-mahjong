@@ -1,6 +1,7 @@
 import type { ClientGameState, TileInstance } from "@fuzhou-mahjong/shared";
 import { PlayerArea } from "./PlayerArea";
 import { GameInfo } from "./GameInfo";
+import { TileWall } from "./TileWall";
 
 interface GameTableProps {
   state: ClientGameState;
@@ -66,8 +67,9 @@ export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTile
 
       {/* Center - game info */}
       <div style={{ gridArea: "center", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <TileWall wallRemaining={wallRemaining} gold={gold} />
         <GameInfo
-          gold={gold}
+          gold={null}
           wallRemaining={wallRemaining}
           dealerIndex={dealerIndex}
           lianZhuangCount={lianZhuangCount}
