@@ -304,6 +304,8 @@ export function Game({ initialGameState, onLeave }: GameProps) {
           const tile = gameState.myHand.find(t => t.id === tileInstanceId);
           if (tile) handleAction({ type: ActionType.Discard, playerIndex: gameState.myIndex, tile });
         }}
+        canHu={!!(actions?.canHu && actions?.canDiscard)}
+        onHu={() => handleAction({ type: ActionType.Hu, playerIndex: gameState.myIndex })}
         canDraw={actions?.canDraw ?? false}
         onDraw={() => handleAction({ type: ActionType.Draw, playerIndex: gameState.myIndex })}
         kongTileIds={getKongTileIds(actions)}

@@ -11,6 +11,8 @@ interface GameTableProps {
   claimableTileIds?: Set<number>;
   canDiscard?: boolean;
   onDiscard?: (tileInstanceId: number) => void;
+  canHu?: boolean;
+  onHu?: () => void;
   canDraw?: boolean;
   onDraw?: () => void;
   kongTileIds?: Set<number>;
@@ -18,7 +20,7 @@ interface GameTableProps {
   onBuGang?: (tileInstanceId: number) => void;
 }
 
-export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTileId, claimableTileIds, canDiscard, onDiscard, canDraw, onDraw, kongTileIds, onAnGang, onBuGang }: GameTableProps) {
+export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTileId, claimableTileIds, canDiscard, onDiscard, canHu, onHu, canDraw, onDraw, kongTileIds, onAnGang, onBuGang }: GameTableProps) {
   const { myHand, myFlowers, myMelds, myDiscards, myName, otherPlayers, currentTurn, myIndex, gold, dealerIndex, lianZhuangCount, wallRemaining } = state;
   const botLabel = (name: string, isBot?: boolean) => isBot ? `${name} 🤖` : name;
   const labels = [
@@ -122,6 +124,8 @@ export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTile
           claimableTileIds={claimableTileIds}
           canDiscard={canDiscard}
           onDiscard={onDiscard}
+          canHu={canHu}
+          onHu={onHu}
           kongTileIds={kongTileIds}
           onAnGang={onAnGang}
           onBuGang={onBuGang}
