@@ -13,6 +13,8 @@
  *   goldWarningPulse        → .gold-warning-pulse (PlayerArea: gold suit warning)
  *   yourTurnBounce          → .your-turn-prompt   (PlayerArea: turn prompt)
  *   scoreReveal + meldEntrance → score/meld anim  (PlayerArea: round-end reveal)
+ *   overlayFadeOut          → inline style        (ClaimOverlay: exit backdrop)
+ *   overlayScaleOut         → inline style        (ClaimOverlay: exit modal + chi picker)
  *   pageFadeIn              → .page-transition    (index: page entrance)
  *   spin                    → .spinner            (index: loading spinner)
  */
@@ -236,6 +238,16 @@
 @keyframes overlayScaleIn {
   0% { opacity: 0; transform: scale(0.85); }
   100% { opacity: 1; transform: scale(1); }
+}
+
+@keyframes overlayFadeOut {
+  0% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@keyframes overlayScaleOut {
+  0% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(0.9); }
 }
 
 /* Gold indicator flip reveal (plays once when gold tile first appears) */
