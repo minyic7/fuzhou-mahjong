@@ -121,7 +121,9 @@ export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTile
 
       {/* Center - game info */}
       <div className="table-center-area" style={{ gridArea: "center", display: "flex", flexDirection: isCompact ? "column" : "row", alignItems: "center", justifyContent: "center", position: "relative", zIndex: 1, overflow: "hidden" }}>
-        <TileWall wallRemaining={wallRemaining} wallDrawCount={state.wallDrawCount} wallSupplementCount={state.wallSupplementCount} gold={gold} canDraw={canDraw} onDraw={onDraw} compact={isCompact} />
+        {isCompact && (
+          <TileWall wallRemaining={wallRemaining} wallDrawCount={state.wallDrawCount} wallSupplementCount={state.wallSupplementCount} gold={gold} canDraw={canDraw} onDraw={onDraw} compact />
+        )}
         <GameInfo
           gold={gold}
           wallRemaining={wallRemaining}
@@ -133,6 +135,26 @@ export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTile
           compact={isCompact}
         />
       </div>
+
+      {/* Wall segments along table edges (non-compact only) */}
+      {!isCompact && (
+        <>
+          <div style={{ gridArea: "center", alignSelf: "start", justifySelf: "center", zIndex: 2 }}>
+            <TileWall segment="top" wallRemaining={wallRemaining} wallDrawCount={state.wallDrawCount} wallSupplementCount={state.wallSupplementCount} gold={gold} canDraw={canDraw} onDraw={onDraw} />
+          </div>
+          <div style={{ gridArea: "center", alignSelf: "center", justifySelf: "start", zIndex: 2 }}>
+            <TileWall segment="left" wallRemaining={wallRemaining} wallDrawCount={state.wallDrawCount} wallSupplementCount={state.wallSupplementCount} gold={gold} canDraw={canDraw} onDraw={onDraw} />
+          </div>
+          <div style={{ gridArea: "center", alignSelf: "center", justifySelf: "end", zIndex: 2 }}>
+            <TileWall segment="right" wallRemaining={wallRemaining} wallDrawCount={state.wallDrawCount} wallSupplementCount={state.wallSupplementCount} gold={gold} canDraw={canDraw} onDraw={onDraw} />
+          </div>
+          {!isFirstPersonMobile && (
+            <div style={{ gridArea: "center", alignSelf: "end", justifySelf: "center", zIndex: 2 }}>
+              <TileWall segment="bottom" wallRemaining={wallRemaining} wallDrawCount={state.wallDrawCount} wallSupplementCount={state.wallSupplementCount} gold={gold} canDraw={canDraw} onDraw={onDraw} />
+            </div>
+          )}
+        </>
+      )}
 
       {/* Right player */}
       <div style={{ gridArea: "right", position: "relative", zIndex: 1 }}>

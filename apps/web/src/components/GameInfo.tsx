@@ -87,6 +87,25 @@ export function GameInfo({ gold, wallRemaining, dealerIndex, lianZhuangCount, my
       <div style={{ fontSize: 12, color: "var(--color-text-secondary)" }}>
         庄:{posLabel(dealerIndex)} | 连庄:{lianZhuangCount}
       </div>
+      {wallRemaining !== undefined && (
+        <div style={{ fontSize: 12, color: "var(--color-text-secondary)" }}>
+          余{wallRemaining}
+        </div>
+      )}
+      {wallRemaining !== undefined && wallRemaining <= 10 && (
+        <div
+          className="wall-low-pulse"
+          style={{
+            fontSize: 11,
+            color: "var(--color-error)",
+            padding: "2px 6px",
+            borderRadius: 4,
+            background: "rgba(244,67,54,0.15)",
+          }}
+        >
+          牌墙将尽
+        </div>
+      )}
       <MuteButton />
     </div>
   );
