@@ -83,10 +83,15 @@ export function useLongPress(gold: GoldState | null) {
     );
   };
 
+  const onTouchCancel = useCallback(() => {
+    if (timerRef.current) { clearTimeout(timerRef.current); timerRef.current = null; }
+    setTooltip((t) => t.visible ? { ...t, visible: false } : t);
+  }, []);
+
   const dismiss = useCallback(() => {
     if (timerRef.current) { clearTimeout(timerRef.current); timerRef.current = null; }
     setTooltip((t) => t.visible ? { ...t, visible: false } : t);
   }, []);
 
-  return { onTouchStart, onTouchEnd, onMouseEnter, onMouseLeave, Tooltip, dismiss };
+  return { onTouchStart, onTouchEnd, onTouchCancel, onMouseEnter, onMouseLeave, Tooltip, dismiss };
 }

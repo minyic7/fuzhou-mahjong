@@ -55,7 +55,7 @@ export function PlayerArea({
   canDiscard, onDiscard, canHu, onHu, kongTileIds, onAnGang, onBuGang, departingTileId, hasDiscardedGold,
   isDisconnected, compact, ultraCompact, firstPerson, cumulativeScore, claimActive,
 }: PlayerAreaProps) {
-  const { onTouchStart: lpTouchStart, onTouchEnd: lpTouchEnd, onMouseEnter, onMouseLeave, Tooltip, dismiss } = useLongPress(gold);
+  const { onTouchStart: lpTouchStart, onTouchEnd: lpTouchEnd, onTouchCancel: lpTouchCancel, onMouseEnter, onMouseLeave, Tooltip, dismiss } = useLongPress(gold);
 
   // Auto-dismiss tooltip when claim overlay appears
   useEffect(() => {
@@ -333,7 +333,8 @@ export function PlayerArea({
               key={t.id}
               onTouchStart={(e) => swipe.onTouchStart(t.id, e)}
               onTouchMove={swipe.onTouchMove}
-              onTouchEnd={(e) => { swipe.onTouchEnd(); }}
+              onTouchEnd={() => { swipe.onTouchEnd(); }}
+              onTouchCancel={() => { swipe.onTouchCancel(); }}
               style={{
                 display: "inline-flex",
                 marginLeft: lastDrawnTileId === t.id ? "var(--hand-new-tile-margin)" : 0,
@@ -423,6 +424,7 @@ export function PlayerArea({
                 className={departingTileId === t.id ? "tile-departing" : lastDrawnTileId === t.id ? "tile-new" : undefined}
                 onTouchStart={(e) => lpTouchStart(t, e)}
                 onTouchEnd={lpTouchEnd}
+                onTouchCancel={lpTouchCancel}
                 onMouseEnter={(e) => onMouseEnter(t, e)}
                 onMouseLeave={onMouseLeave}
                 onClick={() => handleTap(t)}

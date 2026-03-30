@@ -75,5 +75,11 @@ export function useSwipeGesture({
     setSwipeOffset(0);
   }, [swipeOffset, thresholdProp, onSwipeUp]);
 
-  return { onTouchStart, onTouchMove, onTouchEnd, swipingTileId, swipeOffset };
+  const onTouchCancel = useCallback(() => {
+    touchRef.current = null;
+    setSwipingTileId(null);
+    setSwipeOffset(0);
+  }, []);
+
+  return { onTouchStart, onTouchMove, onTouchEnd, onTouchCancel, swipingTileId, swipeOffset };
 }
