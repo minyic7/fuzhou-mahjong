@@ -296,6 +296,8 @@ export function registerRoomHandlers(io: GameServer, socket: GameSocket): void {
         // If no humans left connected, clean up room and game
         if (!room.hasConnectedPlayers()) {
           deleteGame(room.id);
+          const playerIds = room.players.map((p) => p.playerId);
+          for (const id of playerIds) unregisterPlayerRoom(id);
           room.players = [];
           deleteRoomIfEmpty(room.id);
           console.log(`Room ${room.id} cleaned up (all humans disconnected)`);
