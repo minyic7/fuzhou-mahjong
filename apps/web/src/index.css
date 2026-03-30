@@ -348,7 +348,7 @@ body {
     --fp-hand-gap: 1px;
     --grid-side-col: clamp(40px, 13vh, 60px);
     --wall-progress-w: clamp(50px, 16vh, 80px);
-    --fp-side-col: clamp(30px, 9.5vh, 44px);
+    --fp-side-col: clamp(40px, 9.5vh, 44px);
     --fp-top-row: clamp(16px, 5.3vh, 24px);
     --font-badge: max(10px, 2.6vh);
     --font-uc-label: max(10px, 2.6vh);
