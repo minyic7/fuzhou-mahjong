@@ -521,7 +521,7 @@ export function Game({ initialGameState, onLeave }: GameProps) {
         return (
         <div style={{
           position: "fixed", inset: 0, zIndex: 100,
-          background: "rgba(0,0,0,0.7)",
+          background: "rgba(0,0,0,0.35)",
           display: "flex", alignItems: "center", justifyContent: "center",
           animation: "overlayFadeIn 0.3s ease-out",
         }}>
@@ -529,8 +529,8 @@ export function Game({ initialGameState, onLeave }: GameProps) {
             background: "var(--overlay-bg)",
             border: "2px solid var(--color-gold-border-hover)",
             borderRadius: "var(--radius-lg)",
-            padding: "clamp(16px, 3vh, 32px)",
-            maxWidth: 480, width: "90vw",
+            padding: "16px 20px",
+            maxWidth: 360, width: "90vw",
             maxHeight: "90dvh", overflowY: "auto",
             textAlign: "center",
             animation: "overlayScaleIn 0.3s ease-out",
