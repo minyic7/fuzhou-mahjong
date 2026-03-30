@@ -133,6 +133,20 @@ body {
   --hand-new-tile-margin: 16px;
   --hand-padding-top: 18px;
   --tile-margin: 1px;
+
+  /* Grid layout sizing */
+  --grid-side-col: 60px;
+  --grid-top-row: 28px;
+  --grid-center-row: 40px;
+  --fp-side-col: 44px;
+  --fp-top-row: 24px;
+
+  /* TileCounter cell sizing */
+  --counter-tile-w: 32px;
+  --counter-tile-h: 40px;
+
+  /* Wall progress bar width */
+  --wall-progress-w: 80px;
 }
 
 /* BREAKPOINTS.TABLET_WIDTH */
@@ -248,9 +262,8 @@ body {
     --fp-opponent-tile-w: 16px;
     --fp-opponent-tile-h: 22px;
     --fp-hand-gap: 1px;
-  }
-  .game-table {
-    grid-template-columns: 50px 1fr 50px;
+    --grid-side-col: 50px;
+    --wall-progress-w: 60px;
   }
 }
 

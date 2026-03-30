@@ -54,8 +54,8 @@ function TileCell({ label, remaining, total, color }: {
   const allGone = remaining === 0;
   return (
     <div style={{
-      width: 32,
-      height: 40,
+      width: "var(--counter-tile-w)",
+      height: "var(--counter-tile-h)",
       display: "flex",
       flexDirection: "column",
       alignItems: "center",
