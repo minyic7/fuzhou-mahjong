@@ -71,6 +71,7 @@ export function Game({ initialGameState, onLeave }: GameProps) {
   const [drawAnimation, setDrawAnimation] = useState<DrawAnimationState | null>(null);
   const drawAnimKeyRef = useRef(0);
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
+  const [departingTileId, setDepartingTileId] = useState<number | null>(null);
 
   // First-game auto-show tutorial
   useEffect(() => {
@@ -198,6 +199,7 @@ export function Game({ initialGameState, onLeave }: GameProps) {
         }
       }
 
+      setDepartingTileId(null);
       prevStateRef.current = state;
       setGameState(state);
     });
@@ -219,14 +221,20 @@ export function Game({ initialGameState, onLeave }: GameProps) {
       });
     });
     socket.on("gameOver", (result) => {
+      // Show hu announcement in center before transitioning to game-over screen
+      if (result.winnerId !== null) {
+        const winnerName = (result.playerNames ?? [])[result.winnerId] || `玩家${result.winnerId}`;
+        showClaim([], "hu", winnerName);
+        sounds.hu();
+      } else {
+        sounds.gameDraw();
+      }
       setGameOver(result);
       setRoundHistory((prev) => [...prev, {
         scores: result.scores,
         winnerId: result.winnerId,
         winType: result.winType,
       }]);
-      if (result.winnerId !== null) sounds.hu();
-      else sounds.gameDraw();
     });
     socket.on("playerDisconnected", (event: PlayerDisconnectedEvent) => {
       setDisconnectedPlayers((prev) => new Set(prev).add(event.playerIndex));
@@ -583,6 +591,7 @@ export function Game({ initialGameState, onLeave }: GameProps) {
         onTileSelect={(tile) => setSelectedTileId(tile?.id ?? null)}
         onTileDoubleClick={(tile) => {
           if (effectiveCanDiscard) {
+            setDepartingTileId(tile.id);
             handleAction({ type: ActionType.Discard, playerIndex: gameState.myIndex, tile });
           }
         }}
@@ -591,7 +600,10 @@ export function Game({ initialGameState, onLeave }: GameProps) {
         canDiscard={effectiveCanDiscard}
         onDiscard={(tileInstanceId) => {
           const tile = gameState.myHand.find(t => t.id === tileInstanceId);
-          if (tile) handleAction({ type: ActionType.Discard, playerIndex: gameState.myIndex, tile });
+          if (tile) {
+            setDepartingTileId(tileInstanceId);
+            handleAction({ type: ActionType.Discard, playerIndex: gameState.myIndex, tile });
+          }
         }}
         canHu={!!(actions?.canHu && effectiveCanDiscard)}
         onHu={() => handleAction({ type: ActionType.Hu, playerIndex: gameState.myIndex })}
@@ -609,6 +621,7 @@ export function Game({ initialGameState, onLeave }: GameProps) {
         onBackgroundClick={() => setSelectedTileId(null)}
         disconnectedPlayers={disconnectedPlayers}
         drawAnimation={drawAnimation}
+        departingTileId={departingTileId}
       />
       {isClaimWindow && actions && (
         <ClaimOverlay actions={actions} gameState={gameState} onAction={handleAction} />

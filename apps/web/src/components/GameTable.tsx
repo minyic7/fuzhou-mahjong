@@ -31,9 +31,10 @@ interface GameTableProps {
   onBackgroundClick?: () => void;
   disconnectedPlayers?: Set<number>;
   drawAnimation?: DrawAnimationState | null;
+  departingTileId?: number | null;
 }
 
-export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTileId, claimableTileIds, canDiscard, onDiscard, canHu, onHu, canDraw, onDraw, kongTileIds, onAnGang, onBuGang, onBackgroundClick, disconnectedPlayers, drawAnimation }: GameTableProps) {
+export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTileId, claimableTileIds, canDiscard, onDiscard, canHu, onHu, canDraw, onDraw, kongTileIds, onAnGang, onBuGang, onBackgroundClick, disconnectedPlayers, drawAnimation, departingTileId }: GameTableProps) {
   const isCompact = useIsCompactLandscape();
   const { myHand, myFlowers, myMelds, myDiscards, myName, otherPlayers, currentTurn, myIndex, gold, dealerIndex, lianZhuangCount, wallRemaining, myHasDiscardedGold, cumulativeScores, roundsPlayed } = state;
   const lastDiscardTileId = state.lastDiscard?.tile.id ?? null;
@@ -164,6 +165,7 @@ export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTile
           hasDiscardedGold={myHasDiscardedGold}
           lastDrawnTileId={state.lastDrawnTileId}
           lastDiscardedTileId={lastDiscardPlayerIndex === myIndex ? lastDiscardTileId : null}
+          departingTileId={departingTileId}
           tenpaiTiles={state.tenpaiTiles}
           cumulativeScore={roundsPlayed > 0 ? cumulativeScores[myIndex] : undefined}
         />

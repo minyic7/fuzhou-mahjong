@@ -15,6 +15,7 @@
  *   scoreReveal + meldEntrance → score/meld anim  (PlayerArea: round-end reveal)
  *   overlayFadeOut          → inline style        (ClaimOverlay: exit backdrop)
  *   overlayScaleOut         → inline style        (ClaimOverlay: exit modal + chi picker)
+ *   tileDeparting           → .tile-departing      (PlayerArea: discarded tile exit)
  *   pageFadeIn              → .page-transition    (index: page entrance)
  *   spin                    → .spinner            (index: loading spinner)
  */
@@ -63,6 +64,17 @@
 
 .discard-arrive {
   animation: discardArrive 0.3s ease-out;
+}
+
+/* Discard exit animation (tile leaves hand when discarded) */
+@keyframes tileDeparting {
+  0% { opacity: 1; transform: scale(1); }
+  100% { opacity: 0; transform: scale(0.5) translateY(20px); }
+}
+
+.tile-departing {
+  animation: tileDeparting 0.2s ease-in forwards;
+  pointer-events: none;
 }
 
 /* Hu celebration */
