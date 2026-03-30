@@ -18,6 +18,13 @@ export function setMuted(m: boolean) {
 }
 export function isMuted() { return muted; }
 
+function vibrate(pattern: number | number[]) {
+  if (muted) return;
+  if (typeof navigator !== "undefined" && navigator.vibrate) {
+    navigator.vibrate(pattern);
+  }
+}
+
 function playTone(freq: number, duration: number, type: OscillatorType = "sine", volume = 0.3) {
   if (muted) return;
   const ctx = getCtx();
@@ -55,6 +62,7 @@ export const sounds = {
     // Short clack — like tile hitting table
     playTone(800, 0.08, "square", 0.2);
     setTimeout(() => playTone(400, 0.06, "square", 0.15), 30);
+    vibrate(10);
   },
 
   draw() {
@@ -67,6 +75,7 @@ export const sounds = {
     // Sharp double tap
     playTone(500, 0.1, "square", 0.25);
     setTimeout(() => playTone(700, 0.1, "square", 0.25), 100);
+    vibrate([30, 10, 30]);
   },
 
   chi() {
@@ -80,6 +89,7 @@ export const sounds = {
     // Heavy thud
     playTone(200, 0.15, "square", 0.3);
     playNoise(0.1, 0.2);
+    vibrate([80]);
   },
 
   hu() {
@@ -88,6 +98,7 @@ export const sounds = {
     setTimeout(() => playTone(659, 0.3, "triangle", 0.2), 100);  // E
     setTimeout(() => playTone(784, 0.3, "triangle", 0.2), 200);  // G
     setTimeout(() => playTone(1047, 0.5, "triangle", 0.25), 300); // C5
+    vibrate([50, 20, 50, 20, 50]);
   },
 
   gameStart() {
@@ -113,6 +124,7 @@ export const sounds = {
     playTone(1200, 0.12, "sine", 0.15);
     setTimeout(() => playTone(1500, 0.1, "sine", 0.18), 80);
     setTimeout(() => playTone(1800, 0.15, "sine", 0.12), 160);
+    vibrate([20, 10, 20, 10, 40]);
   },
 
   gameDraw() {
