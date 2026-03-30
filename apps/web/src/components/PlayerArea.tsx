@@ -369,11 +369,12 @@ export function PlayerArea({
                   left: "50%",
                   transform: "translateX(-50%)",
                   display: "flex",
-                  flexDirection: "column",
+                  flexDirection: ultraCompact ? "row" : "column",
+                  flexWrap: ultraCompact ? "wrap" : "nowrap",
                   gap: 4,
                   zIndex: 20,
-                  maxHeight: "40dvh",
-                  overflowY: "auto",
+                  maxHeight: ultraCompact ? undefined : "40dvh",
+                  overflowY: ultraCompact ? undefined : "auto",
                   animation: "bubbleFadeIn 0.15s ease-out",
                 }}>
                   {canHu && (
