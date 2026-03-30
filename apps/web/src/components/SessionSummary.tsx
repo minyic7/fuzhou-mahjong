@@ -39,20 +39,29 @@ function RoundHistorySection({ roundHistory, playerNames, isCompact }: {
 
   return (
     <div style={{ marginBottom: "clamp(8px, 2.5dvh, 16px)" }}>
-      <div
-        style={{
-          fontSize: "clamp(11px, 3dvh, 13px)", color: "var(--color-text-secondary)", marginBottom: "clamp(3px, 1dvh, 6px)",
-          ...(showToggle ? { cursor: "pointer", userSelect: "none" as const } : {}),
-        }}
-        onClick={showToggle ? () => setExpanded(e => !e) : undefined}
-      >
-        每局记录 / Round History
-        {showToggle && (
+      {showToggle ? (
+        <button
+          type="button"
+          onClick={() => setExpanded(e => !e)}
+          style={{
+            fontSize: "clamp(11px, 3dvh, 13px)", color: "var(--color-text-secondary)", marginBottom: "clamp(3px, 1dvh, 6px)",
+            cursor: "pointer", userSelect: "none" as const,
+            background: "transparent", border: "none", padding: 0, minHeight: 44,
+            display: "block", width: "100%", textAlign: "left",
+          }}
+        >
+          每局记录 / Round History
           <span style={{ marginLeft: 6, fontSize: "clamp(9px, 2.5dvh, 11px)" }}>
             {expanded ? "▲ 收起" : "▼ 展开"}
           </span>
-        )}
-      </div>
+        </button>
+      ) : (
+        <div style={{
+          fontSize: "clamp(11px, 3dvh, 13px)", color: "var(--color-text-secondary)", marginBottom: "clamp(3px, 1dvh, 6px)",
+        }}>
+          每局记录 / Round History
+        </div>
+      )}
       {(!showToggle || expanded) && (
         <div style={{ maxHeight: contentMaxHeight, overflowY: "auto" }}>
           {/* Player name header */}

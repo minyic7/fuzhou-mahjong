@@ -533,17 +533,16 @@ button {
   min-height: 44px;
 }
 
-button:hover:not(:disabled) {
-  background: var(--color-bg-button-hover);
+@media (hover: hover) {
+  button:hover:not(:disabled) {
+    background: var(--color-bg-button-hover);
+    filter: brightness(1.2);
+  }
 }
 
 button:disabled {
   opacity: 0.5;
   cursor: not-allowed;
-}
-
-button:hover:not(:disabled) {
-  filter: brightness(1.2);
 }
 
 button:active:not(:disabled) {
@@ -796,10 +795,12 @@ hr {
   transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
-.room-card:hover {
-  transform: translateY(-2px);
-  border-color: var(--color-gold-border-hover);
-  box-shadow: 0 4px 12px rgba(255,215,0,0.15), 0 4px 16px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05);
+@media (hover: hover) {
+  .room-card:hover {
+    transform: translateY(-2px);
+    border-color: var(--color-gold-border-hover);
+    box-shadow: 0 4px 12px rgba(255,215,0,0.15), 0 4px 16px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05);
+  }
 }
 
 /* Quick Start gradient button */
