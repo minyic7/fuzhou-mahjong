@@ -310,7 +310,11 @@ export function handlePlayerAction(
   // Check if there's an active action window
   const window = activeWindows.get(room.id);
   if (window) {
-    window.addResponse(playerIndex, action);
+    const accepted = window.addResponse(playerIndex, action);
+    if (!accepted) {
+      console.warn(`[GameEngine] addResponse rejected for player ${playerIndex} — window may be stale`);
+      return false;
+    }
     return true;
   }
 
