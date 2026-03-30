@@ -32,6 +32,7 @@ interface PlayerAreaProps {
   onBuGang?: (tileInstanceId: number) => void;
   hasDiscardedGold?: boolean;
   isDisconnected?: boolean;
+  compact?: boolean;
 }
 
 const BUBBLE_BTN = {
@@ -46,7 +47,7 @@ export function PlayerArea({
   isCurrentTurn, isDealer, gold, selectedTileId, onTileClick, label,
   claimableTileIds, onTileDoubleClick, lastDrawnTileId, lastDiscardedTileId, tenpaiTiles,
   canDiscard, onDiscard, canHu, onHu, kongTileIds, onAnGang, onBuGang, hasDiscardedGold,
-  isDisconnected,
+  isDisconnected, compact,
 }: PlayerAreaProps) {
   const { onTouchStart: lpTouchStart, onTouchEnd: lpTouchEnd, onMouseEnter, onMouseLeave, Tooltip } = useLongPress(gold);
 
@@ -80,6 +81,74 @@ export function PlayerArea({
     enabled: !!canDiscard,
     threshold: 40,
   });
+
+  // Compact single-row layout for opponents on mobile landscape
+  if (compact) {
+    return (
+      <div
+        className={`player-area-card${isCurrentTurn ? " current-turn" : ""} compact-opponent`}
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 6,
+          padding: "2px 8px",
+          background: isCurrentTurn ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.3)",
+          border: isCurrentTurn ? "2px solid #ffd700" : undefined,
+          borderRadius: 4,
+          borderLeft: isCurrentTurn ? "3px solid #ffd700" : "3px solid transparent",
+          opacity: isDisconnected ? 0.5 : 1,
+          overflow: "hidden",
+          minHeight: 0,
+        }}
+      >
+        {/* Name + badges */}
+        <span style={{ fontSize: "var(--label-font)", fontWeight: "bold", color: "#e8d5a3", whiteSpace: "nowrap", flexShrink: 0 }}>
+          {label}
+        </span>
+        {isDealer && <span style={{ fontSize: 9, background: "#b71c1c", color: "#ffd700", padding: "0 4px", borderRadius: 3, fontWeight: "bold", flexShrink: 0 }}>庄</span>}
+        {isDisconnected && <span style={{ fontSize: 9, background: "#ff5722", color: "#fff", padding: "0 4px", borderRadius: 3, fontWeight: "bold", flexShrink: 0 }}>断线</span>}
+        {hasDiscardedGold && <span style={{ fontSize: 9, background: "#c41e3a", color: "#fff", padding: "0 4px", borderRadius: 3, fontWeight: "bold", flexShrink: 0 }}>弃金</span>}
+        {isCurrentTurn && <span style={{ fontSize: 9, background: "rgba(255,215,0,0.2)", color: "#ffd700", padding: "0 4px", borderRadius: 3, border: "1px solid #ffd700", flexShrink: 0 }}>出牌</span>}
+
+        {/* Hand count */}
+        <span style={{ fontSize: 11, color: "#8fbc8f", flexShrink: 0 }}>{handCount ?? 0}张</span>
+
+        {/* Melds (small tiles inline) */}
+        {melds.length > 0 && (
+          <div style={{ display: "flex", gap: 4, flexShrink: 0 }}>
+            {melds.map((m, mi) => (
+              <div key={mi} style={{ display: "flex", gap: 0 }}>
+                {m.tiles.map((t, ti) => (
+                  <TileView key={ti} tile={t} faceUp={m.type !== MeldType.AnGang} gold={gold} small />
+                ))}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {/* Discards (tiny, single row, scrollable) */}
+        {discards.length > 0 && (
+          <div className="compact-discards" style={{
+            display: "flex",
+            gap: 1,
+            overflowX: "auto",
+            overflowY: "hidden",
+            flex: 1,
+            minWidth: 0,
+          }}>
+            {discards.map((d) => (
+              <TileView key={d.id} tile={d} faceUp gold={gold} small
+                className={lastDiscardedTileId === d.id ? "discard-arrive" : undefined}
+              />
+            ))}
+          </div>
+        )}
+
+        {/* Flower count */}
+        <span style={{ fontSize: 11, color: "#8fbc8f", flexShrink: 0, marginLeft: "auto" }}>🌸{flowers.length}</span>
+      </div>
+    );
+  }
 
   return (
     <>
