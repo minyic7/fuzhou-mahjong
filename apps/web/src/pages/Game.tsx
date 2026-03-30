@@ -93,6 +93,22 @@ export function Game({ initialGameState, onLeave }: GameProps) {
     return () => window.removeEventListener('beforeunload', handler);
   }, [gameOver]);
 
+  // Intercept browser back button / swipe-back during active game
+  useEffect(() => {
+    if (gameOver) return;
+    // Push a dummy state so back button triggers popstate instead of leaving
+    history.pushState({ game: true }, "");
+
+    const handler = () => {
+      // Back was pressed — push state again and show confirm
+      history.pushState({ game: true }, "");
+      setShowLeaveConfirm(true);
+    };
+
+    window.addEventListener("popstate", handler);
+    return () => window.removeEventListener("popstate", handler);
+  }, [gameOver]);
+
   useEffect(() => {
     socket.on("gameStateUpdate", (state) => {
       // Play game start sound on first state update
