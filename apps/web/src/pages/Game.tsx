@@ -547,39 +547,39 @@ export function Game({ initialGameState, onLeave }: GameProps) {
             background: "var(--overlay-bg)",
             border: "2px solid var(--color-gold-border-hover)",
             borderRadius: "var(--radius-lg)",
-            padding: "clamp(8px, 2.5vh, 16px) clamp(12px, 3vh, 20px)",
+            padding: "clamp(8px, 2.5dvh, 16px) clamp(12px, 3dvh, 20px)",
             maxWidth: "min(360px, 90vw)", width: "90vw",
-            maxHeight: "clamp(200px, 80dvh, 90vh)", overflowY: "auto",
+            maxHeight: "clamp(200px, 80dvh, 90dvh)", overflowY: "auto",
             textAlign: "center",
             animation: "overlayScaleIn 0.3s ease-out",
           }}>
-            <h2 style={{ fontSize: "clamp(16px, 5vh, 24px)", marginBottom: "clamp(4px, 1.2vh, 8px)" }}>
+            <h2 style={{ fontSize: "clamp(16px, 5dvh, 24px)", marginBottom: "clamp(4px, 1.2dvh, 8px)" }}>
               {go.winnerId !== null
                 ? `🎉 ${(go.playerNames ?? [])[go.winnerId] || "玩家"} 胡了!`
                 : "流局 / Draw"}
             </h2>
-            <p style={{ fontSize: "clamp(12px, 3.5vh, 16px)", color: "var(--color-text-gold)", marginBottom: "clamp(6px, 2vh, 12px)" }}>
+            <p style={{ fontSize: "clamp(12px, 3.5dvh, 16px)", color: "var(--color-text-gold)", marginBottom: "clamp(6px, 2dvh, 12px)" }}>
               {winTypeNames[go.winType] || go.winType}
             </p>
 
             {/* Score breakdown */}
             {go.breakdown && go.winnerId !== null && (
               <div className="score-breakdown">
-                <div style={{ fontSize: "clamp(10px, 2.8vh, 12px)", color: "var(--color-text-secondary)", marginBottom: "clamp(2px, 0.8vh, 4px)" }}>得分明细</div>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: "clamp(2px, 0.8vh, 4px) clamp(6px, 2vh, 12px)", justifyContent: "center", fontSize: "clamp(11px, 3vh, 13px)", color: "var(--color-text-primary)" }}>
+                <div style={{ fontSize: "clamp(10px, 2.8dvh, 12px)", color: "var(--color-text-secondary)", marginBottom: "clamp(2px, 0.8dvh, 4px)" }}>得分明细</div>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "clamp(2px, 0.8dvh, 4px) clamp(6px, 2dvh, 12px)", justifyContent: "center", fontSize: "clamp(11px, 3dvh, 13px)", color: "var(--color-text-primary)" }}>
                   <span>花分: {go.breakdown.flowerScore}</span>
                   <span>金: {go.breakdown.goldScore}</span>
                   <span>连庄: {go.breakdown.lianZhuangCount}</span>
                   <span>特殊: {go.breakdown.specialMultiplier}x</span>
                 </div>
-                <div style={{ fontSize: "clamp(12px, 3.2vh, 14px)", color: "var(--color-text-gold)", marginTop: "clamp(2px, 0.8vh, 4px)" }}>
+                <div style={{ fontSize: "clamp(12px, 3.2dvh, 14px)", color: "var(--color-text-gold)", marginTop: "clamp(2px, 0.8dvh, 4px)" }}>
                   总分: {go.breakdown.totalScore}
                 </div>
               </div>
             )}
 
             {/* Round scores */}
-            <div style={{ marginBottom: "clamp(6px, 2vh, 12px)" }}>
+            <div style={{ marginBottom: "clamp(6px, 2dvh, 12px)" }}>
               {go.scores
                 .map((score, i) => ({ name: (go.playerNames ?? [])[i] || `玩家${i}`, score, i }))
                 .sort((a, b) => b.score - a.score)
@@ -595,8 +595,8 @@ export function Game({ initialGameState, onLeave }: GameProps) {
             </div>
 
             {/* Actions */}
-            <div style={{ display: "flex", gap: "clamp(6px, 2vh, 12px)", justifyContent: "center", flexWrap: "wrap" }}>
-              <Button variant="gold" size="lg" onClick={handleNextRound} style={{ minHeight: "clamp(44px, 10vh, 48px)" }}>
+            <div style={{ display: "flex", gap: "clamp(6px, 2dvh, 12px)", justifyContent: "center", flexWrap: "wrap" }}>
+              <Button variant="gold" size="lg" onClick={handleNextRound} style={{ minHeight: "clamp(44px, 10dvh, 48px)" }}>
                 下一局 / Next Round
               </Button>
               {onLeave && (
@@ -613,7 +613,7 @@ export function Game({ initialGameState, onLeave }: GameProps) {
                     socket.emit("leaveRoom");
                     onLeave();
                   }
-                }} style={{ minHeight: "clamp(44px, 10vh, 48px)" }}>
+                }} style={{ minHeight: "clamp(44px, 10dvh, 48px)" }}>
                   离开 / Leave
                 </Button>
               )}

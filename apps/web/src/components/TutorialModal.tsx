@@ -292,7 +292,7 @@ export function TutorialModal({ open, onClose, condensed }: TutorialModalProps) 
         </div>
 
         {/* Slide content */}
-        <div key={currentSlide} style={{ animation: "tutorialSlideIn 0.25s ease-out", minHeight: "clamp(80px, 30vh, 120px)" }}>
+        <div key={currentSlide} style={{ animation: "tutorialSlideIn 0.25s ease-out", minHeight: "clamp(80px, 30dvh, 120px)" }}>
           {slide.content}
         </div>
 
