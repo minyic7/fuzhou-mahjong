@@ -27,6 +27,9 @@ body {
   flex-direction: column;
   flex: 1;
   min-height: 0;
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 /* Portrait rotate overlay — shown on mobile in portrait orientation */
@@ -180,6 +183,16 @@ body {
     --hand-new-tile-margin: 6px;
     --hand-padding-top: 8px;
     --tile-margin: 2px;
+  }
+}
+
+@media (orientation: landscape) and (max-height: 390px) {
+  :root {
+    --game-gap: 1px;
+    --game-padding: 1px;
+  }
+  .game-table {
+    grid-template-columns: 50px 1fr 50px;
   }
 }
 
@@ -531,6 +544,13 @@ button.lobby-create-btn:hover:not(:disabled) {
 }
 .chi-picker-scroll::-webkit-scrollbar {
   display: none; /* Chrome/Safari */
+}
+
+/* Compact opponent — constrain width and truncate overflow */
+.compact-opponent {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* Compact opponent discards — hide scrollbar */
