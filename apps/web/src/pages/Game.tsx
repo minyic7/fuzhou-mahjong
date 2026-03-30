@@ -88,16 +88,20 @@ export function Game({ initialGameState, onLeave }: GameProps) {
   }, []);
   const settingsRef = useRef<HTMLDivElement>(null);
 
-  // Close settings dropdown on click outside
+  // Close settings dropdown on click/touch outside
   useEffect(() => {
     if (!settingsOpen) return;
-    const handler = (e: MouseEvent) => {
+    const handler = (e: MouseEvent | TouchEvent) => {
       if (settingsRef.current && !settingsRef.current.contains(e.target as Node)) {
         setSettingsOpen(false);
       }
     };
     document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
+    document.addEventListener('touchstart', handler);
+    return () => {
+      document.removeEventListener('mousedown', handler);
+      document.removeEventListener('touchstart', handler);
+    };
   }, [settingsOpen]);
 
   // First-game auto-show tutorial
