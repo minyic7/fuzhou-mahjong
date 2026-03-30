@@ -65,8 +65,8 @@ export function useLongPress(gold: GoldState | null) {
     return (
       <div style={{
         position: "fixed",
-        left: `clamp(max(8px, env(safe-area-inset-left, 0px)), ${tooltip.x - 40}px, calc(100vw - 128px - env(safe-area-inset-right, 0px)))`,
-        top: `max(${Math.max(tooltip.y - 100, 0)}px, env(safe-area-inset-top, 10px))`,
+        left: `clamp(env(safe-area-inset-left, 8px), ${tooltip.x - 40}px, calc(100vw - 128px - env(safe-area-inset-right, 8px)))`,
+        top: `max(${tooltip.y - 100}px, env(safe-area-inset-top, 10px))`,
         background: "var(--color-bg-dark)",
         border: isGold ? "2px solid var(--color-gold-bright)" : "1px solid var(--color-text-secondary)",
         borderRadius: 8,

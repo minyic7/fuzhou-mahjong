@@ -6,6 +6,7 @@ export const BREAKPOINTS = {
   TABLET_WIDTH: 768,
   PHONE_WIDTH: 480,
   TINY_WIDTH: 360,
+  FIRST_PERSON_WIDTH_THRESHOLD: 1024,
 } as const;
 
 export function useIsCompactLandscape(): boolean {
@@ -31,14 +32,14 @@ export function useIsCompactLandscape(): boolean {
 
 export function useIsFirstPersonMobile(): boolean {
   const [isFP, setIsFP] = useState(
-    () => window.innerHeight <= BREAKPOINTS.COMPACT_HEIGHT && window.innerWidth <= 1024
+    () => window.innerHeight <= BREAKPOINTS.COMPACT_HEIGHT && window.innerWidth <= BREAKPOINTS.FIRST_PERSON_WIDTH_THRESHOLD
   );
   useEffect(() => {
     let timeout: ReturnType<typeof setTimeout>;
     const onResize = () => {
       clearTimeout(timeout);
       timeout = setTimeout(() => {
-        setIsFP(window.innerHeight <= BREAKPOINTS.COMPACT_HEIGHT && window.innerWidth <= 1024);
+        setIsFP(window.innerHeight <= BREAKPOINTS.COMPACT_HEIGHT && window.innerWidth <= BREAKPOINTS.FIRST_PERSON_WIDTH_THRESHOLD);
       }, 100);
     };
     window.addEventListener("resize", onResize);

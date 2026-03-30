@@ -78,10 +78,10 @@ export function Game({ initialGameState, onLeave }: GameProps) {
   const [departingTile, setDepartingTile] = useState<TileInstance | null>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [muted, setMutedState] = useState(isMuted);
-  const [isPortrait, setIsPortrait] = useState(() => window.matchMedia("(orientation: portrait)").matches && window.innerWidth <= 768);
+  const [isPortrait, setIsPortrait] = useState(() => window.matchMedia("(orientation: portrait)").matches && window.innerWidth <= BREAKPOINTS.TABLET_WIDTH);
 
   useEffect(() => {
-    const mq = window.matchMedia("(orientation: portrait) and (max-width: 768px)");
+    const mq = window.matchMedia(`(orientation: portrait) and (max-width: ${BREAKPOINTS.TABLET_WIDTH}px)`);
     const handler = (e: MediaQueryListEvent) => setIsPortrait(e.matches);
     mq.addEventListener("change", handler);
     return () => mq.removeEventListener("change", handler);
