@@ -35,9 +35,10 @@ interface GameTableProps {
   drawAnimation?: DrawAnimationState | null;
   claimAnimation?: { seat: DrawAnimationSeat; key: number } | null;
   departingTile?: TileInstance | null;
+  revealedHands?: { hand: TileInstance[]; melds: import("@fuzhou-mahjong/shared").Meld[]; flowers: TileInstance[] }[] | null;
 }
 
-export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTileId, claimableTileIds, canDiscard, onDiscard, canHu, onHu, canDraw, onDraw, kongTileIds, onAnGang, onBuGang, onBackgroundClick, disconnectedPlayers, drawAnimation, claimAnimation, departingTile }: GameTableProps) {
+export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTileId, claimableTileIds, canDiscard, onDiscard, canHu, onHu, canDraw, onDraw, kongTileIds, onAnGang, onBuGang, onBackgroundClick, disconnectedPlayers, drawAnimation, claimAnimation, departingTile, revealedHands }: GameTableProps) {
   const isCompact = useIsCompactLandscape();
   const isFirstPersonMobile = useIsFirstPersonMobile();
 
@@ -83,9 +84,10 @@ export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTile
       <div style={{ gridArea: "top", position: "relative", zIndex: 1 }}>
         <PlayerArea
           isMe={false}
+          hand={revealedHands?.[(myIndex + 2) % 4]?.hand}
           handCount={otherPlayers[1]?.handCount ?? 0}
-          melds={otherPlayers[1]?.melds ?? []}
-          flowers={otherPlayers[1]?.flowers ?? []}
+          melds={revealedHands?.[(myIndex + 2) % 4]?.melds ?? otherPlayers[1]?.melds ?? []}
+          flowers={revealedHands?.[(myIndex + 2) % 4]?.flowers ?? otherPlayers[1]?.flowers ?? []}
           discards={otherPlayers[1]?.discards ?? []}
           isCurrentTurn={currentTurn === (myIndex + 2) % 4}
           isDealer={dealerIndex === (myIndex + 2) % 4}
@@ -104,9 +106,10 @@ export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTile
       <div style={{ gridArea: "left", position: "relative", zIndex: 1, transform: "rotate(90deg)", transformOrigin: "center center", display: "flex", alignItems: "center", justifyContent: "center" }}>
         <PlayerArea
           isMe={false}
+          hand={revealedHands?.[(myIndex + 3) % 4]?.hand}
           handCount={otherPlayers[2]?.handCount ?? 0}
-          melds={otherPlayers[2]?.melds ?? []}
-          flowers={otherPlayers[2]?.flowers ?? []}
+          melds={revealedHands?.[(myIndex + 3) % 4]?.melds ?? otherPlayers[2]?.melds ?? []}
+          flowers={revealedHands?.[(myIndex + 3) % 4]?.flowers ?? otherPlayers[2]?.flowers ?? []}
           discards={otherPlayers[2]?.discards ?? []}
           isCurrentTurn={currentTurn === (myIndex + 3) % 4}
           isDealer={dealerIndex === (myIndex + 3) % 4}
@@ -162,9 +165,10 @@ export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTile
       <div style={{ gridArea: "right", position: "relative", zIndex: 1, transform: "rotate(-90deg)", transformOrigin: "center center", display: "flex", alignItems: "center", justifyContent: "center" }}>
         <PlayerArea
           isMe={false}
+          hand={revealedHands?.[(myIndex + 1) % 4]?.hand}
           handCount={otherPlayers[0]?.handCount ?? 0}
-          melds={otherPlayers[0]?.melds ?? []}
-          flowers={otherPlayers[0]?.flowers ?? []}
+          melds={revealedHands?.[(myIndex + 1) % 4]?.melds ?? otherPlayers[0]?.melds ?? []}
+          flowers={revealedHands?.[(myIndex + 1) % 4]?.flowers ?? otherPlayers[0]?.flowers ?? []}
           discards={otherPlayers[0]?.discards ?? []}
           isCurrentTurn={currentTurn === (myIndex + 1) % 4}
           isDealer={dealerIndex === (myIndex + 1) % 4}

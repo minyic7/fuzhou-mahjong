@@ -387,6 +387,10 @@ export function PlayerArea({
             </div>
             );
           })
+        ) : hand ? (
+          hand.map((t) => (
+            <TileView key={t.id} tile={t} faceUp gold={gold} small />
+          ))
         ) : (
           Array.from({ length: handCount ?? 0 }).map((_, i) => (
             <TileView key={i} tile={{ id: -1, tile: { kind: "suited", suit: "wan" as any, value: 1 as any } }} faceUp={false} />
