@@ -60,8 +60,8 @@ export function Lobby({ onJoined }: LobbyProps) {
     <div className="lobby-page" style={{ display: "flex", justifyContent: "center", padding: "max(16px, 3vh) max(12px, 3vw)" }}>
     <div className="lobby-content" style={{ maxWidth: 560, width: "100%", display: "flex", flexDirection: "column", gap: 20 }}>
       <div style={{ textAlign: "center", marginBottom: 8 }}>
-        <h1 style={{ fontSize: 36, color: "var(--color-text-primary)", marginBottom: 4 }}>福州麻将</h1>
-        <h2 style={{ fontSize: 16, color: "var(--color-text-secondary)", fontWeight: 400 }}>Fuzhou Mahjong</h2>
+        <h1 style={{ color: "var(--color-text-primary)", marginBottom: 4 }}>福州麻将</h1>
+        <h2 style={{ color: "var(--color-text-secondary)", fontWeight: 400 }}>Fuzhou Mahjong</h2>
       </div>
 
       <div>
@@ -70,7 +70,7 @@ export function Lobby({ onJoined }: LobbyProps) {
           placeholder="你的名字 / Your name"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          style={{ width: "100%", padding: "10px 12px", fontSize: 16, boxSizing: "border-box" }}
+          style={{ width: "100%", padding: "var(--btn-padding)", fontSize: "var(--lobby-subtitle-font)", boxSizing: "border-box" }}
         />
       </div>
 
@@ -81,11 +81,11 @@ export function Lobby({ onJoined }: LobbyProps) {
           onClick={handleQuickStart}
           disabled={quickStarting}
           className="lobby-create-btn"
-          style={{ width: "100%", background: "linear-gradient(135deg, var(--color-bg-button) 0%, var(--color-bg-button-hover) 100%)", border: "2px solid rgba(212, 160, 23, 0.8)", boxShadow: "0 0 12px rgba(212, 160, 23, 0.3)" }}
+          style={{ width: "100%", background: "linear-gradient(135deg, var(--color-bg-button) 0%, var(--color-bg-button-hover) 100%)", border: "2px solid var(--color-gold-border-hover)", boxShadow: "0 0 12px rgba(212, 160, 23, 0.3)" }}
         >
           {quickStarting ? "启动中... / Starting..." : "⚡ 快速开始 / Quick Start"}
         </Button>
-        <p style={{ color: "var(--color-text-secondary)", fontSize: 13, textAlign: "center" }}>
+        <p style={{ color: "var(--color-text-secondary)", fontSize: "var(--label-font)", textAlign: "center" }}>
           一键开局，自动匹配 3 个机器人
         </p>
       </div>
@@ -101,7 +101,7 @@ export function Lobby({ onJoined }: LobbyProps) {
         >
           创建房间 / Create Room
         </Button>
-        <p style={{ color: "var(--color-text-secondary)", fontSize: 13, textAlign: "center" }}>
+        <p style={{ color: "var(--color-text-secondary)", fontSize: "var(--label-font)", textAlign: "center" }}>
           创建房间后可邀请朋友或添加机器人
         </p>
       </div>
@@ -127,10 +127,10 @@ export function Lobby({ onJoined }: LobbyProps) {
                 <div>
                   <div style={{ display: "flex", gap: 6, marginBottom: 4 }}>
                     {Array.from({ length: room.maxPlayers }).map((_, i) => (
-                      <span key={i} style={{ width: 10, height: 10, borderRadius: "50%", background: i < room.playerCount ? "var(--color-bg-button-hover)" : "rgba(184, 134, 11, 0.15)", border: "1px solid rgba(184, 134, 11, 0.3)", display: "inline-block" }} />
+                      <span key={i} style={{ width: 10, height: 10, borderRadius: "var(--radius-sm)", background: i < room.playerCount ? "var(--color-bg-button-hover)" : "rgba(184, 134, 11, 0.15)", border: "1px solid rgba(184, 134, 11, 0.3)", display: "inline-block" }} />
                     ))}
                   </div>
-                  <span style={{ color: "var(--color-text-secondary)", fontSize: 13 }}>
+                  <span style={{ color: "var(--color-text-secondary)", fontSize: "var(--label-font)" }}>
                     {room.players.join(", ")}
                   </span>
                 </div>
@@ -156,7 +156,7 @@ export function Lobby({ onJoined }: LobbyProps) {
           value={roomCode}
           onChange={(e) => setRoomCode(e.target.value.toUpperCase())}
           maxLength={4}
-          style={{ flex: 1, padding: "10px 12px", fontSize: 16, textTransform: "uppercase", letterSpacing: 4, textAlign: "center" }}
+          style={{ flex: 1, padding: "var(--btn-padding)", fontSize: "var(--lobby-subtitle-font)", textTransform: "uppercase", letterSpacing: 4, textAlign: "center" }}
         />
         <Button
           onClick={() => handleJoin(roomCode.trim())}
