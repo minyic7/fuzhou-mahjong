@@ -1071,12 +1071,18 @@ export function emitOrBotAction(
       const currentV = getBotVersion(game.roomId, playerIndex);
       if (currentV !== version) {
         console.log(`${tag} Safety timer STALE — bailing (had=${version}, now=${currentV}) ts=${Date.now()}`);
-        // Re-trigger if game is stuck and current turn is a bot with no active window
-        if (game.state.phase === GamePhase.Playing && game.isBot(game.state.currentTurn) && !activeWindows.has(game.roomId)) {
-          const currentPlayer = game.state.currentTurn;
-          const currentActions = getPostDrawActions(game, currentPlayer, false);
-          console.warn(`${tag} Re-triggering bot action for p${currentPlayer} ts=${Date.now()}`);
-          emitOrBotAction(io, game, currentPlayer, currentActions);
+        // Re-trigger if game is stuck
+        if (game.state.phase === GamePhase.Playing) {
+          const window = activeWindows.get(game.roomId);
+          if (window) {
+            // Action window active: check if this bot has pending actions, otherwise Pass
+            console.warn(`[Bot:FALLBACK] ${tag} Stale safety re-trigger during action window — passing (roomId=${game.roomId}, playerIndex=${playerIndex}, turn=${turnNumber}, phase=${game.state.phase}, hasActionWindow=true) ts=${Date.now()}`);
+            handlePlayerAction(io, game.roomId, { type: ActionType.Pass, playerIndex }, playerIndex);
+          } else if (game.isBot(game.state.currentTurn) && game.state.currentTurn === playerIndex) {
+            const currentActions = getPostDrawActions(game, playerIndex, false);
+            console.warn(`[Bot:FALLBACK] ${tag} Stale safety re-trigger on own turn (roomId=${game.roomId}, playerIndex=${playerIndex}, turn=${turnNumber}, phase=${game.state.phase}, hasActionWindow=false) ts=${Date.now()}`);
+            emitOrBotAction(io, game, playerIndex, currentActions);
+          }
         }
         return;
       }
@@ -1085,38 +1091,48 @@ export function emitOrBotAction(
         return;
       }
       acted = true;
-      console.warn(`${tag} Safety timeout — forcing emergency discard (version=${version}, phase=${game.state.phase}) ts=${Date.now()}`);
-      try {
-        const player = game.state.players[playerIndex];
-        handlePlayerAction(io, game.roomId, emergencyDiscard(player.hand, playerIndex, game.state.gold), playerIndex);
-      } catch (e) {
-        console.error(`${tag} Safety timeout fallback failed:`, e);
+      const safetyWindow = activeWindows.get(game.roomId);
+      if (safetyWindow) {
+        console.warn(`[Bot:FALLBACK] ${tag} Safety timeout during action window — passing (roomId=${game.roomId}, playerIndex=${playerIndex}, turn=${turnNumber}, phase=${game.state.phase}, hasActionWindow=true) ts=${Date.now()}`);
+        try {
+          handlePlayerAction(io, game.roomId, { type: ActionType.Pass, playerIndex }, playerIndex);
+        } catch (e) {
+          console.error(`${tag} Safety timeout Pass fallback failed:`, e);
+        }
+      } else {
+        console.warn(`[Bot:FALLBACK] ${tag} Safety timeout — forcing emergency discard (roomId=${game.roomId}, playerIndex=${playerIndex}, turn=${turnNumber}, phase=${game.state.phase}, hasActionWindow=false, version=${version}) ts=${Date.now()}`);
+        try {
+          const player = game.state.players[playerIndex];
+          handlePlayerAction(io, game.roomId, emergencyDiscard(player.hand, playerIndex, game.state.gold), playerIndex);
+        } catch (e) {
+          console.error(`${tag} Safety timeout fallback failed:`, e);
+        }
       }
     }, 5_000);
 
     setTimeout(() => {
-      if (acted) {
-        console.log(`${tag} Callback fired but already acted (version=${version}) ts=${Date.now()}`);
-        return;
-      }
+      acted = true;  // FIRST — prevent safety timer from also firing
+      clearTimeout(safetyTimer);
       const currentV = getBotVersion(game.roomId, playerIndex);
       console.log(`${tag} Callback fired (version=${version}, current=${currentV}, phase=${game.state.phase}) ts=${Date.now()}`);
       // Stale check: if version has advanced, another action superseded this one
       if (currentV !== version) {
         console.log(`${tag} STALE — bailing (had=${version}, now=${currentV}) ts=${Date.now()}`);
-        clearTimeout(safetyTimer);
-        // Re-trigger if game is stuck and current turn is a bot with no active window
-        if (game.state.phase === GamePhase.Playing && game.isBot(game.state.currentTurn) && !activeWindows.has(game.roomId)) {
-          const currentPlayer = game.state.currentTurn;
-          const currentActions = getPostDrawActions(game, currentPlayer, false);
-          console.warn(`${tag} Re-triggering bot action for p${currentPlayer} ts=${Date.now()}`);
-          emitOrBotAction(io, game, currentPlayer, currentActions);
+        // Re-trigger based on context
+        if (game.state.phase === GamePhase.Playing) {
+          const window = activeWindows.get(game.roomId);
+          if (window) {
+            console.warn(`[Bot:FALLBACK] ${tag} Stale callback re-trigger during action window — passing (roomId=${game.roomId}, playerIndex=${playerIndex}, turn=${turnNumber}, phase=${game.state.phase}, hasActionWindow=true) ts=${Date.now()}`);
+            handlePlayerAction(io, game.roomId, { type: ActionType.Pass, playerIndex }, playerIndex);
+          } else if (game.isBot(game.state.currentTurn) && game.state.currentTurn === playerIndex) {
+            const currentActions = getPostDrawActions(game, playerIndex, false);
+            console.warn(`[Bot:FALLBACK] ${tag} Stale callback re-trigger on own turn (roomId=${game.roomId}, playerIndex=${playerIndex}, turn=${turnNumber}, phase=${game.state.phase}, hasActionWindow=false) ts=${Date.now()}`);
+            emitOrBotAction(io, game, playerIndex, currentActions);
+          }
         }
         return;
       }
       try {
-        acted = true;
-        clearTimeout(safetyTimer);
         // Restore the snapshotted drawn tile ID so downstream handlers
         // (e.g. handleSelfDrawHu, getPostDrawActions) see the correct value
         game.lastDrawnTileIds[playerIndex] = snapshotDrawnTileId;
