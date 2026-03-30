@@ -120,6 +120,10 @@ class ActionWindow {
     return this.pendingPlayers.has(playerIndex);
   }
 
+  getDiscarderIndex(): number {
+    return this.discarderIndex;
+  }
+
   cancel(): void {
     if (this.timer) { clearTimeout(this.timer); this.timer = null; }
   }
@@ -1458,7 +1462,11 @@ export function emitOrBotAction(
           console.log(`${tag} Bot already responded to action window, skipping ts=${Date.now()}`);
           return;
         }
-        const freshActions = activeWindow ? actions : getPostDrawActions(game, playerIndex, inFinal);
+        const freshActions = activeWindow && lastDiscardTile
+          ? getResponseActions(game, playerIndex, lastDiscardTile, activeWindow.getDiscarderIndex())
+          : activeWindow
+            ? actions  // activeWindow but no lastDiscardTile — use captured actions as fallback
+            : getPostDrawActions(game, playerIndex, inFinal);
         const botAction = decideBotAction(player.hand, player.melds, freshActions, playerIndex, game.state.gold, lastDiscardTile, botContext);
         console.log(`${tag} Decided action=${botAction.type} (version=${version}) ts=${Date.now()}`);
         const success = handlePlayerAction(io, game.roomId, botAction, playerIndex);
