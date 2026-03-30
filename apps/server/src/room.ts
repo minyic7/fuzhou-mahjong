@@ -19,6 +19,7 @@ export class Room {
   disconnectTimers = new Map<string, ReturnType<typeof setTimeout>>();
   cumulativeScores: number[] = [0, 0, 0, 0];  // per seat index
   roundsPlayed = 0;
+  isStartingRound = false;
 
   constructor(id: string) {
     this.id = id;
