@@ -568,7 +568,7 @@ export function Game({ initialGameState, onLeave }: GameProps) {
       {/* Toast notifications */}
       <div style={{
         position: "fixed",
-        ...(isCompactMain ? { bottom: 60 } : { top: 16 }),
+        ...(isCompactMain ? { bottom: "calc(60px + env(safe-area-inset-bottom, 0px))" } : { top: 16 }),
         left: "50%", transform: "translateX(-50%)",
         zIndex: 9000, display: "flex", flexDirection: "column", gap: 8, alignItems: "center",
         pointerEvents: "none",
@@ -629,7 +629,7 @@ export function Game({ initialGameState, onLeave }: GameProps) {
       <TileCounter gameState={gameState} />
       {/* Help & Leave buttons — compact: top-right row; normal: bottom-right stacked */}
       {isCompactMain ? (
-        <div style={{ position: 'fixed', top: 8, right: 8, display: 'flex', gap: 4, zIndex: 20 }}>
+        <div style={{ position: 'fixed', top: 'calc(8px + env(safe-area-inset-top, 0px))', right: 'calc(8px + env(safe-area-inset-right, 0px))', display: 'flex', gap: 4, zIndex: 20 }}>
           <button
             onClick={() => { setTutorialCondensed(false); setShowTutorial(true); }}
             aria-label="How to play"
@@ -662,7 +662,7 @@ export function Game({ initialGameState, onLeave }: GameProps) {
               onClick={() => setShowLeaveConfirm(true)}
               aria-label="Leave game"
               style={{
-                position: "fixed", bottom: 56, right: 12,
+                position: "fixed", bottom: "calc(56px + env(safe-area-inset-bottom, 0px))", right: "calc(12px + env(safe-area-inset-right, 0px))",
                 width: 44, height: 44, minHeight: 44, borderRadius: "50%",
                 background: "rgba(15,30,25,0.85)", border: "1px solid rgba(184,134,11,0.4)",
                 color: "#ff5252", fontSize: 18, fontWeight: 700,
@@ -675,7 +675,7 @@ export function Game({ initialGameState, onLeave }: GameProps) {
             onClick={() => { setTutorialCondensed(false); setShowTutorial(true); }}
             aria-label="How to play"
             style={{
-              position: "fixed", bottom: 12, right: 12,
+              position: "fixed", bottom: "calc(12px + env(safe-area-inset-bottom, 0px))", right: "calc(12px + env(safe-area-inset-right, 0px))",
               width: 44, height: 44, minHeight: 44, borderRadius: "50%",
               background: "rgba(15,30,25,0.85)", border: "1px solid rgba(184,134,11,0.4)",
               color: "#8fbc8f", fontSize: 18, fontWeight: 700,

@@ -27,6 +27,9 @@ body {
   flex-direction: column;
   flex: 1;
   min-height: 0;
+  padding-left: env(safe-area-inset-left, 0px);
+  padding-right: env(safe-area-inset-right, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 /* Portrait rotate overlay — shown on mobile in portrait orientation */
