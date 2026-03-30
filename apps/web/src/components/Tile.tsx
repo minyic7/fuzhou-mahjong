@@ -59,8 +59,8 @@ export function TileView({ tile, faceUp = true, selected, claimable, onClick, on
       <div style={{
         width: w, height: h,
         borderRadius: "var(--radius-sm)",
-        borderBottom: "3px solid #1a3c2a",
-        borderRight: "2px solid #1e4530",
+        borderBottom: "3px solid var(--color-tile-back-border)",
+        borderRight: "2px solid var(--color-tile-back-border-right)",
         display: "inline-flex",
         alignItems: "center",
         justifyContent: "center",

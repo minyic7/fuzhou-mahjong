@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import type { TileInstance, GoldState } from "@fuzhou-mahjong/shared";
 import { TileView } from "./Tile";
+import { BREAKPOINTS } from "../hooks/useIsMobile";
 
 interface CenterActionProps {
   gold: GoldState | null;
@@ -68,7 +69,7 @@ export function CenterAction({ display, gold }: { display: ActionDisplay | null;
         filter: "drop-shadow(0 4px 12px rgba(0,0,0,0.5))",
       }}>
         {display.tiles.map((t) => (
-          <div key={t.id} style={{ transform: `scale(${window.innerHeight <= 500 ? 1.2 : 1.8})` }}>
+          <div key={t.id} style={{ transform: `scale(${window.innerHeight <= BREAKPOINTS.COMPACT_HEIGHT ? 1.2 : 1.8})` }}>
             <TileView tile={t} faceUp gold={gold} />
           </div>
         ))}

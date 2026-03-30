@@ -121,10 +121,10 @@ export function PlayerArea({
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 2 }}>
-          <span style={{ fontSize: 9, fontWeight: "bold", color: "#e8d5a3", whiteSpace: "nowrap" }}>{label}</span>
+          <span style={{ fontSize: 9, fontWeight: "bold", color: "var(--color-text-warm)", whiteSpace: "nowrap" }}>{label}</span>
           {isDealer && <span style={{ fontSize: 7, background: "#b71c1c", color: "var(--color-gold-bright)", padding: "0 2px", borderRadius: 2, fontWeight: "bold" }}>庄</span>}
           {isCurrentTurn && <span style={{ fontSize: 7, background: "rgba(255,215,0,0.2)", color: "var(--color-gold-bright)", padding: "0 2px", borderRadius: 2 }}>出牌</span>}
-          <span style={{ fontSize: 8, color: "#8fbc8f", marginLeft: "auto" }}>{handCount ?? 0}张 🌸{flowers.length}</span>
+          <span style={{ fontSize: 8, color: "var(--color-text-secondary)", marginLeft: "auto" }}>{handCount ?? 0}张 🌸{flowers.length}</span>
         </div>
         {melds.length > 0 && (
           <div style={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
@@ -173,7 +173,7 @@ export function PlayerArea({
         }}
       >
         {/* Name + badges */}
-        <span style={{ fontSize: "var(--compact-label-font, 12px)", fontWeight: "bold", color: "#e8d5a3", whiteSpace: "nowrap", flexShrink: 0 }}>
+        <span style={{ fontSize: "var(--compact-label-font, 12px)", fontWeight: "bold", color: "var(--color-text-warm)", whiteSpace: "nowrap", flexShrink: 0 }}>
           {label}
         </span>
         {isDealer && <span style={{ fontSize: 9, background: "#b71c1c", color: "var(--color-gold-bright)", padding: "0 4px", borderRadius: 3, fontWeight: "bold", flexShrink: 0 }}>庄</span>}
@@ -182,7 +182,7 @@ export function PlayerArea({
         {isCurrentTurn && <span className="your-turn-prompt" style={{ fontSize: 9, background: "rgba(255,215,0,0.2)", color: "var(--color-gold-bright)", padding: "0 4px", borderRadius: 3, border: "1px solid var(--color-gold-bright)", flexShrink: 0 }}>出牌</span>}
 
         {/* Hand count */}
-        <span style={{ fontSize: "var(--compact-info-font, 11px)", color: "#8fbc8f", flexShrink: 0 }}>{handCount ?? 0}张</span>
+        <span style={{ fontSize: "var(--compact-info-font, 11px)", color: "var(--color-text-secondary)", flexShrink: 0 }}>{handCount ?? 0}张</span>
 
         {/* Melds (small tiles inline) */}
         {melds.length > 0 && (
@@ -216,11 +216,11 @@ export function PlayerArea({
         )}
 
         {/* Flower count */}
-        <span style={{ fontSize: "var(--compact-info-font, 11px)", color: "#8fbc8f", flexShrink: 0, marginLeft: "auto" }}>🌸{flowers.length}</span>
+        <span style={{ fontSize: "var(--compact-info-font, 11px)", color: "var(--color-text-secondary)", flexShrink: 0, marginLeft: "auto" }}>🌸{flowers.length}</span>
         {cumulativeScore != null && (
           <span className="cumulative-score-badge" style={{
             fontSize: "var(--compact-info-font, 11px)", fontWeight: "bold",
-            color: cumulativeScore > 0 ? "var(--color-gold-bright)" : cumulativeScore < 0 ? "#f44336" : "var(--color-text-secondary)",
+            color: cumulativeScore > 0 ? "var(--color-gold-bright)" : cumulativeScore < 0 ? "var(--color-error)" : "var(--color-text-secondary)",
             padding: "1px 6px", borderRadius: 3, background: "rgba(0,0,0,0.3)",
           }}>
             {cumulativeScore > 0 ? "+" : ""}{cumulativeScore}
@@ -251,20 +251,20 @@ export function PlayerArea({
         borderRadius: 4,
         borderLeft: isCurrentTurn ? "3px solid var(--color-gold-bright)" : "3px solid transparent",
       }}>
-        <span style={{ fontSize: "var(--label-font)", fontWeight: "bold", color: "#e8d5a3" }}>
+        <span style={{ fontSize: "var(--label-font)", fontWeight: "bold", color: "var(--color-text-warm)" }}>
           {label}
         </span>
         {isDealer && <span style={{ fontSize: 10, background: "#b71c1c", color: "var(--color-gold-bright)", padding: "1px 5px", borderRadius: 3, fontWeight: "bold" }}>庄</span>}
         {isDisconnected && <span style={{ fontSize: 10, background: "#ff5722", color: "#fff", padding: "1px 5px", borderRadius: 3, fontWeight: "bold", animation: "disconnectPulse 2s ease-in-out infinite" }}>断线</span>}
         {hasDiscardedGold && <span style={{ fontSize: 10, background: "var(--color-action-hu)", color: "#fff", padding: "1px 5px", borderRadius: 3, fontWeight: "bold" }}>弃金</span>}
         {isCurrentTurn && <span className="your-turn-prompt" style={{ fontSize: 10, background: "rgba(255,215,0,0.2)", color: "var(--color-gold-bright)", padding: "1px 5px", borderRadius: 3, border: "1px solid var(--color-gold-bright)" }}>出牌</span>}
-        <span style={{ fontSize: 11, color: "#8fbc8f", marginLeft: "auto" }}>
+        <span style={{ fontSize: 11, color: "var(--color-text-secondary)", marginLeft: "auto" }}>
           🌸{flowers.length}
         </span>
         {cumulativeScore != null && (
           <span className="cumulative-score-badge" style={{
             fontSize: 11, fontWeight: "bold",
-            color: cumulativeScore > 0 ? "var(--color-gold-bright)" : cumulativeScore < 0 ? "#f44336" : "var(--color-text-secondary)",
+            color: cumulativeScore > 0 ? "var(--color-gold-bright)" : cumulativeScore < 0 ? "var(--color-error)" : "var(--color-text-secondary)",
             padding: "1px 6px", borderRadius: 3, background: "rgba(0,0,0,0.3)",
           }}>
             {cumulativeScore > 0 ? "+" : ""}{cumulativeScore}
@@ -327,7 +327,7 @@ export function PlayerArea({
                 }}>
                   {canHu && (
                     <button
-                      style={{ ...BUBBLE_BTN, background: "#c41e3a", color: "#fff", boxShadow: "0 2px 8px rgba(196,30,58,0.5)" }}
+                      style={{ ...BUBBLE_BTN, background: "var(--color-action-hu)", color: "#fff", boxShadow: "0 2px 8px rgba(196,30,58,0.5)" }}
                       onClick={(e) => { e.stopPropagation(); onHu?.(); }}
                     >
                       胡!
@@ -338,7 +338,7 @@ export function PlayerArea({
                       className={isGoldTile ? "gold-warning-pulse" : undefined}
                       style={{
                         ...BUBBLE_BTN,
-                        background: isGoldTile ? "#c41e3a" : "#00b894",
+                        background: isGoldTile ? "var(--color-action-hu)" : "var(--color-action-discard)",
                         color: "#fff",
                         boxShadow: isGoldTile ? "0 2px 8px rgba(196,30,58,0.5)" : "0 2px 8px rgba(0,184,148,0.5)",
                       }}
@@ -349,7 +349,7 @@ export function PlayerArea({
                   )}
                   {isAnGang && (
                     <button
-                      style={{ ...BUBBLE_BTN, background: "#d4760a", color: "#fff", boxShadow: "0 2px 8px rgba(212,118,10,0.5)" }}
+                      style={{ ...BUBBLE_BTN, background: "var(--color-action-gang)", color: "#fff", boxShadow: "0 2px 8px rgba(212,118,10,0.5)" }}
                       onClick={(e) => { e.stopPropagation(); onAnGang?.(t.id); }}
                     >
                       暗杠
@@ -357,7 +357,7 @@ export function PlayerArea({
                   )}
                   {isBuGang && (
                     <button
-                      style={{ ...BUBBLE_BTN, background: "#d4760a", color: "#fff", boxShadow: "0 2px 8px rgba(212,118,10,0.5)" }}
+                      style={{ ...BUBBLE_BTN, background: "var(--color-action-gang)", color: "#fff", boxShadow: "0 2px 8px rgba(212,118,10,0.5)" }}
                       onClick={(e) => { e.stopPropagation(); onBuGang?.(t.id); }}
                     >
                       补杠
@@ -390,7 +390,7 @@ export function PlayerArea({
 
       {/* Tenpai indicator */}
       {isMe && tenpaiTiles && tenpaiTiles.length > 0 && (
-        <div style={{ fontSize: 12, color: "#4caf50", marginBottom: 4 }}>
+        <div style={{ fontSize: 12, color: "var(--color-success)", marginBottom: 4 }}>
           🀄 听牌！等: {tenpaiTiles.map(t => `${t.value}${{wan:"万",bing:"饼",tiao:"条"}[t.suit]}`).join(" ")}
         </div>
       )}

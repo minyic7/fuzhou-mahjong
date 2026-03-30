@@ -99,7 +99,7 @@ function MuteButton() {
       onClick={() => { setMuted(!muted); setMutedState(!muted); }}
       style={{
         marginTop: 6, padding: "2px 8px", fontSize: 12,
-        background: "transparent", border: "1px solid #555",
+        background: "transparent", border: "1px solid var(--color-text-secondary)",
         color: "var(--color-text-secondary)", borderRadius: 4, minHeight: 44,
         cursor: "pointer",
       }}
