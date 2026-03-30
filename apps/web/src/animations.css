@@ -7,6 +7,7 @@
  *   huGlow + huScale        → .hu-celebration     (Game: win overlay)
  *   confettiFall            → .confetti           (Game: win confetti)
  *   goldFlipReveal          → .gold-flip-reveal   (TileWall + GameInfo: gold indicator)
+ *   anGangFlipReveal        → .angang-flip-reveal  (PlayerArea: hidden kong meld tiles)
  *   wallLowPulse            → .wall-low-pulse     (TileWall: low tile warning)
  *   disconnectPulse         → inline style        (PlayerArea: disconnected badge)
  *   drawBtnPulse            → .draw-button-pulse  (TileWall: draw prompt)
@@ -271,6 +272,18 @@
 
 .gold-flip-reveal {
   animation: goldFlipReveal 0.6s ease-out;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+}
+
+/* AnGang (hidden kong) flip reveal — tiles flip to show the concealed kong */
+@keyframes anGangFlipReveal {
+  0% { transform: rotateY(180deg); }
+  100% { transform: rotateY(0deg); }
+}
+
+.angang-flip-reveal {
+  animation: anGangFlipReveal 0.6s ease-out;
   transform-style: preserve-3d;
   backface-visibility: hidden;
 }
