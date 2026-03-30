@@ -180,17 +180,19 @@ function clearBotWatchdog(roomId: string): void {
   }
 }
 
-/** Monotonic counter per room to invalidate stale bot callbacks. */
-const botActionVersion = new Map<string, number>();
+/** Monotonic counter per room+player to invalidate stale bot callbacks. */
+const botActionVersion = new Map<string, number[]>();
 
-function nextBotVersion(roomId: string): number {
-  const v = (botActionVersion.get(roomId) ?? 0) + 1;
-  botActionVersion.set(roomId, v);
-  return v;
+function nextBotVersion(roomId: string, playerIndex: number): number {
+  let versions = botActionVersion.get(roomId);
+  if (!versions) { versions = [0, 0, 0, 0]; botActionVersion.set(roomId, versions); }
+  versions[playerIndex] = (versions[playerIndex] ?? 0) + 1;
+  return versions[playerIndex];
 }
 
-function getBotVersion(roomId: string): number {
-  return botActionVersion.get(roomId) ?? 0;
+function getBotVersion(roomId: string, playerIndex: number): number {
+  const versions = botActionVersion.get(roomId);
+  return versions?.[playerIndex] ?? 0;
 }
 
 // Clean up per-room state when a game is deleted
@@ -609,29 +611,32 @@ function gangDraw(
   playerIndex: number,
 ): void {
   const state = game.state;
-  if (state.wallTail.length === 0) {
-    endGameDraw(io, game);
-    return;
-  }
-
-  const tile = state.wallTail.pop()!;
   const player = state.players[playerIndex];
 
-  if (!isSuitedTile(tile.tile)) {
-    player.flowers.push(tile);
-    // Draw another replacement
-    gangDraw(io, game, playerIndex);
+  // Iterative loop to handle consecutive flowers from wallTail
+  while (true) {
+    if (state.wallTail.length === 0) {
+      endGameDraw(io, game);
+      return;
+    }
+
+    const tile = state.wallTail.pop()!;
+
+    if (!isSuitedTile(tile.tile)) {
+      player.flowers.push(tile);
+      continue; // draw another replacement
+    }
+
+    player.hand.push(tile);
+    player.hand = sortHand(player.hand, state.gold);
+    game.lastDrawnTileIds[playerIndex] = tile.id;
+    broadcastState(io, game);
+
+    // After gang draw, player gets actions (discard, check hu/gang)
+    const actions = getPostDrawActions(game, playerIndex, false);
+    emitOrBotAction(io, game, playerIndex, actions);
     return;
   }
-
-  player.hand.push(tile);
-  player.hand = sortHand(player.hand, state.gold);
-  game.lastDrawnTileIds[playerIndex] = tile.id;
-  broadcastState(io, game);
-
-  // After gang draw, player gets actions (discard, check hu/gang)
-  const actions = getPostDrawActions(game, playerIndex, false);
-  emitOrBotAction(io, game, playerIndex, actions);
 }
 
 // ─── Action Resolution ──────────────────────────────────────────
@@ -643,6 +648,11 @@ function resolveActionWindow(
   discarderIndex: number,
   discardTile: TileInstance,
 ): void {
+  if (game.state.phase !== GamePhase.Playing) {
+    console.warn(`[GameEngine] resolveActionWindow skipped: phase is ${game.state.phase}`);
+    return;
+  }
+
   if (!winner) {
     // All passed, next player draws
     advanceToNextPlayer(io, game, discarderIndex);
@@ -763,6 +773,10 @@ function advanceToNextPlayer(
   game: ServerGameState,
   currentPlayerIndex: number,
 ): void {
+  if (game.state.phase !== GamePhase.Playing) {
+    console.warn(`[GameEngine] advanceToNextPlayer skipped: phase is ${game.state.phase}`);
+    return;
+  }
   const nextPlayer = (currentPlayerIndex + 1) % 4;
   game.state.currentTurn = nextPlayer;
   handleDraw(io, game, nextPlayer);
@@ -1023,16 +1037,15 @@ export function emitOrBotAction(
   actions: import("@fuzhou-mahjong/shared").AvailableActions,
   lastDiscardTile?: TileInstance,
 ): void {
-  const version = nextBotVersion(game.roomId);
-
   if (game.isBot(playerIndex)) {
+    const version = nextBotVersion(game.roomId, playerIndex);
     startBotWatchdog(game.roomId, playerIndex, io);
     let acted = false;
 
     const safetyTimer = setTimeout(() => {
       if (acted) return;
       // 5-second safety timeout: if bot callback hasn't fired, force discard
-      if (getBotVersion(game.roomId) !== version) return; // stale
+      if (getBotVersion(game.roomId, playerIndex) !== version) return; // stale
       if (game.state.phase !== GamePhase.Playing) return;
       acted = true;
       console.warn(`Bot ${playerIndex} safety timeout — forcing emergency discard`);
@@ -1047,7 +1060,7 @@ export function emitOrBotAction(
     setTimeout(() => {
       if (acted) return;
       // Stale check: if version has advanced, another action superseded this one
-      if (getBotVersion(game.roomId) !== version) {
+      if (getBotVersion(game.roomId, playerIndex) !== version) {
         clearTimeout(safetyTimer);
         return;
       }
@@ -1105,23 +1118,27 @@ export function emitOrBotAction(
     if (socket) {
       socket.emit("actionRequired", actions);
     } else {
-      // Disconnected human player — auto-pass to prevent game freeze
-      console.warn(`[GameEngine] Player ${playerIndex} has no valid socket, auto-passing`);
+      // Disconnected human player — auto-act to prevent game freeze
+      console.warn(`[GameEngine] Player ${playerIndex} has no valid socket, auto-acting`);
       const savedTurn = game.state.currentTurn;
       setTimeout(() => {
         if (game.state.phase !== GamePhase.Playing) return;
         // Skip if turn has advanced since timeout was set (stale)
         if (game.state.currentTurn !== savedTurn) {
-          console.warn(`[GameEngine] Player ${playerIndex} auto-pass skipped: turn has advanced`);
+          console.warn(`[GameEngine] Player ${playerIndex} auto-act skipped: turn has advanced`);
           return;
         }
-        // Skip if no action window is expecting this player
         const window = activeWindows.get(game.roomId);
-        if (!window) {
-          console.warn(`[GameEngine] Player ${playerIndex} auto-pass skipped: no active window`);
-          return;
+        if (window) {
+          // In action window: pass
+          handlePlayerAction(io, game.roomId, { type: ActionType.Pass, playerIndex }, playerIndex);
+        } else if (game.state.currentTurn === playerIndex) {
+          // Own turn, no window: emergency discard to keep game moving
+          console.warn(`[GameEngine] Player ${playerIndex} disconnected on own turn — emergency discard`);
+          const player = game.state.players[playerIndex];
+          const fallback = emergencyDiscard(player.hand, playerIndex, game.state.gold);
+          handlePlayerAction(io, game.roomId, fallback, playerIndex);
         }
-        handlePlayerAction(io, game.roomId, { type: ActionType.Pass, playerIndex }, playerIndex);
       }, 100);
     }
   }
