@@ -3,6 +3,7 @@ import { TileView } from "./Tile";
 import type { TileInstance } from "@fuzhou-mahjong/shared";
 import { Suit } from "@fuzhou-mahjong/shared";
 import { BREAKPOINTS } from "../hooks/useIsMobile";
+import { useWindowSize } from "../hooks/useWindowSize";
 
 /* Helper to create demo TileInstance objects for display */
 function demoTile(id: number, tile: TileInstance["tile"]): TileInstance {
@@ -217,10 +218,11 @@ export function TutorialModal({ open, onClose, condensed }: TutorialModalProps) 
     ? CONDENSED_INDICES.map((i) => ALL_SLIDES[i])
     : ALL_SLIDES;
   const [currentSlide, setCurrentSlide] = useState(0);
+  const { height } = useWindowSize();
 
   if (!open) return null;
 
-  const isCompact = window.innerHeight <= BREAKPOINTS.COMPACT_HEIGHT;
+  const isCompact = height <= BREAKPOINTS.COMPACT_HEIGHT;
   const slide = slides[currentSlide];
   const isFirst = currentSlide === 0;
   const isLast = currentSlide === slides.length - 1;

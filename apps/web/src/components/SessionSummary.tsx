@@ -1,6 +1,7 @@
 import { useState } from "react";
 import type { GameOverResult } from "@fuzhou-mahjong/shared";
 import { BREAKPOINTS } from "../hooks/useIsMobile";
+import { useWindowSize } from "../hooks/useWindowSize";
 
 interface RoundRecord {
   scores: number[];
@@ -99,7 +100,8 @@ function RoundHistorySection({ roundHistory, playerNames, isCompact }: {
 
 export function SessionSummary({ data, onClose }: SessionSummaryProps) {
   const { playerNames, cumulativeScores, roundsPlayed, roundHistory } = data;
-  const isCompact = window.innerHeight <= BREAKPOINTS.COMPACT_HEIGHT;
+  const { height } = useWindowSize();
+  const isCompact = height <= BREAKPOINTS.COMPACT_HEIGHT;
 
   // Rankings sorted by cumulative score
   const rankings = cumulativeScores

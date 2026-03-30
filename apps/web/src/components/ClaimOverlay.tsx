@@ -3,6 +3,7 @@ import { ActionType } from "@fuzhou-mahjong/shared";
 import type { AvailableActions, ClientGameState, GameAction, TileInstance } from "@fuzhou-mahjong/shared";
 import { TileView } from "./Tile";
 import { BREAKPOINTS } from "../hooks/useIsMobile";
+import { useWindowSize } from "../hooks/useWindowSize";
 
 interface ClaimOverlayProps {
   actions: AvailableActions;
@@ -31,8 +32,9 @@ const BTN = {
 };
 
 export function ClaimOverlay({ actions, gameState, onAction }: ClaimOverlayProps) {
-  const isCompact = window.innerHeight <= BREAKPOINTS.COMPACT_HEIGHT;
-  const isUltraCompact = window.innerHeight <= 390;
+  const { height } = useWindowSize();
+  const isCompact = height <= BREAKPOINTS.COMPACT_HEIGHT;
+  const isUltraCompact = height <= 390;
   const [showChiPicker, setShowChiPicker] = useState(false);
   const [exiting, setExiting] = useState(false);
   const [exitingChi, setExitingChi] = useState(false);
