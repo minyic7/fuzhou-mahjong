@@ -126,6 +126,7 @@ class ActionWindow {
 
   cancel(): void {
     if (this.timer) { clearTimeout(this.timer); this.timer = null; }
+    this.resolved = true;
   }
 }
 
@@ -1376,7 +1377,6 @@ export function emitOrBotAction(
         console.log(`${tag} Safety timer skipped — not this bot's turn (currentTurn=${game.state.currentTurn}) ts=${Date.now()}`);
         return;
       }
-      acted = true;
       const safetyWindow = activeWindows.get(game.roomId);
       if (safetyWindow) {
         if (!safetyWindow.isPending(playerIndex)) {
@@ -1384,7 +1384,7 @@ export function emitOrBotAction(
         } else {
           console.warn(`[Bot:SAFETY] ${tag} Safety timeout during action window — passing (roomId=${game.roomId}, playerIndex=${playerIndex}, turn=${turnNumber}, phase=${game.state.phase}, version=${version}, hasActionWindow=true) ts=${Date.now()}`);
           try {
-            handlePlayerAction(io, game.roomId, { type: ActionType.Pass, playerIndex }, playerIndex);
+            if (handlePlayerAction(io, game.roomId, { type: ActionType.Pass, playerIndex }, playerIndex)) acted = true;
           } catch (e) {
             console.error(`${tag} Safety timeout Pass fallback failed:`, e);
           }
@@ -1393,7 +1393,7 @@ export function emitOrBotAction(
         console.warn(`[Bot:SAFETY] ${tag} Safety timeout — forcing emergency discard (roomId=${game.roomId}, playerIndex=${playerIndex}, turn=${turnNumber}, phase=${game.state.phase}, version=${version}, hasActionWindow=false) ts=${Date.now()}`);
         try {
           const player = game.state.players[playerIndex];
-          handlePlayerAction(io, game.roomId, emergencyDiscard(player.hand, playerIndex, game.state.gold), playerIndex);
+          if (handlePlayerAction(io, game.roomId, emergencyDiscard(player.hand, playerIndex, game.state.gold), playerIndex)) acted = true;
         } catch (e) {
           console.error(`${tag} Safety timeout fallback failed:`, e);
         }
@@ -1432,6 +1432,7 @@ export function emitOrBotAction(
             console.log(tag + " Stale bail — bot turn is over, no action needed");
           }
         }
+        clearTimeout(safetyTimer);
         return;
       }
         // Restore the snapshotted drawn tile ID so downstream handlers
