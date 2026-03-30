@@ -64,7 +64,7 @@ export function GameInfo({ gold, wallRemaining, dealerIndex, lianZhuangCount, my
       borderRadius: 8,
     }}>
       <div style={{ marginBottom: 8 }}>
-        <span style={{ color: "var(--color-text-secondary)", fontSize: 12 }}>金牌: </span>
+        <span style={{ color: "var(--color-text-secondary)", fontSize: "var(--font-sm)" }}>金牌: </span>
         {gold && <TileView tile={gold.indicatorTile} faceUp gold={null} small className={`gold-indicator-glow${goldFlip ? " gold-flip-reveal" : ""}`} />}
       </div>
 
@@ -76,18 +76,18 @@ export function GameInfo({ gold, wallRemaining, dealerIndex, lianZhuangCount, my
           borderRadius: 6,
           border: "1px solid rgba(255,165,0,0.4)",
         }}>
-          <div style={{ fontSize: 11, color: "var(--color-accent-orange)", marginBottom: 4 }}>
+          <div style={{ fontSize: "var(--font-sm)", color: "var(--color-accent-orange)", marginBottom: 4 }}>
             {posLabel(lastDiscard.playerIndex)} 打出:
           </div>
           <TileView tile={lastDiscard.tile} faceUp gold={gold} />
         </div>
       )}
 
-      <div style={{ fontSize: 12, color: "var(--color-text-secondary)" }}>
+      <div style={{ fontSize: "var(--font-sm)", color: "var(--color-text-secondary)" }}>
         庄:{posLabel(dealerIndex)} | 连庄:{lianZhuangCount}
       </div>
       {wallRemaining !== undefined && (
-        <div style={{ fontSize: 12, color: "var(--color-text-secondary)" }}>
+        <div style={{ fontSize: "var(--font-sm)", color: "var(--color-text-secondary)" }}>
           余{wallRemaining}
         </div>
       )}
@@ -95,7 +95,7 @@ export function GameInfo({ gold, wallRemaining, dealerIndex, lianZhuangCount, my
         <div
           className="wall-low-pulse"
           style={{
-            fontSize: 11,
+            fontSize: "var(--font-sm)",
             color: "var(--color-error)",
             padding: "2px 6px",
             borderRadius: 4,
@@ -115,7 +115,7 @@ function MuteButton() {
     <button
       onClick={() => { setMuted(!muted); setMutedState(!muted); }}
       style={{
-        marginTop: 6, padding: "2px 8px", fontSize: 12,
+        marginTop: 6, padding: "2px 8px", fontSize: "var(--font-sm)",
         background: "transparent", border: "1px solid var(--color-text-secondary)",
         color: "var(--color-text-secondary)", borderRadius: 4, minHeight: 44,
         cursor: "pointer",

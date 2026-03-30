@@ -197,6 +197,14 @@ body {
   --font-uc-badge: 12px;
   --font-uc-tile: 11px;
   --font-dot: 9px;
+
+  /* Typography scale — used by components for inline fontSize */
+  --font-xs: 9px;
+  --font-sm: 11px;
+  --font-md: 13px;
+  --font-lg: 16px;
+  --font-xl: 20px;
+  --font-2xl: 28px;
   --font-overflow: 10px;
 }
 
@@ -301,6 +309,13 @@ body {
     --font-uc-tile: max(9px, 1.4vh);
     --font-dot: max(9px, 1.3vh);
     --font-overflow: max(9px, 1.4vh);
+
+    --font-xs: max(9px, 1.3vh);
+    --font-sm: max(11px, 1.8vh);
+    --font-md: max(13px, 2.2vh);
+    --font-lg: max(16px, 2.8vh);
+    --font-xl: max(20px, 3.6vh);
+    --font-2xl: max(28px, 5vh);
   }
 }
 
@@ -359,6 +374,13 @@ body {
     --font-uc-tile: max(9px, 2.3vh);
     --font-dot: max(9px, 2.3vh);
     --font-overflow: max(9px, 2.3vh);
+
+    --font-xs: max(9px, 2.3vh);
+    --font-sm: max(11px, 2.8vh);
+    --font-md: max(13px, 3.3vh);
+    --font-lg: max(16px, 4.1vh);
+    --font-xl: max(20px, 5.1vh);
+    --font-2xl: max(28px, 7.2vh);
   }
 }
 

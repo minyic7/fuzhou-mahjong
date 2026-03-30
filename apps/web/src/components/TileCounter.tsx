@@ -68,7 +68,7 @@ function TileCell({ label, remaining, total, color }: {
       textDecoration: allGone ? "line-through" : "none",
     }}>
       <span style={{
-        fontSize: 14,
+        fontSize: "var(--font-md)",
         fontWeight: "bold",
         color: allGone ? "var(--color-text-secondary)" : color,
         opacity: allGone ? 0.5 : 1,
@@ -107,7 +107,7 @@ export function TileCounter({ gameState }: TileCounterProps) {
         }}>
           {SUITS.map(suit => (
             <div key={suit} style={{ marginBottom: 6 }}>
-              <div style={{ color: SUIT_COLORS[suit], fontWeight: "bold", fontSize: 10, marginBottom: 2 }}>
+              <div style={{ color: SUIT_COLORS[suit], fontWeight: "bold", fontSize: "var(--font-xs)", marginBottom: 2 }}>
                 {SUIT_LABELS[suit]}
               </div>
               <div style={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
@@ -127,7 +127,7 @@ export function TileCounter({ gameState }: TileCounterProps) {
               </div>
             </div>
           ))}
-          <div style={{ fontSize: 9, color: "var(--color-text-muted)", opacity: 0.3, marginTop: 4, textAlign: "center" }}>
+          <div style={{ fontSize: "var(--font-xs)", color: "var(--color-text-muted)", opacity: 0.3, marginTop: 4, textAlign: "center" }}>
             ● 剩余 &nbsp; ○ 已见
           </div>
         </div>
@@ -139,7 +139,7 @@ export function TileCounter({ gameState }: TileCounterProps) {
           alignItems: "center",
           gap: 6,
           padding: "6px 12px",
-          fontSize: 13,
+          fontSize: "var(--font-md)",
           background: expanded ? "rgba(255,215,0,0.15)" : "rgba(0,0,0,0.7)",
           backdropFilter: "blur(8px)",
           WebkitBackdropFilter: "blur(8px)",
@@ -151,7 +151,7 @@ export function TileCounter({ gameState }: TileCounterProps) {
           whiteSpace: "nowrap",
         }}
       >
-        <span style={{ fontSize: 11 }}>{expanded ? "▼" : "▶"}</span>
+        <span style={{ fontSize: "var(--font-sm)" }}>{expanded ? "▼" : "▶"}</span>
         <span>牌 {totalRemaining}</span>
       </button>
     </div>
