@@ -63,7 +63,7 @@ export function SessionSummary({ data, onClose }: SessionSummaryProps) {
         padding: "24px 28px",
         maxWidth: 440,
         width: "90vw",
-        maxHeight: "85vh",
+        maxHeight: "90dvh",
         overflowY: "auto",
         color: "#eee",
       }}>
