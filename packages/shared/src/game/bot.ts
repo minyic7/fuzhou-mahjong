@@ -577,5 +577,8 @@ export function decideBotAction(
   }
 
   // Default: pass
+  console.warn(
+    `[Bot:decision] Player ${playerIndex} defaulting to Pass — available: canHu=${actions.canHu}, canPeng=${actions.canPeng}, canMingGang=${actions.canMingGang}, chiOptions=${actions.chiOptions.length}, canDiscard=${actions.canDiscard}, canDraw=${actions.canDraw}`,
+  );
   return { type: ActionType.Pass, playerIndex };
 }
