@@ -489,7 +489,7 @@ export function Game({ initialGameState, onLeave }: GameProps) {
           <div style={{
             position: 'absolute', top: 'calc(100% + 4px)', right: 0, zIndex: 35,
             background: 'var(--overlay-bg)', border: '1px solid var(--color-gold-border-hover)',
-            borderRadius: 'var(--radius-md)', padding: 4, minWidth: 160,
+            borderRadius: 'var(--radius-md)', padding: 4, minWidth: "clamp(120px, 35vw, 160px)",
             display: 'flex', flexDirection: 'column', gap: 2,
           }}>
             <Button
@@ -596,7 +596,7 @@ export function Game({ initialGameState, onLeave }: GameProps) {
 
             {/* Actions */}
             <div style={{ display: "flex", gap: "clamp(6px, 2vh, 12px)", justifyContent: "center", flexWrap: "wrap" }}>
-              <Button variant="gold" size="lg" onClick={handleNextRound} style={{ minHeight: "clamp(36px, 10vh, 48px)" }}>
+              <Button variant="gold" size="lg" onClick={handleNextRound} style={{ minHeight: "clamp(44px, 10vh, 48px)" }}>
                 下一局 / Next Round
               </Button>
               {onLeave && (
@@ -613,7 +613,7 @@ export function Game({ initialGameState, onLeave }: GameProps) {
                     socket.emit("leaveRoom");
                     onLeave();
                   }
-                }} style={{ minHeight: "clamp(36px, 10vh, 48px)" }}>
+                }} style={{ minHeight: "clamp(44px, 10vh, 48px)" }}>
                   离开 / Leave
                 </Button>
               )}

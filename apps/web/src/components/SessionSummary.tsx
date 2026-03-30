@@ -35,7 +35,7 @@ function RoundHistorySection({ roundHistory, playerNames, isCompact }: {
 }) {
   const [expanded, setExpanded] = useState(false);
   const showToggle = isCompact;
-  const contentMaxHeight = isCompact ? (expanded ? 120 : 0) : 160;
+  const contentMaxHeight = isCompact ? (expanded ? 150 : 0) : 160;
 
   return (
     <div style={{ marginBottom: "clamp(8px, 2.5vh, 16px)" }}>

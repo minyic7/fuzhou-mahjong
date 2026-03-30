@@ -94,7 +94,7 @@ export function Room({ initialRoomState, sessionScores }: RoomProps) {
           <Button
             onClick={() => socket.emit("addBot")}
             disabled={room.players.length >= 4}
-            style={{ flex: 1, minWidth: 120 }}
+            style={{ flex: 1, minWidth: "clamp(80px, 22vw, 120px)" }}
           >
             +机器人 / +Bot
           </Button>
