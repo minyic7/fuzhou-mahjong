@@ -173,6 +173,7 @@ function WallSegment({ side, stacks, drawStack, canDraw, onDraw, standalone }: {
                   minHeight: "var(--btn-min-size)",
                   minWidth: "var(--btn-min-size)",
                   zIndex: "var(--z-draw-button)",
+                  touchAction: "manipulation",
                 }}
               >
                 摸牌
