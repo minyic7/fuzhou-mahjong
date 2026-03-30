@@ -107,8 +107,8 @@ export function PlayerArea({
         style={{
           display: "flex",
           alignItems: "center",
-          gap: 6,
-          padding: "2px 8px",
+          gap: "var(--compact-gap, 6px)",
+          padding: "var(--compact-padding, 2px 8px)",
           background: isCurrentTurn ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.3)",
           border: isCurrentTurn ? "2px solid #ffd700" : undefined,
           borderRadius: 4,
@@ -119,7 +119,7 @@ export function PlayerArea({
         }}
       >
         {/* Name + badges */}
-        <span style={{ fontSize: "var(--label-font)", fontWeight: "bold", color: "#e8d5a3", whiteSpace: "nowrap", flexShrink: 0 }}>
+        <span style={{ fontSize: "var(--compact-label-font, 12px)", fontWeight: "bold", color: "#e8d5a3", whiteSpace: "nowrap", flexShrink: 0 }}>
           {label}
         </span>
         {isDealer && <span style={{ fontSize: 9, background: "#b71c1c", color: "#ffd700", padding: "0 4px", borderRadius: 3, fontWeight: "bold", flexShrink: 0 }}>庄</span>}
@@ -128,7 +128,7 @@ export function PlayerArea({
         {isCurrentTurn && <span className="your-turn-prompt" style={{ fontSize: 9, background: "rgba(255,215,0,0.2)", color: "#ffd700", padding: "0 4px", borderRadius: 3, border: "1px solid #ffd700", flexShrink: 0 }}>出牌</span>}
 
         {/* Hand count */}
-        <span style={{ fontSize: 11, color: "#8fbc8f", flexShrink: 0 }}>{handCount ?? 0}张</span>
+        <span style={{ fontSize: "var(--compact-info-font, 11px)", color: "#8fbc8f", flexShrink: 0 }}>{handCount ?? 0}张</span>
 
         {/* Melds (small tiles inline) */}
         {melds.length > 0 && (
@@ -162,10 +162,10 @@ export function PlayerArea({
         )}
 
         {/* Flower count */}
-        <span style={{ fontSize: 11, color: "#8fbc8f", flexShrink: 0, marginLeft: "auto" }}>🌸{flowers.length}</span>
+        <span style={{ fontSize: "var(--compact-info-font, 11px)", color: "#8fbc8f", flexShrink: 0, marginLeft: "auto" }}>🌸{flowers.length}</span>
         {cumulativeScore != null && (
           <span className="cumulative-score-badge" style={{
-            fontSize: 11, fontWeight: "bold",
+            fontSize: "var(--compact-info-font, 11px)", fontWeight: "bold",
             color: cumulativeScore > 0 ? "#ffd700" : cumulativeScore < 0 ? "#f44336" : "#8fbc8f",
             padding: "1px 6px", borderRadius: 3, background: "rgba(0,0,0,0.3)",
           }}>
