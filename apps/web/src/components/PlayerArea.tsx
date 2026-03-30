@@ -4,6 +4,7 @@ import { MeldType } from "@fuzhou-mahjong/shared";
 import { TileView } from "./Tile";
 import { useLongPress } from "./TileTooltip";
 import { useSwipeGesture } from "../hooks/useSwipeGesture";
+import { useIsCompactLandscape } from "../hooks/useIsMobile";
 
 interface PlayerAreaProps {
   isMe: boolean;
@@ -51,6 +52,7 @@ export function PlayerArea({
   isDisconnected, compact, cumulativeScore,
 }: PlayerAreaProps) {
   const { onTouchStart: lpTouchStart, onTouchEnd: lpTouchEnd, onMouseEnter, onMouseLeave, Tooltip } = useLongPress(gold);
+  const isCompactLandscape = useIsCompactLandscape();
 
   // Double-tap detection for reliable mobile double-tap
   const lastTapRef = useRef<{ id: number; time: number } | null>(null);
@@ -362,8 +364,23 @@ export function PlayerArea({
         </div>
       )}
 
-      {/* Discards - grid layout */}
-      {discards.length > 0 && (
+      {/* Discards - horizontal scroll on compact landscape, grid otherwise */}
+      {discards.length > 0 && (isMe && isCompactLandscape ? (
+        <div className="compact-discards" style={{
+          display: "flex",
+          gap: 1,
+          overflowX: "auto",
+          overflowY: "hidden",
+          padding: "var(--game-padding)",
+          maxHeight: "var(--tile-h-sm)",
+        }}>
+          {discards.map((d) => (
+            <TileView key={d.id} tile={d} faceUp gold={gold} small
+              className={lastDiscardedTileId === d.id ? "discard-arrive last-discard" : undefined}
+            />
+          ))}
+        </div>
+      ) : (
         <div style={{
           display: "grid",
           gridTemplateColumns: `repeat(var(--discard-cols), auto)`,
@@ -379,7 +396,7 @@ export function PlayerArea({
             />
           ))}
         </div>
-      )}
+      ))}
     </div>
     </>
   );
