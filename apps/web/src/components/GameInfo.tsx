@@ -21,7 +21,10 @@ export function GameInfo({ gold, wallRemaining, dealerIndex, lianZhuangCount, my
 
   return (
     <div style={{
-      textAlign: "center",
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      gap: 6,
       padding: 12,
       background: "rgba(0,0,0,0.3)",
       borderRadius: 8,
