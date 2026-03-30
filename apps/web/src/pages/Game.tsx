@@ -537,7 +537,7 @@ export function Game({ initialGameState, onLeave }: GameProps) {
           }}>
             <h2 style={{ fontSize: 24, marginBottom: 8 }}>
               {go.winnerId !== null
-                ? `🎉 ${(() => { if (!gameState) return ''; if (go.winnerId === gameState.myIndex) return gameState.myName || '我'; const o = gameState.otherPlayers.find((_, i) => (gameState.myIndex + i + 1) % 4 === go.winnerId); return o?.name || ''; })()} 胡了!`
+                ? `🎉 ${(go.playerNames ?? [])[go.winnerId] || "玩家"} 胡了!`
                 : "流局 / Draw"}
             </h2>
             <p style={{ fontSize: 16, color: "var(--color-text-gold)", marginBottom: 12 }}>

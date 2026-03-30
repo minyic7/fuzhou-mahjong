@@ -104,11 +104,14 @@ export function ClaimOverlay({ actions, gameState, onAction }: ClaimOverlayProps
           {actions.canMingGang && gameState.lastDiscard && (
             <button
               style={{ ...BTN.base, ...BTN.gang }}
-              onClick={() => handleAction({
-                type: ActionType.MingGang,
-                playerIndex: myIndex,
-                targetTile: gameState.lastDiscard!.tile,
-              })}
+              onClick={() => {
+                if (!gameState.lastDiscard) return;
+                handleAction({
+                  type: ActionType.MingGang,
+                  playerIndex: myIndex,
+                  targetTile: gameState.lastDiscard.tile,
+                });
+              }}
             >
               杠
             </button>
@@ -117,11 +120,14 @@ export function ClaimOverlay({ actions, gameState, onAction }: ClaimOverlayProps
           {actions.canPeng && gameState.lastDiscard && (
             <button
               style={{ ...BTN.base, ...BTN.peng }}
-              onClick={() => handleAction({
-                type: ActionType.Peng,
-                playerIndex: myIndex,
-                targetTile: gameState.lastDiscard!.tile,
-              })}
+              onClick={() => {
+                if (!gameState.lastDiscard) return;
+                handleAction({
+                  type: ActionType.Peng,
+                  playerIndex: myIndex,
+                  targetTile: gameState.lastDiscard.tile,
+                });
+              }}
             >
               碰
             </button>
@@ -198,11 +204,12 @@ export function ClaimOverlay({ actions, gameState, onAction }: ClaimOverlayProps
                     border: "2px solid rgba(46,139,87,0.6)",
                   }}
                   onClick={() => {
+                    if (!gameState.lastDiscard) return;
                     handleAction({
                       type: ActionType.Chi,
                       playerIndex: myIndex,
                       tiles: combo as [TileInstance, TileInstance],
-                      targetTile: gameState.lastDiscard!.tile,
+                      targetTile: gameState.lastDiscard.tile,
                     });
                   }}
                 >
