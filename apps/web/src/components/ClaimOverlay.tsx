@@ -189,6 +189,7 @@ export function ClaimOverlay({ actions, gameState, onAction }: ClaimOverlayProps
               padding: "4px 4px",
               scrollSnapType: "x mandatory",
               WebkitOverflowScrolling: "touch",
+              touchAction: "pan-x",
               justifyContent: actions.chiOptions.length <= 2 ? "center" : undefined,
               maxHeight: isUltraCompact ? "min(45dvh, calc(100dvh - 160px))" : "60dvh",
               overflowY: "auto",
