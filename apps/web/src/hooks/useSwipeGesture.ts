@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 interface SwipeConfig {
   onSwipeUp: (tileId: number) => void;
@@ -34,7 +34,11 @@ export function useSwipeGesture({
     [enabled],
   );
 
-  const onTouchMove = useCallback((e: React.TouchEvent) => {
+  // Ref to the container element so we can attach a non-passive touchmove listener
+  const containerRef = useRef<HTMLElement | null>(null);
+
+  // Native touchmove handler — must be non-passive so preventDefault() works on iOS
+  const handleTouchMove = useCallback((e: TouchEvent) => {
     const ref = touchRef.current;
     if (!ref) return;
     const touch = e.touches[0];
@@ -68,6 +72,14 @@ export function useSwipeGesture({
     }
   }, []);
 
+  // Attach touchmove via addEventListener with { passive: false }
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    el.addEventListener("touchmove", handleTouchMove, { passive: false });
+    return () => el.removeEventListener("touchmove", handleTouchMove);
+  }, [handleTouchMove]);
+
   const onTouchEnd = useCallback(() => {
     const ref = touchRef.current;
     const threshold = thresholdProp ?? Math.max(25, window.innerHeight * 0.08);
@@ -85,5 +97,5 @@ export function useSwipeGesture({
     setSwipeOffset(0);
   }, []);
 
-  return { onTouchStart, onTouchMove, onTouchEnd, onTouchCancel, swipingTileId, swipeOffset };
+  return { onTouchStart, containerRef, onTouchEnd, onTouchCancel, swipingTileId, swipeOffset };
 }

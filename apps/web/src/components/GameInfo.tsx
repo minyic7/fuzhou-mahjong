@@ -24,6 +24,8 @@ export function GameInfo({ gold, wallRemaining, dealerIndex, lianZhuangCount, my
       if (prevGoldRef.current !== key) {
         prevGoldRef.current = key;
         setGoldFlip(true);
+        const timer = setTimeout(() => setGoldFlip(false), 600);
+        return () => clearTimeout(timer);
       }
     } else {
       prevGoldRef.current = null;

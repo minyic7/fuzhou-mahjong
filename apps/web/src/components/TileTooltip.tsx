@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import type { TileInstance, GoldState, Tile } from "@fuzhou-mahjong/shared";
 import { isSuitedTile, isGoldTile } from "@fuzhou-mahjong/shared";
 
@@ -31,6 +31,13 @@ interface TooltipState {
 export function useLongPress(gold: GoldState | null) {
   const [tooltip, setTooltip] = useState<TooltipState>({ visible: false, tile: null, x: 0, y: 0 });
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Clear any pending timer on unmount to prevent setState on unmounted component
+  useEffect(() => {
+    return () => {
+      if (timerRef.current) { clearTimeout(timerRef.current); timerRef.current = null; }
+    };
+  }, []);
 
   const onTouchStart = useCallback((tile: TileInstance, e: React.TouchEvent) => {
     const touch = e.touches[0];
