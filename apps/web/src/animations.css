@@ -123,8 +123,8 @@
 
 .confetti {
   position: absolute;
-  width: 10px;
-  height: 10px;
+  width: clamp(8px, 2vmin, 12px);
+  height: clamp(8px, 2vmin, 12px);
   animation: confettiFall 3s ease-in forwards;
 }
 

@@ -268,8 +268,8 @@ export function TutorialModal({ open, onClose, condensed }: TutorialModalProps) 
           aria-label="Close tutorial"
           style={{
             position: "absolute",
-            top: 8,
-            right: 8,
+            top: "clamp(8px, 2dvh, 16px)",
+            right: "clamp(8px, 2dvh, 16px)",
             background: "transparent",
             border: "none",
             color: "var(--color-text-secondary)",
