@@ -3,6 +3,8 @@ import type { GoldState } from "@fuzhou-mahjong/shared";
 import { TileView } from "./Tile";
 import { TILE_BACK_URL } from "../tileSvg";
 
+type Side = "top" | "right" | "bottom" | "left";
+
 interface TileWallProps {
   wallRemaining: number;
   wallDrawCount: number;
@@ -11,12 +13,16 @@ interface TileWallProps {
   canDraw?: boolean;
   onDraw?: () => void;
   compact?: boolean;
+  /** Render only this side as a standalone strip (for edge placement). */
+  segment?: Side;
 }
 
 const STACKS_PER_SIDE = 18;
 const TOTAL_STACKS = STACKS_PER_SIDE * 4;
 
 interface StackState { hasUpper: boolean; hasLower: boolean; }
+
+const SIDES: Side[] = ["top", "right", "bottom", "left"];
 
 /**
  * Given actual draw and supplement counts from the server,
@@ -61,9 +67,6 @@ function findDrawStackIndex(sides: StackState[][]): { side: number; stack: numbe
   return null;
 }
 
-type Side = "top" | "right" | "bottom" | "left";
-const SIDES: Side[] = ["top", "right", "bottom", "left"];
-
 function WallTile() {
   return (
     <div style={{
@@ -82,12 +85,14 @@ function WallTile() {
   );
 }
 
-function WallSegment({ side, stacks, drawStack, canDraw, onDraw }: {
+function WallSegment({ side, stacks, drawStack, canDraw, onDraw, standalone }: {
   side: Side;
   stacks: StackState[];
   drawStack: number | null;
   canDraw?: boolean;
   onDraw?: () => void;
+  /** When true, renders as flow element (no absolute positioning). */
+  standalone?: boolean;
 }) {
   const isH = side === "top" || side === "bottom";
   // Reverse order for bottom and left so depletion visually proceeds correctly
@@ -101,11 +106,13 @@ function WallSegment({ side, stacks, drawStack, canDraw, onDraw }: {
       display: "flex",
       flexDirection: isH ? "row" : "column",
       gap: 0,
-      position: "absolute",
-      ...(side === "top" && { top: 0, left: "50%", transform: "translateX(-50%)" }),
-      ...(side === "bottom" && { bottom: 0, left: "50%", transform: "translateX(-50%)" }),
-      ...(side === "left" && { left: 0, top: "50%", transform: "translateY(-50%)" }),
-      ...(side === "right" && { right: 0, top: "50%", transform: "translateY(-50%)" }),
+      ...(!standalone && {
+        position: "absolute" as const,
+        ...(side === "top" && { top: 0, left: "50%", transform: "translateX(-50%)" }),
+        ...(side === "bottom" && { bottom: 0, left: "50%", transform: "translateX(-50%)" }),
+        ...(side === "left" && { left: 0, top: "50%", transform: "translateY(-50%)" }),
+        ...(side === "right" && { right: 0, top: "50%", transform: "translateY(-50%)" }),
+      }),
     }}>
       {ordered.map((s, i) => {
         const isTarget = drawIdx === i;
@@ -178,7 +185,7 @@ function WallSegment({ side, stacks, drawStack, canDraw, onDraw }: {
   );
 }
 
-export function TileWall({ wallRemaining, wallDrawCount, wallSupplementCount, gold, canDraw, onDraw, compact }: TileWallProps) {
+export function TileWall({ wallRemaining, wallDrawCount, wallSupplementCount, gold, canDraw, onDraw, compact, segment }: TileWallProps) {
   const sides = useMemo(() => computeWallStacks(wallDrawCount, wallSupplementCount), [wallDrawCount, wallSupplementCount]);
   const drawIndex = useMemo(() => findDrawStackIndex(sides), [sides]);
 
@@ -197,6 +204,21 @@ export function TileWall({ wallRemaining, wallDrawCount, wallSupplementCount, go
       setGoldFlip(false);
     }
   }, [gold]);
+
+  // Single segment mode — render one standalone wall strip
+  if (segment) {
+    const sideIndex = SIDES.indexOf(segment);
+    return (
+      <WallSegment
+        side={segment}
+        stacks={sides[sideIndex]}
+        drawStack={drawIndex?.side === sideIndex ? drawIndex.stack : null}
+        canDraw={canDraw}
+        onDraw={onDraw}
+        standalone
+      />
+    );
+  }
 
   if (compact) {
     return (
@@ -239,10 +261,10 @@ export function TileWall({ wallRemaining, wallDrawCount, wallSupplementCount, go
     );
   }
 
+  // Full square mode (legacy — kept for reference, no longer used from GameTable)
   return (
     <div className="tile-wall-container" style={{
       position: "relative",
-      /* Width ≈ 18 stacks + side thickness on each end */
       width: "calc(var(--wall-tw) * 18 + 2 * var(--wall-th) + 26px)",
       height: "calc(var(--wall-tw) * 18 + 2 * var(--wall-th) + 26px)",
       margin: "0 auto",
