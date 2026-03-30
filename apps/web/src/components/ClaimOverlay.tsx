@@ -77,7 +77,7 @@ export function ClaimOverlay({ actions, gameState, onAction }: ClaimOverlayProps
         background: "var(--overlay-bg)",
         border: "2px solid var(--color-accent-orange)",
         borderRadius: 12,
-        padding: "var(--overlay-padding-y) var(--overlay-padding-x)",
+        padding: "calc(var(--overlay-padding-y) + env(safe-area-inset-top, 0px)) calc(var(--overlay-padding-x) + env(safe-area-inset-right, 0px)) calc(var(--overlay-padding-y) + env(safe-area-inset-bottom, 0px)) calc(var(--overlay-padding-x) + env(safe-area-inset-left, 0px))",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
