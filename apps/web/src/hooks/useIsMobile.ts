@@ -8,13 +8,16 @@ export const BREAKPOINTS = {
   TINY_WIDTH: 360,
 } as const;
 
+const COMPACT_LANDSCAPE_MQ = `(orientation: landscape) and (max-height: ${BREAKPOINTS.COMPACT_HEIGHT}px)`;
+
 export function useIsCompactLandscape(): boolean {
-  const [isCompact, setIsCompact] = useState(() => window.innerHeight <= BREAKPOINTS.COMPACT_HEIGHT);
+  const [isCompact, setIsCompact] = useState(() => window.matchMedia(COMPACT_LANDSCAPE_MQ).matches);
 
   useEffect(() => {
-    const onResize = () => setIsCompact(window.innerHeight <= BREAKPOINTS.COMPACT_HEIGHT);
-    window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
+    const mq = window.matchMedia(COMPACT_LANDSCAPE_MQ);
+    const handler = (e: MediaQueryListEvent) => setIsCompact(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
   }, []);
 
   return isCompact;

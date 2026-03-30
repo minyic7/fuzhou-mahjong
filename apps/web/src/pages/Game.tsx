@@ -6,8 +6,7 @@ import { CenterAction, useCenterAction } from "../components/CenterAction";
 import { sounds, setMuted, isMuted } from "../sounds";
 import { TileCounter } from "../components/TileCounter";
 import { TutorialModal } from "../components/TutorialModal";
-import { BREAKPOINTS } from "../hooks/useIsMobile";
-import { useWindowSize } from "../hooks/useWindowSize";
+import { useIsCompactLandscape } from "../hooks/useIsMobile";
 import { TileView } from "../components/Tile";
 import { SessionSummary, type SessionData } from "../components/SessionSummary";
 import { Button } from "../components/Button";
@@ -78,7 +77,7 @@ export function Game({ initialGameState, onLeave }: GameProps) {
   const [departingTile, setDepartingTile] = useState<TileInstance | null>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [muted, setMutedState] = useState(isMuted);
-  const [isPortrait, setIsPortrait] = useState(() => window.matchMedia("(orientation: portrait)").matches && window.innerWidth <= 768);
+  const [isPortrait, setIsPortrait] = useState(() => window.matchMedia("(orientation: portrait) and (max-width: 768px)").matches);
 
   useEffect(() => {
     const mq = window.matchMedia("(orientation: portrait) and (max-width: 768px)");
@@ -351,8 +350,12 @@ export function Game({ initialGameState, onLeave }: GameProps) {
     ? (actions.canHu || actions.canPeng || actions.canMingGang || actions.chiOptions.length > 0) && !actions.canDiscard
     : false;
 
-  const { height: windowHeight } = useWindowSize();
-  const isCompactMain = windowHeight <= BREAKPOINTS.COMPACT_HEIGHT;
+  // Auto-close settings dropdown when claim overlay appears
+  useEffect(() => {
+    if (isClaimWindow) setSettingsOpen(false);
+  }, [isClaimWindow]);
+
+  const isCompactMain = useIsCompactLandscape();
 
   const handleAction = (action: GameAction) => {
     socket.emit("playerAction", action);
@@ -478,7 +481,7 @@ export function Game({ initialGameState, onLeave }: GameProps) {
         >⚙</button>
         {settingsOpen && (
           <div style={{
-            position: 'absolute', top: 'calc(48px + env(safe-area-inset-top, 0px))', right: 0, zIndex: 45,
+            position: 'absolute', top: 'calc(100% + 4px)', right: 0, zIndex: 35,
             background: 'var(--overlay-bg)', border: '1px solid var(--color-gold-border-hover)',
             borderRadius: 'var(--radius-md)', padding: 4, minWidth: 160,
             display: 'flex', flexDirection: 'column', gap: 2,
