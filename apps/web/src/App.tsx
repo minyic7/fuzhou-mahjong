@@ -5,15 +5,17 @@ import type { RoomState, ClientGameState } from "@fuzhou-mahjong/shared";
 import { Lobby } from "./pages/Lobby";
 import { Room } from "./pages/Room";
 import { Game } from "./pages/Game";
+import { ConnectionStatus } from "./components/ConnectionStatus";
 
 type View = "lobby" | "room" | "game";
 
 const PLAYER_ID_KEY = "fuzhou-mahjong-playerId";
 
 export function App() {
-  const { connected } = useSocket();
+  const { connected, connectionState, reconnectAttempt } = useSocket();
   const [view, setView] = useState<View>("lobby");
   const [reconnecting, setReconnecting] = useState(false);
+  const [disconnectedAt, setDisconnectedAt] = useState<number | null>(null);
   const [initialRoomState, setInitialRoomState] = useState<RoomState | null>(null);
   const [initialGameState, setInitialGameState] = useState<ClientGameState | null>(null);
 
@@ -29,7 +31,10 @@ export function App() {
   // Detect disconnect during game
   useEffect(() => {
     const handler = () => {
-      if (view === "game") setReconnecting(true);
+      if (view === "game") {
+        setReconnecting(true);
+        setDisconnectedAt(Date.now());
+      }
     };
     socket.on("disconnect", handler);
     return () => { socket.off("disconnect", handler); };
@@ -53,6 +58,7 @@ export function App() {
     const handler = (state: ClientGameState) => {
       setInitialGameState(state);
       setReconnecting(false);
+      setDisconnectedAt(null);
       setView("game");
     };
     socket.on("gameStarted", handler);
@@ -79,11 +85,11 @@ export function App() {
     return () => { socket.off("error", handler); };
   }, []);
 
-  if (!connected) {
+  if (!connected && !reconnecting) {
     return (
       <div className="loading-state" style={{ minHeight: "80vh" }}>
         <div className="spinner" />
-        {reconnecting ? "重新连接中... / Reconnecting..." : "连接服务器中... / Connecting..."}
+        连接服务器中... / Connecting...
       </div>
     );
   }
@@ -99,5 +105,17 @@ export function App() {
     }
   })();
 
-  return <div key={view} className="page-transition" style={{ display: "flex", flexDirection: "column", flex: 1 }}>{content}</div>;
+  return (
+    <div key={view} className="page-transition" style={{ display: "flex", flexDirection: "column", flex: 1 }}>
+      {content}
+      {reconnecting && (
+        <ConnectionStatus
+          connectionState={connectionState}
+          reconnectAttempt={reconnectAttempt}
+          timeoutMs={60000}
+          disconnectedAt={disconnectedAt}
+        />
+      )}
+    </div>
+  );
 }

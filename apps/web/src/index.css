@@ -432,6 +432,12 @@ button.lobby-create-btn:hover:not(:disabled) {
   }
 }
 
+/* Disconnect pulse animation */
+@keyframes disconnectPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
 /* Chi picker horizontal scroll — hide scrollbar */
 .chi-picker-scroll {
   scrollbar-width: none; /* Firefox */

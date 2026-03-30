@@ -114,6 +114,17 @@ export interface ClientEvents {
   quickStart: (playerName: string) => void;
 }
 
+export interface PlayerDisconnectedEvent {
+  playerIndex: number;
+  playerName: string;
+  timeoutMs: number;
+}
+
+export interface PlayerReconnectedEvent {
+  playerIndex: number;
+  playerName: string;
+}
+
 export interface ServerEvents {
   roomCreated: (roomId: string) => void;
   roomJoined: (roomState: RoomState) => void;
@@ -126,6 +137,6 @@ export interface ServerEvents {
   gameOver: (result: GameOverResult) => void;
   error: (message: string) => void;
   playerIdAssigned: (playerId: string) => void;
-  playerDisconnected: (playerIndex: number) => void;
-  playerReconnected: (playerIndex: number) => void;
+  playerDisconnected: (event: PlayerDisconnectedEvent) => void;
+  playerReconnected: (event: PlayerReconnectedEvent) => void;
 }

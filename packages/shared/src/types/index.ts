@@ -52,4 +52,6 @@ export type {
   CumulativeData,
   ClientEvents,
   ServerEvents,
+  PlayerDisconnectedEvent,
+  PlayerReconnectedEvent,
 } from './events.js';

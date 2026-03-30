@@ -77,7 +77,7 @@ export function registerRoomHandlers(io: GameServer, socket: GameSocket): void {
       game.updateSocketId(playerIndex, socket.id);
       socket.emit("playerIdAssigned", playerId);
       socket.emit("gameStarted", game.getClientGameState(playerIndex));
-      io.to(room.id).emit("playerReconnected", playerIndex);
+      io.to(room.id).emit("playerReconnected", { playerIndex, playerName: player.name });
       console.log(`Player ${player.name} reconnected to room ${room.id}`);
     } else {
       socket.emit("roomJoined", room.getState());
@@ -247,7 +247,7 @@ export function registerRoomHandlers(io: GameServer, socket: GameSocket): void {
       if (!player) return;
 
       const playerIndex = room.getPlayerIndexByPlayerId(player.playerId);
-      io.to(room.id).emit("playerDisconnected", playerIndex);
+      io.to(room.id).emit("playerDisconnected", { playerIndex, playerName: player.name, timeoutMs: RECONNECT_TIMEOUT_MS });
       io.to(room.id).emit("roomUpdated", room.getState());
       console.log(`Player ${player.name} disconnected from game in room ${room.id}`);
 

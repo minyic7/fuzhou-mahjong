@@ -7,7 +7,7 @@ import { sounds, setMuted, isMuted } from "../sounds";
 import { TileCounter } from "../components/TileCounter";
 import { TileView } from "../components/Tile";
 import { ActionType, MeldType } from "@fuzhou-mahjong/shared";
-import type { ClientGameState, GameOverResult, AvailableActions, GameAction } from "@fuzhou-mahjong/shared";
+import type { ClientGameState, GameOverResult, AvailableActions, GameAction, PlayerDisconnectedEvent, PlayerReconnectedEvent } from "@fuzhou-mahjong/shared";
 
 const MUTE_KEY = "fuzhou-mahjong-muted";
 
@@ -59,6 +59,15 @@ export function Game({ initialGameState, onLeave }: GameProps) {
     return false;
   });
   const gameStartedRef = useRef(false);
+  const [disconnectedPlayers, setDisconnectedPlayers] = useState<Set<number>>(new Set());
+  const [toasts, setToasts] = useState<{ id: number; message: string }[]>([]);
+  const toastIdRef = useRef(0);
+
+  const addToast = (message: string) => {
+    const id = ++toastIdRef.current;
+    setToasts((prev) => [...prev, { id, message }]);
+    setTimeout(() => setToasts((prev) => prev.filter((t) => t.id !== id)), 4000);
+  };
 
   const toggleMute = () => {
     const next = !soundMuted;
@@ -147,11 +156,25 @@ export function Game({ initialGameState, onLeave }: GameProps) {
       setGameOver(result);
       if (result.winnerId !== null) sounds.hu();
     });
+    socket.on("playerDisconnected", (event: PlayerDisconnectedEvent) => {
+      setDisconnectedPlayers((prev) => new Set(prev).add(event.playerIndex));
+      addToast(`${event.playerName} 断线了 / disconnected`);
+    });
+    socket.on("playerReconnected", (event: PlayerReconnectedEvent) => {
+      setDisconnectedPlayers((prev) => {
+        const next = new Set(prev);
+        next.delete(event.playerIndex);
+        return next;
+      });
+      addToast(`${event.playerName} 已重连 / reconnected`);
+    });
 
     return () => {
       socket.off("gameStateUpdate");
       socket.off("actionRequired");
       socket.off("gameOver");
+      socket.off("playerDisconnected");
+      socket.off("playerReconnected");
     };
   }, []);
 
@@ -412,6 +435,24 @@ export function Game({ initialGameState, onLeave }: GameProps) {
           <div className="border-flash" />
         </>
       )}
+      {/* Toast notifications */}
+      <div style={{
+        position: "fixed", top: 16, left: "50%", transform: "translateX(-50%)",
+        zIndex: 9000, display: "flex", flexDirection: "column", gap: 8, alignItems: "center",
+        pointerEvents: "none",
+      }}>
+        {toasts.map((t) => (
+          <div key={t.id} style={{
+            background: "rgba(0,0,0,0.85)", color: "#e8d5a3", padding: "8px 20px",
+            borderRadius: 8, fontSize: 14, fontWeight: "bold",
+            border: "1px solid rgba(232,213,163,0.3)",
+            animation: "pageFadeIn 0.3s ease-out",
+            whiteSpace: "nowrap",
+          }}>
+            {t.message}
+          </div>
+        ))}
+      </div>
       <CenterAction display={centerAction} gold={gameState.gold} />
       <GameTable
         state={gameState}
@@ -442,6 +483,7 @@ export function Game({ initialGameState, onLeave }: GameProps) {
           if (tile) handleAction({ type: ActionType.BuGang, playerIndex: gameState.myIndex, tile });
         }}
         onBackgroundClick={() => setSelectedTileId(null)}
+        disconnectedPlayers={disconnectedPlayers}
       />
       {isClaimWindow && actions && (
         <ClaimOverlay actions={actions} gameState={gameState} onAction={handleAction} />
