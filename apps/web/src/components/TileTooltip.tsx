@@ -71,7 +71,7 @@ export function useLongPress(gold: GoldState | null) {
         border: isGold ? "2px solid var(--color-gold-bright)" : "1px solid var(--color-text-secondary)",
         borderRadius: 8,
         padding: 12,
-        zIndex: 200,
+        zIndex: 35,
         textAlign: "center",
         boxShadow: "0 4px 20px rgba(0,0,0,0.5)",
         pointerEvents: "none",
@@ -83,5 +83,10 @@ export function useLongPress(gold: GoldState | null) {
     );
   };
 
-  return { onTouchStart, onTouchEnd, onMouseEnter, onMouseLeave, Tooltip };
+  const dismiss = useCallback(() => {
+    if (timerRef.current) { clearTimeout(timerRef.current); timerRef.current = null; }
+    setTooltip((t) => t.visible ? { ...t, visible: false } : t);
+  }, []);
+
+  return { onTouchStart, onTouchEnd, onMouseEnter, onMouseLeave, Tooltip, dismiss };
 }

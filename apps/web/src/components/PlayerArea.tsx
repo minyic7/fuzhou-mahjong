@@ -38,6 +38,7 @@ interface PlayerAreaProps {
   ultraCompact?: boolean;
   firstPerson?: boolean;
   cumulativeScore?: number;
+  claimActive?: boolean;
 }
 
 const BUBBLE_BTN = {
@@ -52,9 +53,14 @@ export function PlayerArea({
   isCurrentTurn, isDealer, gold, selectedTileId, onTileClick, label,
   claimableTileIds, onTileDoubleClick, lastDrawnTileId, lastDiscardedTileId, tenpaiTiles,
   canDiscard, onDiscard, canHu, onHu, kongTileIds, onAnGang, onBuGang, departingTileId, hasDiscardedGold,
-  isDisconnected, compact, ultraCompact, firstPerson, cumulativeScore,
+  isDisconnected, compact, ultraCompact, firstPerson, cumulativeScore, claimActive,
 }: PlayerAreaProps) {
-  const { onTouchStart: lpTouchStart, onTouchEnd: lpTouchEnd, onMouseEnter, onMouseLeave, Tooltip } = useLongPress(gold);
+  const { onTouchStart: lpTouchStart, onTouchEnd: lpTouchEnd, onMouseEnter, onMouseLeave, Tooltip, dismiss } = useLongPress(gold);
+
+  // Auto-dismiss tooltip when claim overlay appears
+  useEffect(() => {
+    if (claimActive) dismiss();
+  }, [claimActive, dismiss]);
   const isCompactLandscape = useIsCompactLandscape();
 
   // Double-tap detection for reliable mobile double-tap
