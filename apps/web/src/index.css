@@ -212,6 +212,11 @@ body {
     --compact-padding: 2px 8px;
     --compact-label-font: 12px;
     --compact-info-font: 11px;
+    --fp-tile-w: 38px;
+    --fp-tile-h: 56px;
+    --fp-opponent-tile-w: 18px;
+    --fp-opponent-tile-h: 26px;
+    --fp-hand-gap: 2px;
   }
 }
 
@@ -238,6 +243,11 @@ body {
     --compact-padding: 2px 4px;
     --compact-label-font: 10px;
     --compact-info-font: 9px;
+    --fp-tile-w: 32px;
+    --fp-tile-h: 46px;
+    --fp-opponent-tile-w: 16px;
+    --fp-opponent-tile-h: 22px;
+    --fp-hand-gap: 1px;
   }
   .game-table {
     grid-template-columns: 50px 1fr 50px;
