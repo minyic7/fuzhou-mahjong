@@ -80,8 +80,8 @@ export function Lobby({ onJoined }: LobbyProps) {
           size="lg"
           onClick={handleQuickStart}
           disabled={quickStarting}
-          className="lobby-create-btn"
-          style={{ width: "100%", background: "linear-gradient(135deg, var(--color-bg-button) 0%, var(--color-bg-button-hover) 100%)", border: "2px solid var(--color-gold-border-hover)", boxShadow: "0 0 12px rgba(212, 160, 23, 0.3)" }}
+          className="lobby-create-btn lobby-quick-start"
+          style={{ width: "100%" }}
         >
           {quickStarting ? "启动中... / Starting..." : "⚡ 快速开始 / Quick Start"}
         </Button>
@@ -119,7 +119,7 @@ export function Lobby({ onJoined }: LobbyProps) {
                 <span style={{ fontFamily: "monospace", fontSize: 22, fontWeight: "bold", color: "var(--color-text-primary)", letterSpacing: 4 }}>
                   {room.roomId}
                 </span>
-                <span className="room-status-badge" style={{ background: room.playerCount >= room.maxPlayers ? "rgba(255,82,82,0.2)" : "rgba(46,125,80,0.3)", color: room.playerCount >= room.maxPlayers ? "var(--color-error)" : "var(--color-text-secondary)", border: `1px solid ${room.playerCount >= room.maxPlayers ? "rgba(255,82,82,0.3)" : "rgba(46,125,80,0.5)"}`, padding: "2px 10px", borderRadius: 12, fontSize: 12 }}>
+                <span className={room.playerCount >= room.maxPlayers ? "room-badge-full" : "room-badge-waiting"}>
                   {room.playerCount >= room.maxPlayers ? "已满 / Full" : "等待中 / Waiting"}
                 </span>
               </div>
@@ -127,7 +127,7 @@ export function Lobby({ onJoined }: LobbyProps) {
                 <div>
                   <div className="player-dots">
                     {Array.from({ length: room.maxPlayers }).map((_, i) => (
-                      <span key={i} style={{ width: 10, height: 10, borderRadius: "var(--radius-sm)", background: i < room.playerCount ? "var(--color-bg-button-hover)" : "rgba(184, 134, 11, 0.15)", border: "1px solid rgba(184, 134, 11, 0.3)", display: "inline-block" }} />
+                      <span key={i} className={`player-dot${i < room.playerCount ? " player-dot-filled" : ""}`} />
                     ))}
                   </div>
                   <span style={{ color: "var(--color-text-secondary)", fontSize: "var(--label-font)" }}>
