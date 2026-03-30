@@ -1,6 +1,5 @@
 import type { Server, Socket } from "socket.io";
 import type { ClientEvents, ServerEvents } from "@fuzhou-mahjong/shared";
-import { ActionType } from "@fuzhou-mahjong/shared";
 import {
   createRoom,
   findRoom,
@@ -12,8 +11,8 @@ import {
   unregisterPlayerRoom,
 } from "../room.js";
 import { createGame, getGame, deleteGame } from "../gameState.js";
-import { checkWin, MeldType, isGoldTile, GamePhase, decideBotAction } from "@fuzhou-mahjong/shared";
-import { handlePlayerAction } from "../gameEngine.js";
+import { checkWin, GamePhase } from "@fuzhou-mahjong/shared";
+import { handlePlayerAction, emitOrBotAction } from "../gameEngine.js";
 
 type GameSocket = Socket<ClientEvents, ServerEvents>;
 type GameServer = Server<ClientEvents, ServerEvents>;
@@ -299,25 +298,8 @@ export function registerRoomHandlers(io: GameServer, socket: GameSocket): void {
 function triggerDealerAction(io: GameServer, game: import("../gameState.js").ServerGameState, room: import("../room.js").Room): void {
   const dealerIdx = game.state.dealerIndex;
   if (game.isBot(dealerIdx)) {
-    setTimeout(() => {
-      try {
-        const actions = game.getInitialDealerActions();
-        const player = game.state.players[dealerIdx];
-        const botAction = decideBotAction(player.hand, player.melds, actions, dealerIdx, game.state.gold);
-        handlePlayerAction(io, game.roomId, botAction, dealerIdx);
-      } catch (err) {
-        console.error(`Dealer bot ${dealerIdx} action error:`, err);
-        // Fallback: discard first non-gold tile (dealer must discard, pass may not be valid)
-        try {
-          const player = game.state.players[dealerIdx];
-          const gold = game.state.gold;
-          const tile = player.hand.find(t => !gold || !isGoldTile(t, gold)) ?? player.hand[0];
-          handlePlayerAction(io, game.roomId, { type: ActionType.Discard, playerIndex: dealerIdx, tile }, dealerIdx);
-        } catch (e) {
-          console.error(`Dealer bot ${dealerIdx} discard fallback also failed:`, e);
-        }
-      }
-    }, 500);
+    const actions = game.getInitialDealerActions();
+    emitOrBotAction(io, game, dealerIdx, actions);
   } else if (room.players[dealerIdx].socketId) {
     io.to(room.players[dealerIdx].socketId!).emit("actionRequired", game.getInitialDealerActions());
   }

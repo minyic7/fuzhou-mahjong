@@ -897,7 +897,7 @@ function broadcastState(io: GameServer, game: ServerGameState): void {
 /**
  * Emit actionRequired to a player, or auto-respond if bot.
  */
-function emitOrBotAction(
+export function emitOrBotAction(
   io: GameServer,
   game: ServerGameState,
   playerIndex: number,
@@ -907,10 +907,14 @@ function emitOrBotAction(
   const version = nextBotVersion(game.roomId);
 
   if (game.isBot(playerIndex)) {
+    let acted = false;
+
     const safetyTimer = setTimeout(() => {
+      if (acted) return;
       // 5-second safety timeout: if bot callback hasn't fired, force discard
       if (getBotVersion(game.roomId) !== version) return; // stale
       if (game.state.phase !== GamePhase.Playing) return;
+      acted = true;
       console.warn(`Bot ${playerIndex} safety timeout — forcing emergency discard`);
       try {
         const player = game.state.players[playerIndex];
@@ -921,15 +925,17 @@ function emitOrBotAction(
     }, 5_000);
 
     setTimeout(() => {
+      if (acted) return;
       // Stale check: if version has advanced, another action superseded this one
       if (getBotVersion(game.roomId) !== version) {
         clearTimeout(safetyTimer);
         return;
       }
       try {
+        acted = true;
+        clearTimeout(safetyTimer);
         // Check if game state is still valid for this bot action
         if (game.state.phase !== GamePhase.Playing) {
-          clearTimeout(safetyTimer);
           console.warn(`Bot ${playerIndex} action skipped: game phase is ${game.state.phase}, attempting Pass fallback`);
           try {
             handlePlayerAction(io, game.roomId, { type: ActionType.Pass, playerIndex }, playerIndex);
@@ -949,10 +955,8 @@ function emitOrBotAction(
             .map(p => p.discards),
         };
         const botAction = decideBotAction(player.hand, player.melds, actions, playerIndex, game.state.gold, lastDiscardTile, botContext);
-        clearTimeout(safetyTimer);
         handlePlayerAction(io, game.roomId, botAction, playerIndex);
       } catch (err) {
-        clearTimeout(safetyTimer);
         console.error(`Bot ${playerIndex} action error:`, err);
         // Fallback: try pass first, then discard if pass not allowed
         try {
