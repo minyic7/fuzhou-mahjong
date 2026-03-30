@@ -6,6 +6,8 @@ interface RoomProps {
   initialRoomState: RoomState | null;
 }
 
+const WIND_LABELS = ["东 East", "南 South", "西 West", "北 North"];
+
 export function Room({ initialRoomState }: RoomProps) {
   const [room, setRoom] = useState<RoomState | null>(initialRoomState);
 
@@ -32,66 +34,104 @@ export function Room({ initialRoomState }: RoomProps) {
     socket.emit("leaveRoom");
   };
 
-  return (
-    <div className="room-page" style={{ maxWidth: 400, margin: "0 auto", padding: 20 }}>
-      <h2>房间 / Room</h2>
+  // Build 4 seat slots: filled players + empty seats
+  const seats = Array.from({ length: 4 }, (_, i) => {
+    const player = room.players[i];
+    return {
+      index: i,
+      player: player ?? null,
+      wind: WIND_LABELS[i],
+    };
+  });
 
-      <div style={{
-        fontSize: 32,
-        fontWeight: "bold",
-        textAlign: "center",
-        padding: 20,
-        background: "#f0f0f0",
-        borderRadius: 8,
-        marginBottom: 20,
-        letterSpacing: 8,
-      }}>
-        {room.roomId}
+  return (
+    <div className="room-page" style={{ maxWidth: 480, margin: "0 auto", padding: "40px 20px" }}>
+      <h2 style={{ textAlign: "center", color: "#8fbc8f", fontSize: 15, fontWeight: 400, marginBottom: 20 }}>房间 / Room</h2>
+
+      {/* Mahjong table seat layout */}
+      <div className="seat-layout">
+        {/* Top seat */}
+        <div className="seat-slot" style={{ gridArea: "top" }}>
+          <SeatCard seat={seats[2]} />
+        </div>
+        {/* Left seat */}
+        <div className="seat-slot" style={{ gridArea: "left" }}>
+          <SeatCard seat={seats[3]} />
+        </div>
+        {/* Center: room ID */}
+        <div className="table-center" style={{ gridArea: "center" }}>
+          <div style={{ fontSize: 11, color: "#8fbc8f", marginBottom: 4 }}>ROOM</div>
+          <div style={{ fontSize: 28, fontWeight: "bold", fontFamily: "monospace", letterSpacing: 6, color: "#d4a017" }}>
+            {room.roomId}
+          </div>
+          <div style={{ fontSize: 12, color: "#8fbc8f", marginTop: 6 }}>
+            {room.players.length}/4 玩家
+          </div>
+        </div>
+        {/* Right seat */}
+        <div className="seat-slot" style={{ gridArea: "right" }}>
+          <SeatCard seat={seats[1]} />
+        </div>
+        {/* Bottom seat */}
+        <div className="seat-slot" style={{ gridArea: "bottom" }}>
+          <SeatCard seat={seats[0]} />
+        </div>
       </div>
 
-      <h3>玩家 / Players ({room.players.length}/4)</h3>
-      <ul style={{ listStyle: "none", padding: 0 }}>
-        {room.players.map((p, i) => (
-          <li key={i} style={{ padding: 8, borderBottom: "1px solid #eee" }}>
-            {p.name} {p.isBot && <span style={{ color: "#aab4a0", fontSize: 12 }}>🤖</span>}
-          </li>
-        ))}
-        {Array.from({ length: 4 - room.players.length }).map((_, i) => (
-          <li key={`empty-${i}`} style={{ padding: 8, borderBottom: "1px solid #eee", color: "#ccc" }}>
-            空位 — 等待玩家或添加机器人
-          </li>
-        ))}
-      </ul>
-
-      <div style={{ marginTop: 20, display: "flex", gap: 10, flexWrap: "wrap" }}>
+      {/* Action buttons */}
+      <div style={{ marginTop: 24, display: "flex", gap: 10, flexWrap: "wrap", justifyContent: "center" }}>
         <button
           onClick={() => socket.emit("addBot")}
           disabled={room.players.length >= 4}
-          style={{ flex: 1, padding: 12, fontSize: 16 }}
+          style={{ flex: 1, minWidth: 120, padding: 12, fontSize: 15 }}
         >
           +机器人 / +Bot
         </button>
         <button
           onClick={() => socket.emit("removeBot")}
           disabled={!room.players.some((p) => p.isBot)}
-          style={{ padding: 12, fontSize: 16 }}
+          style={{ padding: 12, fontSize: 15 }}
         >
           -机器人
         </button>
+      </div>
+      <div style={{ marginTop: 10, display: "flex", gap: 10 }}>
         <button
           onClick={handleStart}
           disabled={room.players.length < 4}
-          style={{ flex: 1, padding: 12, fontSize: 16 }}
+          className="lobby-create-btn"
+          style={{ flex: 1, padding: 14, fontSize: 16, fontWeight: 600, border: "2px solid rgba(184, 134, 11, 0.4)" }}
         >
           开始游戏 / Start
         </button>
         <button
           onClick={handleLeave}
-          style={{ padding: 12, fontSize: 16 }}
+          style={{ padding: 12, fontSize: 15, background: "rgba(255,82,82,0.15)", border: "1px solid rgba(255,82,82,0.3)", color: "#ff8a80" }}
         >
           离开 / Leave
         </button>
       </div>
+    </div>
+  );
+}
+
+function SeatCard({ seat }: { seat: { index: number; player: { name: string; isBot?: boolean } | null; wind: string } }) {
+  const { player, wind } = seat;
+  const isEmpty = !player;
+
+  return (
+    <div className={`seat-card ${isEmpty ? "seat-empty" : "seat-filled"}`}>
+      <div style={{ fontSize: 11, color: "#d4a017", marginBottom: 4, letterSpacing: 1 }}>{wind}</div>
+      {player ? (
+        <>
+          <div style={{ fontSize: 15, fontWeight: 600, color: "#eee" }}>
+            {player.name}
+          </div>
+          {player.isBot && <div style={{ fontSize: 11, color: "#8fbc8f", marginTop: 2 }}>🤖 Bot</div>}
+        </>
+      ) : (
+        <div style={{ fontSize: 13, color: "rgba(143,188,143,0.5)" }}>空位 / Empty</div>
+      )}
     </div>
   );
 }
