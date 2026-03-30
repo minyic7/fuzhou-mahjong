@@ -5,6 +5,7 @@ import { ClaimOverlay } from "../components/ClaimOverlay";
 import { CenterAction, useCenterAction } from "../components/CenterAction";
 import { sounds, setMuted, isMuted } from "../sounds";
 import { TileCounter } from "../components/TileCounter";
+import { TutorialModal } from "../components/TutorialModal";
 import { TileView } from "../components/Tile";
 import { ActionType, MeldType } from "@fuzhou-mahjong/shared";
 import type { ClientGameState, GameOverResult, AvailableActions, GameAction } from "@fuzhou-mahjong/shared";
@@ -59,6 +60,18 @@ export function Game({ initialGameState, onLeave }: GameProps) {
     return false;
   });
   const gameStartedRef = useRef(false);
+  const [showTutorial, setShowTutorial] = useState(false);
+  const [tutorialCondensed, setTutorialCondensed] = useState(false);
+
+  // First-game auto-show tutorial
+  useEffect(() => {
+    const seen = localStorage.getItem('tutorial-seen');
+    if (!seen) {
+      setTutorialCondensed(true);
+      setShowTutorial(true);
+      localStorage.setItem('tutorial-seen', '1');
+    }
+  }, []);
 
   const toggleMute = () => {
     const next = !soundMuted;
@@ -447,6 +460,38 @@ export function Game({ initialGameState, onLeave }: GameProps) {
         <ClaimOverlay actions={actions} gameState={gameState} onAction={handleAction} />
       )}
       <TileCounter gameState={gameState} />
+      {/* Help button */}
+      <button
+        onClick={() => { setTutorialCondensed(false); setShowTutorial(true); }}
+        aria-label="How to play"
+        style={{
+          position: "fixed",
+          bottom: 12,
+          right: 12,
+          width: 36,
+          height: 36,
+          minHeight: 36,
+          borderRadius: "50%",
+          background: "rgba(15,30,25,0.85)",
+          border: "1px solid rgba(184,134,11,0.4)",
+          color: "#8fbc8f",
+          fontSize: 18,
+          fontWeight: 700,
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          cursor: "pointer",
+          zIndex: 20,
+          padding: 0,
+        }}
+      >
+        ?
+      </button>
+      <TutorialModal
+        open={showTutorial}
+        onClose={() => setShowTutorial(false)}
+        condensed={tutorialCondensed}
+      />
     </div>
   );
 }
