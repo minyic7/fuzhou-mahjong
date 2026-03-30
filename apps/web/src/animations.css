@@ -269,6 +269,46 @@
   100% { opacity: 0; transform: translate(-50%, -50%) scale(0.5) translateY(20px); }
 }
 
+/* Wall-to-hand draw fly animations */
+@keyframes drawFlyBottom {
+  0% { transform: translate(0, 0) scale(1); opacity: 1; }
+  100% { transform: translate(0, 120px) scale(1.2); opacity: 0; }
+}
+@keyframes drawFlyTop {
+  0% { transform: translate(0, 0) scale(1); opacity: 1; }
+  100% { transform: translate(0, -120px) scale(0.8); opacity: 0; }
+}
+@keyframes drawFlyLeft {
+  0% { transform: translate(0, 0) scale(1); opacity: 1; }
+  100% { transform: translate(-120px, 0) scale(0.8); opacity: 0; }
+}
+@keyframes drawFlyRight {
+  0% { transform: translate(0, 0) scale(1); opacity: 1; }
+  100% { transform: translate(120px, 0) scale(0.8); opacity: 0; }
+}
+
+/* Supplement draw variant — slightly different path with glow */
+@keyframes supplementFlyBottom {
+  0% { transform: translate(0, 0) scale(1); opacity: 1; filter: brightness(1); }
+  50% { filter: brightness(1.5); }
+  100% { transform: translate(0, 120px) scale(1.2); opacity: 0; filter: brightness(1); }
+}
+@keyframes supplementFlyTop {
+  0% { transform: translate(0, 0) scale(1); opacity: 1; filter: brightness(1); }
+  50% { filter: brightness(1.5); }
+  100% { transform: translate(0, -120px) scale(0.8); opacity: 0; filter: brightness(1); }
+}
+@keyframes supplementFlyLeft {
+  0% { transform: translate(0, 0) scale(1); opacity: 1; filter: brightness(1); }
+  50% { filter: brightness(1.5); }
+  100% { transform: translate(-120px, 0) scale(0.8); opacity: 0; filter: brightness(1); }
+}
+@keyframes supplementFlyRight {
+  0% { transform: translate(0, 0) scale(1); opacity: 1; filter: brightness(1); }
+  50% { filter: brightness(1.5); }
+  100% { transform: translate(120px, 0) scale(0.8); opacity: 0; filter: brightness(1); }
+}
+
 /* Tutorial slide transition */
 @keyframes tutorialSlideIn {
   0% { opacity: 0; transform: translateX(16px); }

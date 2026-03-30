@@ -2,6 +2,15 @@ import type { ClientGameState, TileInstance } from "@fuzhou-mahjong/shared";
 import { PlayerArea } from "./PlayerArea";
 import { GameInfo } from "./GameInfo";
 import { TileWall } from "./TileWall";
+import { TILE_BACK_URL } from "../tileSvg";
+
+export type DrawAnimationSeat = "bottom" | "top" | "left" | "right";
+
+export interface DrawAnimationState {
+  seat: DrawAnimationSeat;
+  isSupplement: boolean;
+  key: number; // unique key to re-trigger animation
+}
 
 interface GameTableProps {
   state: ClientGameState;
@@ -20,9 +29,10 @@ interface GameTableProps {
   onBuGang?: (tileInstanceId: number) => void;
   onBackgroundClick?: () => void;
   disconnectedPlayers?: Set<number>;
+  drawAnimation?: DrawAnimationState | null;
 }
 
-export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTileId, claimableTileIds, canDiscard, onDiscard, canHu, onHu, canDraw, onDraw, kongTileIds, onAnGang, onBuGang, onBackgroundClick, disconnectedPlayers }: GameTableProps) {
+export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTileId, claimableTileIds, canDiscard, onDiscard, canHu, onHu, canDraw, onDraw, kongTileIds, onAnGang, onBuGang, onBackgroundClick, disconnectedPlayers, drawAnimation }: GameTableProps) {
   const { myHand, myFlowers, myMelds, myDiscards, myName, otherPlayers, currentTurn, myIndex, gold, dealerIndex, lianZhuangCount, wallRemaining, myHasDiscardedGold } = state;
   const lastDiscardTileId = state.lastDiscard?.tile.id ?? null;
   const lastDiscardPlayerIndex = state.lastDiscard?.playerIndex ?? -1;
@@ -148,6 +158,38 @@ export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTile
           tenpaiTiles={(state as any).tenpaiTiles}
         />
       </div>
+
+      {/* Draw fly animation overlay */}
+      {drawAnimation && (
+        <div
+          key={drawAnimation.key}
+          style={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            marginTop: -8,
+            marginLeft: -6,
+            pointerEvents: "none",
+            zIndex: 20,
+            animation: `${drawAnimation.isSupplement ? "supplementFly" : "drawFly"}${drawAnimation.seat.charAt(0).toUpperCase() + drawAnimation.seat.slice(1)} ${drawAnimation.seat === "bottom" ? "0.3s" : "0.2s"} ease-out forwards`,
+          }}
+        >
+          <img
+            src={TILE_BACK_URL}
+            alt=""
+            style={{
+              width: "var(--wall-tw)",
+              height: "var(--wall-th)",
+              display: "block",
+              borderRadius: 2,
+              boxShadow: drawAnimation.isSupplement
+                ? "0 0 8px rgba(255,215,0,0.6)"
+                : "0 1px 4px rgba(0,0,0,0.4)",
+            }}
+            draggable={false}
+          />
+        </div>
+      )}
     </div>
   );
 }
