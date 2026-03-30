@@ -576,7 +576,16 @@ export function decideBotAction(
     return { type: ActionType.Discard, playerIndex, tile };
   }
 
-  // Default: pass
+  // Default: pass (but verify pass is actually allowed)
+  if (!actions.canPass && actions.canDiscard) {
+    // Pass is not valid — must discard instead. Pick first non-gold tile.
+    const fallbackTile = hand.find((t) => !(gold && isGoldTile(t, gold))) ?? hand[0];
+    console.warn(
+      `[Bot:decision] Player ${playerIndex} cannot Pass, falling back to Discard`,
+    );
+    return { type: ActionType.Discard, playerIndex, tile: fallbackTile };
+  }
+
   console.warn(
     `[Bot:decision] Player ${playerIndex} defaulting to Pass — available: canHu=${actions.canHu}, canPeng=${actions.canPeng}, canMingGang=${actions.canMingGang}, chiOptions=${actions.chiOptions.length}, canDiscard=${actions.canDiscard}, canDraw=${actions.canDraw}`,
   );
