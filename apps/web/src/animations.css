@@ -336,24 +336,24 @@
 
 /* Supplement draw variant — slightly different path with glow */
 @keyframes supplementFlyBottom {
-  0% { transform: translate(0, 0) scale(1); opacity: 1; filter: brightness(1); }
-  50% { filter: brightness(1.5); }
-  100% { transform: translate(0, 120px) scale(1.2); opacity: 0; filter: brightness(1); }
+  0% { transform: translate(0, 0) scale(1); opacity: 1; filter: drop-shadow(0 0 4px rgba(255,215,0,0.4)); }
+  50% { filter: drop-shadow(0 0 10px rgba(255,215,0,0.8)); }
+  100% { transform: translate(0, 120px) scale(1.2); opacity: 0; filter: drop-shadow(0 0 4px rgba(255,215,0,0.4)); }
 }
 @keyframes supplementFlyTop {
-  0% { transform: translate(0, 0) scale(1); opacity: 1; filter: brightness(1); }
-  50% { filter: brightness(1.5); }
-  100% { transform: translate(0, -120px) scale(0.8); opacity: 0; filter: brightness(1); }
+  0% { transform: translate(0, 0) scale(1); opacity: 1; filter: drop-shadow(0 0 4px rgba(255,215,0,0.4)); }
+  50% { filter: drop-shadow(0 0 10px rgba(255,215,0,0.8)); }
+  100% { transform: translate(0, -120px) scale(0.8); opacity: 0; filter: drop-shadow(0 0 4px rgba(255,215,0,0.4)); }
 }
 @keyframes supplementFlyLeft {
-  0% { transform: translate(0, 0) scale(1); opacity: 1; filter: brightness(1); }
-  50% { filter: brightness(1.5); }
-  100% { transform: translate(-120px, 0) scale(0.8); opacity: 0; filter: brightness(1); }
+  0% { transform: translate(0, 0) scale(1); opacity: 1; filter: drop-shadow(0 0 4px rgba(255,215,0,0.4)); }
+  50% { filter: drop-shadow(0 0 10px rgba(255,215,0,0.8)); }
+  100% { transform: translate(-120px, 0) scale(0.8); opacity: 0; filter: drop-shadow(0 0 4px rgba(255,215,0,0.4)); }
 }
 @keyframes supplementFlyRight {
-  0% { transform: translate(0, 0) scale(1); opacity: 1; filter: brightness(1); }
-  50% { filter: brightness(1.5); }
-  100% { transform: translate(120px, 0) scale(0.8); opacity: 0; filter: brightness(1); }
+  0% { transform: translate(0, 0) scale(1); opacity: 1; filter: drop-shadow(0 0 4px rgba(255,215,0,0.4)); }
+  50% { filter: drop-shadow(0 0 10px rgba(255,215,0,0.8)); }
+  100% { transform: translate(120px, 0) scale(0.8); opacity: 0; filter: drop-shadow(0 0 4px rgba(255,215,0,0.4)); }
 }
 
 /* Pool-to-player claim fly animations (chi/peng/gang) */
