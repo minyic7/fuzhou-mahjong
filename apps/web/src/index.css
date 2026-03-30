@@ -354,11 +354,6 @@ hr {
   animation: pageFadeIn 0.3s ease-out;
 }
 
-@keyframes pageFadeIn {
-  0% { opacity: 0; transform: translateY(8px); }
-  100% { opacity: 1; transform: translateY(0); }
-}
-
 /* ─── Lobby: room card list ─── */
 .room-card-list {
   display: flex;
@@ -490,7 +485,6 @@ button.lobby-create-btn:hover:not(:disabled) {
 }
 
 /* Loading spinner */
-@keyframes spin { to { transform: rotate(360deg); } }
 .spinner {
   width: 28px; height: 28px;
   border: 3px solid rgba(255,255,255,0.15);
@@ -526,12 +520,6 @@ button.lobby-create-btn:hover:not(:disabled) {
   body {
     font-size: 14px;
   }
-}
-
-/* Disconnect pulse animation */
-@keyframes disconnectPulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.4; }
 }
 
 /* Chi picker horizontal scroll — hide scrollbar */
