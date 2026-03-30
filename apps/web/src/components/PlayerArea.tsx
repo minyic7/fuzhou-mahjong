@@ -281,6 +281,7 @@ export function PlayerArea({
         display: "flex", flexWrap: "nowrap", gap: firstPerson ? "var(--fp-hand-gap)" : 1, marginBottom: 4, alignItems: "flex-end",
         justifyContent: isMe ? "center" : undefined,
         paddingTop: isMe ? "var(--hand-padding-top)" : 0, overflow: "hidden", position: "relative",
+        touchAction: "manipulation",
         ...(firstPerson ? { "--tile-w": "var(--fp-tile-w)", "--tile-h": "var(--fp-tile-h)" } as React.CSSProperties : {}),
       }}>
         {isMe && hand ? (
