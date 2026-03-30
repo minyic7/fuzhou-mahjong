@@ -130,11 +130,12 @@ const botWatchdogs = new Map<string, NodeJS.Timeout>();
 let lastIoRef: GameServer | null = null;
 
 function startBotWatchdog(roomId: string, playerIndex: number, io: GameServer): void {
-  clearBotWatchdog(roomId);
+  const key = roomId + ":" + playerIndex;
+  clearBotWatchdog(roomId, playerIndex);
   lastIoRef = io;
 
   const watchdog = setTimeout(() => {
-    botWatchdogs.delete(roomId);
+    botWatchdogs.delete(key);
     const game = getGame(roomId);
     if (!game || game.state.phase !== GamePhase.Playing) {
       console.log(`[Bot:${roomId}:p${playerIndex}:watchdog] Fired but game ended (phase=${game?.state.phase ?? "deleted"}) ts=${Date.now()}`);
@@ -176,14 +177,15 @@ function startBotWatchdog(roomId: string, playerIndex: number, io: GameServer): 
     }
   }, BOT_WATCHDOG_MS);
 
-  botWatchdogs.set(roomId, watchdog);
+  botWatchdogs.set(key, watchdog);
 }
 
-function clearBotWatchdog(roomId: string): void {
-  const existing = botWatchdogs.get(roomId);
+function clearBotWatchdog(roomId: string, playerIndex: number): void {
+  const key = roomId + ":" + playerIndex;
+  const existing = botWatchdogs.get(key);
   if (existing) {
     clearTimeout(existing);
-    botWatchdogs.delete(roomId);
+    botWatchdogs.delete(key);
   }
 }
 
@@ -205,7 +207,7 @@ function getBotVersion(roomId: string, playerIndex: number): number {
 // Clean up per-room state when a game is deleted
 setOnGameDeleted((roomId) => {
   botActionVersion.delete(roomId);
-  clearBotWatchdog(roomId);
+  for (let i = 0; i < 4; i++) clearBotWatchdog(roomId, i);
   const window = activeWindows.get(roomId);
   if (window) {
     window.cancel();
@@ -240,10 +242,20 @@ export function handlePlayerAction(
   if (botPlayerIndex !== undefined) {
     // Bot action: resolve by room ID directly
     game = getGame(socketIdOrRoomId);
-    if (!game || game.state.phase !== GamePhase.Playing) return;
+    if (!game) {
+      console.error(`[GameEngine] handlePlayerAction rejected: game not found for roomId=${socketIdOrRoomId}, playerIndex=${botPlayerIndex}, actionType=${action.type}`);
+      return;
+    }
+    if (game.state.phase !== GamePhase.Playing) {
+      console.warn(`[GameEngine] handlePlayerAction rejected: phase=${game.state.phase}, playerIndex=${botPlayerIndex}, actionType=${action.type}`);
+      return;
+    }
     playerIndex = botPlayerIndex;
     room = findRoom(game.roomId);
-    if (!room) return;
+    if (!room) {
+      console.error(`[GameEngine] handlePlayerAction rejected: room not found for roomId=${game.roomId}, playerIndex=${botPlayerIndex}, actionType=${action.type}`);
+      return;
+    }
     // Bots don't need error feedback
   } else {
     // Human action: resolve by socket ID
@@ -259,8 +271,8 @@ export function handlePlayerAction(
     if (playerIndex === -1) return;
   }
 
-  // Clear watchdog on any successful action processing for this room
-  clearBotWatchdog(room.id);
+  // Clear watchdog on any successful action processing for this player
+  clearBotWatchdog(room.id, playerIndex);
 
   // Check if there's an active action window
   const window = activeWindows.get(room.id);
@@ -987,6 +999,13 @@ function endGameWin(
   const state = game.state;
   state.phase = GamePhase.Finished;
 
+  const staleWindow = activeWindows.get(game.roomId);
+  if (staleWindow) {
+    console.warn("[ActionWindow] Cleaning up leaked window for room", game.roomId, "(endGameWin)");
+    staleWindow.cancel();
+    activeWindows.delete(game.roomId);
+  }
+
   const winner = state.players[winnerIndex];
   const winResult = checkWin(winner, winningTile, state.gold, {
     isSelfDraw,
@@ -1055,6 +1074,13 @@ function endGameWin(
 function endGameDraw(io: GameServer, game: ServerGameState): void {
   const state = game.state;
   state.phase = GamePhase.Draw;
+
+  const staleWindow = activeWindows.get(game.roomId);
+  if (staleWindow) {
+    console.warn("[ActionWindow] Cleaning up leaked window for room", game.roomId, "(endGameDraw)");
+    staleWindow.cancel();
+    activeWindows.delete(game.roomId);
+  }
 
   // Dealer rotation on draw
   const { nextDealer, nextLianZhuang } = getNextDealer(
@@ -1142,12 +1168,18 @@ export function emitOrBotAction(
             const currentActions = getPostDrawActions(game, playerIndex, false);
             console.warn(`[Bot:FALLBACK] ${tag} Stale safety re-trigger on own turn (roomId=${game.roomId}, playerIndex=${playerIndex}, turn=${turnNumber}, phase=${game.state.phase}, hasActionWindow=false) ts=${Date.now()}`);
             emitOrBotAction(io, game, playerIndex, currentActions);
+          } else {
+            console.warn(`${tag} Stale safety bail — not this bot's turn (currentTurn=${game.state.currentTurn}), no window. Watchdog will handle.`);
           }
         }
         return;
       }
       if (game.state.phase !== GamePhase.Playing) {
         console.log(`${tag} Safety timer skipped — game phase=${game.state.phase} ts=${Date.now()}`);
+        return;
+      }
+      if (game.state.phase !== GamePhase.Playing) {
+        console.warn(`[Bot:SAFETY] ${tag} Safety timeout skipped — game ended (phase=${game.state.phase})`);
         return;
       }
       acted = true;
@@ -1188,6 +1220,8 @@ export function emitOrBotAction(
             const currentActions = getPostDrawActions(game, playerIndex, false);
             console.warn(`[Bot:FALLBACK] ${tag} Stale callback re-trigger on own turn (roomId=${game.roomId}, playerIndex=${playerIndex}, turn=${turnNumber}, phase=${game.state.phase}, hasActionWindow=false) ts=${Date.now()}`);
             emitOrBotAction(io, game, playerIndex, currentActions);
+          } else {
+            console.warn(`${tag} Stale callback bail — not this bot's turn (currentTurn=${game.state.currentTurn}), no window. Watchdog will handle.`);
           }
         }
         return;
@@ -1223,6 +1257,10 @@ export function emitOrBotAction(
         console.error(`${tag} Action error:`, err);
         // Fallback: try pass first, then discard if pass not allowed
         console.warn(`${tag} Entering fallback chain (canPass=${actions.canPass}) ts=${Date.now()}`);
+        if (game.state.phase !== GamePhase.Playing) {
+          console.warn(`${tag} Fallback skipped — game ended (phase=${game.state.phase})`);
+          return;
+        }
         try {
           if (actions.canPass) {
             handlePlayerAction(io, game.roomId, { type: ActionType.Pass, playerIndex }, playerIndex);
@@ -1234,6 +1272,10 @@ export function emitOrBotAction(
         } catch (fallbackErr) {
           console.error(`${tag} Fallback also failed:`, fallbackErr);
           // Last resort: force Pass to prevent permanent hang
+          if (game.state.phase !== GamePhase.Playing) {
+            console.warn(`${tag} Last-resort skipped — game ended (phase=${game.state.phase})`);
+            return;
+          }
           try {
             console.warn(`${tag} Last-resort Pass ts=${Date.now()}`);
             handlePlayerAction(io, game.roomId, { type: ActionType.Pass, playerIndex }, playerIndex);
