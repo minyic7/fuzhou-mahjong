@@ -31,9 +31,9 @@ body {
   padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
-/* Portrait rotate overlay — shown on mobile in portrait orientation */
+/* Portrait rotate overlay — conditionally rendered via React state */
 .portrait-rotate-overlay {
-  display: none;
+  display: flex;
   position: fixed;
   inset: 0;
   z-index: 9999;
@@ -42,13 +42,6 @@ body {
   align-items: center;
   justify-content: center;
   gap: 20px;
-}
-
-/* BREAKPOINTS.TABLET_WIDTH */
-@media (orientation: portrait) and (max-width: 768px) {
-  .portrait-rotate-overlay {
-    display: flex;
-  }
 }
 
 #root {
