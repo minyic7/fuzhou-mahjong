@@ -83,6 +83,7 @@ export function registerRoomHandlers(io: GameServer, socket: GameSocket): void {
       const game = getGame(room.id);
       if (game) {
         const playerIndex = room.getPlayerIndexByPlayerId(playerId);
+        if (playerIndex < 0) { socket.emit("error", "Player index not found"); return; }
         game.updateSocketId(playerIndex, socket.id);
         socket.emit("playerIdAssigned", playerId);
         socket.emit("gameStarted", game.getClientGameState(playerIndex));
@@ -91,6 +92,9 @@ export function registerRoomHandlers(io: GameServer, socket: GameSocket): void {
       } else {
         socket.emit("roomJoined", room.getState());
       }
+    } catch (err) {
+      console.error("rejoinGame error:", err);
+      socket.emit("error", "Failed to rejoin game");
     } finally {
       reconnectingPlayers.delete(playerId);
     }
@@ -133,6 +137,8 @@ export function registerRoomHandlers(io: GameServer, socket: GameSocket): void {
         socket.leave(oldRoom.id);
         const hasHumans = oldRoom.players.some((p) => !p.isBot && p.socketId);
         if (!hasHumans) {
+          for (const [, timer] of oldRoom.disconnectTimers) clearTimeout(timer);
+          oldRoom.disconnectTimers.clear();
           oldRoom.players = [];
           deleteRoomIfEmpty(oldRoom.id);
         }
@@ -221,119 +227,126 @@ export function registerRoomHandlers(io: GameServer, socket: GameSocket): void {
     room.isStartingRound = true;
 
     try {
-    game.startNextRound();
-    console.log(`Next round in room ${room.id}, dealer: ${game.state.dealerIndex}`);
+      game.startNextRound();
+      console.log(`Next round in room ${room.id}, dealer: ${game.state.dealerIndex}`);
 
-    for (let i = 0; i < 4; i++) {
-      if (!game.isBot(i) && room.players[i].socketId) {
-        io.to(room.players[i].socketId!).emit("gameStarted", game.getClientGameState(i));
-      }
-    }
-
-    // Check tianhu: dealer wins immediately if hand is complete after gold reveal
-    const nextDealer = game.state.players[game.state.dealerIndex];
-    const drawnId = game.lastDrawnTileIds[game.state.dealerIndex];
-    const nextDealerLastTile = drawnId != null
-      ? nextDealer.hand.find(t => t.id === drawnId) ?? nextDealer.hand[nextDealer.hand.length - 1]
-      : nextDealer.hand[nextDealer.hand.length - 1];
-    if (nextDealerLastTile) {
-      const tianhuResult = checkWin(nextDealer, nextDealerLastTile, game.state.gold, {
-        isSelfDraw: true,
-        isFirstAction: true,
-        isDealer: true,
-        isRobbingKong: false,
-        totalFlowers: nextDealer.flowers.length,
-        totalGangs: 0,
-      });
-      if (tianhuResult.isWin) {
-        game.state.phase = GamePhase.Finished;
-        for (let i = 0; i < 4; i++) {
-          if (!game.isBot(i) && room.players[i].socketId) {
-            io.to(room.players[i].socketId!).emit("gameStateUpdate", game.getClientGameState(i));
-          }
+      for (let i = 0; i < 4; i++) {
+        if (!game.isBot(i) && room.players[i].socketId) {
+          io.to(room.players[i].socketId!).emit("gameStarted", game.getClientGameState(i));
         }
-        const scoreResult = calculateScore(
-          nextDealer,
-          game.state.dealerIndex,
-          tianhuResult.winType,
-          tianhuResult.multiplier,
-          game.state.gold,
-          true,
-          null,
-          game.state.lianZhuangCount,
-        );
-        room.addRoundScores(scoreResult.payments);
-        io.to(room.id).emit("gameOver", {
-          winnerId: game.state.dealerIndex,
-          winType: tianhuResult.winType,
-          scores: scoreResult.payments,
-          cumulative: room.getCumulativeData(),
-        });
-        return;
       }
-    }
 
-    triggerDealerAction(io, game, room);
+      // Check tianhu: dealer wins immediately if hand is complete after gold reveal
+      const nextDealer = game.state.players[game.state.dealerIndex];
+      const drawnId = game.lastDrawnTileIds[game.state.dealerIndex];
+      const nextDealerLastTile = drawnId != null
+        ? nextDealer.hand.find(t => t.id === drawnId) ?? nextDealer.hand[nextDealer.hand.length - 1]
+        : nextDealer.hand[nextDealer.hand.length - 1];
+      if (nextDealerLastTile) {
+        const tianhuResult = checkWin(nextDealer, nextDealerLastTile, game.state.gold, {
+          isSelfDraw: true,
+          isFirstAction: true,
+          isDealer: true,
+          isRobbingKong: false,
+          totalFlowers: nextDealer.flowers.length,
+          totalGangs: 0,
+        });
+        if (tianhuResult.isWin) {
+          game.state.phase = GamePhase.Finished;
+          for (let i = 0; i < 4; i++) {
+            if (!game.isBot(i) && room.players[i].socketId) {
+              io.to(room.players[i].socketId!).emit("gameStateUpdate", game.getClientGameState(i));
+            }
+          }
+          const scoreResult = calculateScore(
+            nextDealer,
+            game.state.dealerIndex,
+            tianhuResult.winType,
+            tianhuResult.multiplier,
+            game.state.gold,
+            true,
+            null,
+            game.state.lianZhuangCount,
+          );
+          room.addRoundScores(scoreResult.payments);
+          io.to(room.id).emit("gameOver", {
+            winnerId: game.state.dealerIndex,
+            winType: tianhuResult.winType,
+            scores: scoreResult.payments,
+            cumulative: room.getCumulativeData(),
+          });
+          room.isStartingRound = false;
+          return;
+        }
+      }
+
+      triggerDealerAction(io, game, room);
+      room.isStartingRound = false;
     } catch (err) {
+      room.isStartingRound = false;
       console.error(`[RoomHandlers] nextRound failed in room ${room.id}:`, err);
       socket.emit("error", "Failed to start next round");
-    } finally {
-      room.isStartingRound = false;
     }
   });
 
   socket.on("disconnect", () => {
-    const room = findRoomBySocket(socket.id);
-    if (!room) return;
+    try {
+      const room = findRoomBySocket(socket.id);
+      if (!room) return;
 
-    if (room.gameStarted) {
-      // During game: keep slot, start reconnect timer
-      const player = room.disconnectPlayer(socket.id);
-      if (!player) return;
+      if (room.gameStarted) {
+        // During game: keep slot, start reconnect timer
+        const player = room.disconnectPlayer(socket.id);
+        if (!player) return;
 
-      const playerIndex = room.getPlayerIndexByPlayerId(player.playerId);
+        const playerIndex = room.getPlayerIndexByPlayerId(player.playerId);
 
-      // Sync the game's socketIds so broadcastState/emitOrBotAction see this player as disconnected
-      const game = getGame(room.id);
-      if (game && playerIndex >= 0) {
-        game.updateSocketId(playerIndex, `disconnected-${player.playerId}`);
-      }
-
-      io.to(room.id).emit("playerDisconnected", { playerIndex, playerName: player.name, timeoutMs: RECONNECT_TIMEOUT_MS });
-      io.to(room.id).emit("roomUpdated", room.getState());
-      console.log(`Player ${player.name} disconnected from game in room ${room.id}`);
-
-      const timer = setTimeout(() => {
-        room.disconnectTimers.delete(player.playerId);
-        console.log(`Reconnect timeout for ${player.name} in room ${room.id}`);
-
-        // If no humans left connected, clean up room and game
-        if (!room.hasConnectedPlayers()) {
-          deleteGame(room.id);
-          const playerIds = room.players.map((p) => p.playerId);
-          for (const id of playerIds) unregisterPlayerRoom(id);
-          room.players = [];
-          deleteRoomIfEmpty(room.id);
-          console.log(`Room ${room.id} cleaned up (all humans disconnected)`);
+        // Sync the game's socketIds so broadcastState/emitOrBotAction see this player as disconnected
+        const game = getGame(room.id);
+        if (game && playerIndex >= 0) {
+          game.updateSocketId(playerIndex, `disconnected-${player.playerId}`);
         }
-      }, RECONNECT_TIMEOUT_MS);
-      room.disconnectTimers.set(player.playerId, timer);
-    } else {
-      // Not in game: remove normally
-      const player = room.players.find((p) => p.socketId === socket.id);
-      if (player) unregisterPlayerRoom(player.playerId);
-      room.removePlayer(socket.id);
-      socket.leave(room.id);
 
-      if (room.isEmpty()) {
-        deleteRoomIfEmpty(room.id);
-        console.log(`Room ${room.id} deleted (empty)`);
-      } else {
+        io.to(room.id).emit("playerDisconnected", { playerIndex, playerName: player.name, timeoutMs: RECONNECT_TIMEOUT_MS });
         io.to(room.id).emit("roomUpdated", room.getState());
-        console.log(`Player ${socket.id} left room ${room.id}`);
+        console.log(`Player ${player.name} disconnected from game in room ${room.id}`);
+
+        const timer = setTimeout(() => {
+          room.disconnectTimers.delete(player.playerId);
+          console.log(`Reconnect timeout for ${player.name} in room ${room.id}`);
+
+          // If no humans left connected, clean up room and game
+          if (!room.hasConnectedPlayers()) {
+            for (const [, t] of room.disconnectTimers) clearTimeout(t);
+            room.disconnectTimers.clear();
+            deleteGame(room.id);
+            const playerIds = room.players.map((p) => p.playerId);
+            for (const id of playerIds) unregisterPlayerRoom(id);
+            room.players = [];
+            deleteRoomIfEmpty(room.id);
+            console.log(`Room ${room.id} cleaned up (all humans disconnected)`);
+          }
+        }, RECONNECT_TIMEOUT_MS);
+        room.disconnectTimers.set(player.playerId, timer);
+      } else {
+        // Not in game: remove normally
+        const player = room.players.find((p) => p.socketId === socket.id);
+        if (player) unregisterPlayerRoom(player.playerId);
+        room.removePlayer(socket.id);
+        socket.leave(room.id);
+
+        if (room.isEmpty()) {
+          deleteRoomIfEmpty(room.id);
+          console.log(`Room ${room.id} deleted (empty)`);
+        } else {
+          io.to(room.id).emit("roomUpdated", room.getState());
+          console.log(`Player ${socket.id} left room ${room.id}`);
+        }
       }
+      broadcastRoomList(io);
+    } catch (err) {
+      console.error("disconnect handler error:", err);
     }
-    broadcastRoomList(io);
   });
 }
 
@@ -360,6 +373,8 @@ function leaveCurrentRoom(io: GameServer, socket: GameSocket): void {
   // Remove bots if no humans left (prevent zombie rooms)
   const hasHumans = room.players.some((p) => !p.isBot && p.socketId);
   if (!hasHumans) {
+    for (const [, t] of room.disconnectTimers) clearTimeout(t);
+    room.disconnectTimers.clear();
     room.players = [];
     deleteRoomIfEmpty(room.id);
     console.log(`Room ${room.id} deleted (no humans left)`);
