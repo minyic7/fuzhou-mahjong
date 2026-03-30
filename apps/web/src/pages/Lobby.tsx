@@ -64,118 +64,120 @@ export function Lobby({ onJoined }: LobbyProps) {
         <h2>Fuzhou Mahjong</h2>
       </div>
 
-      <div>
-        <input
-          type="text"
-          placeholder="你的名字 / Your name"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-          style={{ width: "100%", padding: "var(--btn-padding)", fontSize: "var(--lobby-subtitle-font)", boxSizing: "border-box" }}
-        />
-      </div>
+      <div className="lobby-left">
+        <div>
+          <input
+            type="text"
+            placeholder="你的名字 / Your name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            style={{ width: "100%", padding: "var(--btn-padding)", fontSize: "var(--lobby-subtitle-font)", boxSizing: "border-box" }}
+          />
+        </div>
 
-      <div className="lobby-section">
+        <div className="lobby-section">
+          <Button
+            variant="gold"
+            size="lg"
+            onClick={handleQuickStart}
+            disabled={quickStarting}
+            className="lobby-create-btn lobby-quick-start"
+            style={{ width: "100%" }}
+          >
+            {quickStarting ? "启动中... / Starting..." : "⚡ 快速开始 / Quick Start"}
+          </Button>
+          <p className="lobby-hint">
+            一键开局，自动匹配 3 个机器人
+          </p>
+        </div>
+
+        <div className="lobby-section">
+          <Button
+            variant="gold"
+            size="lg"
+            onClick={handleCreate}
+            disabled={!name.trim()}
+            className="lobby-create-btn"
+            style={{ width: "100%" }}
+          >
+            创建房间 / Create Room
+          </Button>
+          <p className="lobby-hint">
+            创建房间后可邀请朋友或添加机器人
+          </p>
+        </div>
+
+        <hr />
+
+        <h3 className="lobby-section-heading">手动加入 / Join by Code</h3>
+        <div className="lobby-join-row">
+          <input
+            type="text"
+            placeholder="房间号 / Room Code"
+            value={roomCode}
+            onChange={(e) => setRoomCode(e.target.value.toUpperCase())}
+            maxLength={4}
+            style={{ flex: 1, padding: "var(--btn-padding)", fontSize: "var(--lobby-subtitle-font)", textTransform: "uppercase", letterSpacing: 4, textAlign: "center" }}
+          />
+          <Button
+            onClick={() => handleJoin(roomCode.trim())}
+            disabled={!name.trim() || !roomCode.trim()}
+          >
+            加入 / Join
+          </Button>
+        </div>
+
+        {error && <p className="error-msg">{error}</p>}
+
+        <hr />
         <Button
-          variant="gold"
-          size="lg"
-          onClick={handleQuickStart}
-          disabled={quickStarting}
-          className="lobby-create-btn lobby-quick-start"
-          style={{ width: "100%" }}
+          variant="secondary"
+          onClick={() => setShowTutorial(true)}
+          style={{ width: "100%", background: "transparent", border: "1px solid var(--color-gold-border-hover)" }}
         >
-          {quickStarting ? "启动中... / Starting..." : "⚡ 快速开始 / Quick Start"}
+          游戏规则 / How to Play
         </Button>
-        <p className="lobby-hint">
-          一键开局，自动匹配 3 个机器人
-        </p>
       </div>
 
-      <div className="lobby-section">
-        <Button
-          variant="gold"
-          size="lg"
-          onClick={handleCreate}
-          disabled={!name.trim()}
-          className="lobby-create-btn"
-          style={{ width: "100%" }}
-        >
-          创建房间 / Create Room
-        </Button>
-        <p className="lobby-hint">
-          创建房间后可邀请朋友或添加机器人
-        </p>
-      </div>
-
-      <hr />
-
-      <h3 className="lobby-section-heading">可用房间 / Available Rooms</h3>
-      {rooms.length === 0 ? (
-        <p className="lobby-empty-msg">暂无房间 / No rooms available</p>
-      ) : (
-        <div className="room-card-list">
-          {rooms.map((room) => (
-            <div key={room.roomId} className="room-card">
-              <div className="room-card-row">
-                <span style={{ fontFamily: "monospace", fontSize: 22, fontWeight: "bold", color: "var(--color-text-primary)", letterSpacing: 4 }}>
-                  {room.roomId}
-                </span>
-                <span className={room.playerCount >= room.maxPlayers ? "room-badge-full" : "room-badge-waiting"}>
-                  {room.playerCount >= room.maxPlayers ? "已满 / Full" : "等待中 / Waiting"}
-                </span>
-              </div>
-              <div className="room-card-row">
-                <div>
-                  <div className="player-dots">
-                    {Array.from({ length: room.maxPlayers }).map((_, i) => (
-                      <span key={i} className={`player-dot${i < room.playerCount ? " player-dot-filled" : ""}`} />
-                    ))}
-                  </div>
-                  <span style={{ color: "var(--color-text-secondary)", fontSize: "var(--label-font)" }}>
-                    {room.players.join(", ")}
+      <div className="lobby-right">
+        <h3 className="lobby-section-heading">可用房间 / Available Rooms</h3>
+        {rooms.length === 0 ? (
+          <p className="lobby-empty-msg">暂无房间 / No rooms available</p>
+        ) : (
+          <div className="room-card-list">
+            {rooms.map((room) => (
+              <div key={room.roomId} className="room-card">
+                <div className="room-card-row">
+                  <span style={{ fontFamily: "monospace", fontSize: 22, fontWeight: "bold", color: "var(--color-text-primary)", letterSpacing: 4 }}>
+                    {room.roomId}
+                  </span>
+                  <span className={room.playerCount >= room.maxPlayers ? "room-badge-full" : "room-badge-waiting"}>
+                    {room.playerCount >= room.maxPlayers ? "已满 / Full" : "等待中 / Waiting"}
                   </span>
                 </div>
-                <Button
-                  onClick={() => handleJoin(room.roomId)}
-                  disabled={!name.trim() || room.playerCount >= room.maxPlayers}
-                >
-                  加入 / Join
-                </Button>
+                <div className="room-card-row">
+                  <div>
+                    <div className="player-dots">
+                      {Array.from({ length: room.maxPlayers }).map((_, i) => (
+                        <span key={i} className={`player-dot${i < room.playerCount ? " player-dot-filled" : ""}`} />
+                      ))}
+                    </div>
+                    <span style={{ color: "var(--color-text-secondary)", fontSize: "var(--label-font)" }}>
+                      {room.players.join(", ")}
+                    </span>
+                  </div>
+                  <Button
+                    onClick={() => handleJoin(room.roomId)}
+                    disabled={!name.trim() || room.playerCount >= room.maxPlayers}
+                  >
+                    加入 / Join
+                  </Button>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
-      )}
-
-      <hr />
-
-      <h3 className="lobby-section-heading">手动加入 / Join by Code</h3>
-      <div className="lobby-join-row">
-        <input
-          type="text"
-          placeholder="房间号 / Room Code"
-          value={roomCode}
-          onChange={(e) => setRoomCode(e.target.value.toUpperCase())}
-          maxLength={4}
-          style={{ flex: 1, padding: "var(--btn-padding)", fontSize: "var(--lobby-subtitle-font)", textTransform: "uppercase", letterSpacing: 4, textAlign: "center" }}
-        />
-        <Button
-          onClick={() => handleJoin(roomCode.trim())}
-          disabled={!name.trim() || !roomCode.trim()}
-        >
-          加入 / Join
-        </Button>
+            ))}
+          </div>
+        )}
       </div>
-
-      {error && <p className="error-msg">{error}</p>}
-
-      <hr />
-      <Button
-        variant="secondary"
-        onClick={() => setShowTutorial(true)}
-        style={{ width: "100%", background: "transparent", border: "1px solid var(--color-gold-border-hover)" }}
-      >
-        游戏规则 / How to Play
-      </Button>
 
       <TutorialModal open={showTutorial} onClose={() => setShowTutorial(false)} />
     </div>
