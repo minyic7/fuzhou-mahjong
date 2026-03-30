@@ -674,7 +674,10 @@ export function Game({ initialGameState, onLeave }: GameProps) {
       {isClaimWindow && actions && (
         <ClaimOverlay actions={actions} gameState={gameState} onAction={handleAction} />
       )}
-      <TileCounter gameState={gameState} />
+      {/* Floating tile counter overlay */}
+      <div style={{ position: "fixed", bottom: "calc(12px + env(safe-area-inset-bottom, 0px))", left: 12, zIndex: 15 }}>
+        <TileCounter gameState={gameState} />
+      </div>
       {/* Settings gear button + dropdown */}
       <div ref={settingsRef} style={{
         position: 'fixed',
