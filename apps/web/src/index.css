@@ -14,7 +14,6 @@ body {
   background: var(--color-bg-dark);
   color: var(--color-text-primary);
   width: 100%;
-  min-height: 100vh;
   min-height: 100dvh;
   display: flex;
   flex-direction: column;
@@ -45,6 +44,7 @@ body {
   gap: 20px;
 }
 
+/* BREAKPOINTS.TABLET_WIDTH */
 @media (orientation: portrait) and (max-width: 768px) {
   .portrait-rotate-overlay {
     display: flex;
@@ -114,6 +114,7 @@ body {
   --tile-margin: 1px;
 }
 
+/* BREAKPOINTS.TABLET_WIDTH */
 @media (max-width: 768px) {
   :root {
     --game-gap: 6px;
@@ -122,6 +123,7 @@ body {
   }
 }
 
+/* BREAKPOINTS.PHONE_WIDTH */
 @media (max-width: 480px) {
   :root {
     --tile-w: 34px;
@@ -145,6 +147,7 @@ body {
   }
 }
 
+/* BREAKPOINTS.TINY_WIDTH */
 @media (max-width: 360px) {
   :root {
     --tile-w: 28px;
@@ -165,6 +168,7 @@ body {
   }
 }
 
+/* BREAKPOINTS.COMPACT_HEIGHT */
 @media (orientation: landscape) and (max-height: 500px) {
   :root {
     --tile-w: 36px;
@@ -186,6 +190,7 @@ body {
   }
 }
 
+/* BREAKPOINTS.SMALL_PHONE_HEIGHT */
 @media (orientation: landscape) and (max-height: 390px) {
   :root {
     --game-gap: 1px;
@@ -196,7 +201,7 @@ body {
   }
 }
 
-/* Landscape compact layout for lobby/room */
+/* Landscape compact layout for lobby/room — BREAKPOINTS.COMPACT_HEIGHT */
 @media (orientation: landscape) and (max-height: 500px) {
   .lobby-page, .room-page {
     padding: 12px 20px;
@@ -343,7 +348,6 @@ hr {
 .lobby-page, .room-page {
   width: 100%;
   background: radial-gradient(ellipse at center, var(--color-bg-medium) 0%, var(--color-bg-dark) 70%);
-  min-height: 100vh;
   min-height: 100dvh;
   overflow-y: auto;
   position: relative;
@@ -483,6 +487,7 @@ button.lobby-create-btn:hover:not(:disabled) {
   }
 }
 
+/* BREAKPOINTS.PHONE_WIDTH */
 @media (max-width: 480px) {
   .seat-layout {
     gap: 6px;
