@@ -8,6 +8,8 @@ import {
   sortHand,
   findTenpaiTiles,
   checkWin,
+  findAnGang,
+  findBuGang,
 } from "@fuzhou-mahjong/shared";
 import { findRoom } from "./room.js";
 import type {
@@ -179,16 +181,20 @@ export class ServerGameState {
       canHu = winResult.isWin;
     }
 
+    const anGangOptions = findAnGang(dealer.hand, this.state.gold);
+    const buGangOptions = findBuGang(dealer.hand, dealer.melds, this.state.gold);
+    const hasGangOptions = anGangOptions.length > 0 || buGangOptions.length > 0;
+
     return {
       canDraw: false,
       canDiscard: true,
       chiOptions: [],
       canPeng: false,
       canMingGang: false,
-      anGangOptions: [],
-      buGangOptions: [],
+      anGangOptions,
+      buGangOptions,
       canHu,
-      canPass: canHu,
+      canPass: canHu || hasGangOptions,
     };
   }
 
