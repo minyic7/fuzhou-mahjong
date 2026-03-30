@@ -19,6 +19,7 @@ interface PlayerAreaProps {
   label: string;
   claimableTileIds?: Set<number>;
   lastDrawnTileId?: number | null;
+  lastDiscardedTileId?: number | null;
   tenpaiTiles?: import("@fuzhou-mahjong/shared").SuitedTile[];
   canDiscard?: boolean;
   onDiscard?: (tileInstanceId: number) => void;
@@ -39,7 +40,7 @@ const BUBBLE_BTN = {
 export function PlayerArea({
   isMe, hand, handCount, melds, flowers, discards,
   isCurrentTurn, isDealer, gold, selectedTileId, onTileClick, label,
-  claimableTileIds, onTileDoubleClick, lastDrawnTileId, tenpaiTiles,
+  claimableTileIds, onTileDoubleClick, lastDrawnTileId, lastDiscardedTileId, tenpaiTiles,
   canDiscard, onDiscard, canHu, onHu, kongTileIds, onAnGang, onBuGang,
 }: PlayerAreaProps) {
   const { onTouchStart, onTouchEnd, onMouseEnter, onMouseLeave, Tooltip } = useLongPress(gold);
@@ -215,7 +216,9 @@ export function PlayerArea({
           maxWidth: "min(300px, 90vw)",
         }}>
           {discards.map((d) => (
-            <TileView key={d.id} tile={d} faceUp gold={gold} small />
+            <TileView key={d.id} tile={d} faceUp gold={gold} small
+              className={lastDiscardedTileId === d.id ? "discard-arrive" : undefined}
+            />
           ))}
         </div>
       )}
