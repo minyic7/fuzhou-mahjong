@@ -174,7 +174,13 @@ export function Game({ initialGameState, onLeave }: GameProps) {
       // so stale claim actions don't block future actionRequired events
       if (prev && (state.currentTurn !== prev.currentTurn || (!state.lastDiscard && prev.lastDiscard))) {
         setPendingClaim(false);
-        setActions(null);
+        // Only clear actions if it's NOT my turn now.
+        // If it IS my turn, actionRequired will set the correct actions.
+        // Clearing unconditionally caused a race: gameStateUpdate would wipe
+        // the actions set by a near-simultaneous actionRequired event.
+        if (state.currentTurn !== state.myIndex) {
+          setActions(null);
+        }
       }
 
       prevStateRef.current = state;
@@ -262,6 +268,11 @@ export function Game({ initialGameState, onLeave }: GameProps) {
     }
     return ids;
   };
+
+  // Client-side safeguard: if actions were cleared by a race but it's our turn
+  // and no claim is pending, allow discard so the bubble still appears.
+  const effectiveCanDiscard = actions?.canDiscard
+    ?? (gameState !== null && gameState.currentTurn === gameState.myIndex && !pendingClaim);
 
   const isClaimWindow = actions
     ? (actions.canHu || actions.canPeng || actions.canMingGang || actions.chiOptions.length > 0) && !actions.canDiscard
@@ -503,18 +514,18 @@ export function Game({ initialGameState, onLeave }: GameProps) {
         state={gameState}
         onTileSelect={(tile) => setSelectedTileId(tile?.id ?? null)}
         onTileDoubleClick={(tile) => {
-          if (actions?.canDiscard) {
+          if (effectiveCanDiscard) {
             handleAction({ type: ActionType.Discard, playerIndex: gameState.myIndex, tile });
           }
         }}
         selectedTileId={selectedTileId}
         claimableTileIds={getClaimableTileIds(actions)}
-        canDiscard={actions?.canDiscard ?? false}
+        canDiscard={effectiveCanDiscard}
         onDiscard={(tileInstanceId) => {
           const tile = gameState.myHand.find(t => t.id === tileInstanceId);
           if (tile) handleAction({ type: ActionType.Discard, playerIndex: gameState.myIndex, tile });
         }}
-        canHu={!!(actions?.canHu && actions?.canDiscard)}
+        canHu={!!(actions?.canHu && effectiveCanDiscard)}
         onHu={() => handleAction({ type: ActionType.Hu, playerIndex: gameState.myIndex })}
         canDraw={actions?.canDraw ?? false}
         onDraw={() => handleAction({ type: ActionType.Draw, playerIndex: gameState.myIndex })}
