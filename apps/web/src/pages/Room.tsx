@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { socket } from "../socket";
+import { sounds } from "../sounds";
 import type { RoomState, CumulativeData } from "@fuzhou-mahjong/shared";
 import { Button } from "../components/Button";
 
@@ -128,7 +129,7 @@ export function Room({ initialRoomState, sessionScores }: RoomProps) {
             <p style={{ fontSize: "var(--lobby-subtitle-font)", marginBottom: 16 }}>确定要离开房间吗？</p>
             <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
               <Button variant='secondary' onClick={() => setShowLeaveConfirm(false)}>取消</Button>
-              <Button variant='danger' onClick={handleLeave}>离开</Button>
+              <Button variant='danger' onClick={() => { sounds.confirm(); handleLeave(); }}>离开</Button>
             </div>
           </div>
         </div>

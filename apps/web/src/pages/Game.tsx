@@ -147,7 +147,8 @@ export function Game({ initialGameState, onLeave }: GameProps) {
 
       // Detect draw: my hand grew without a new meld
       if (prev && state.myHand.length > prev.myHand.length && state.myMelds.length === prev.myMelds.length) {
-        sounds.draw();
+        const isSuppDraw = state.wallSupplementCount > prev.wallSupplementCount;
+        if (isSuppDraw) sounds.supplementDraw(); else sounds.draw();
       }
 
       // Detect gold tile flip
@@ -696,7 +697,7 @@ export function Game({ initialGameState, onLeave }: GameProps) {
               variant="secondary"
               size="sm"
               style={{ justifyContent: 'flex-start', width: '100%', border: 'none' }}
-              onClick={() => { const next = !muted; setMuted(next); setMutedState(next); }}
+              onClick={() => { sounds.toggle(); const next = !muted; setMuted(next); setMutedState(next); }}
             >{muted ? '🔇' : '🔊'} 音效{muted ? '开启' : '关闭'}</Button>
             {onLeave && (
               <Button
@@ -717,7 +718,7 @@ export function Game({ initialGameState, onLeave }: GameProps) {
             <p style={{ fontSize: 13, color: 'var(--color-text-secondary)', marginBottom: 0 }}>退出后本局将由机器人代打</p>
             <div style={{ display: 'flex', gap: 12, justifyContent: 'center', marginTop: 16 }}>
               <Button variant='secondary' onClick={() => setShowLeaveConfirm(false)}>取消</Button>
-              <Button variant='danger' onClick={() => { socket.emit('leaveRoom'); onLeave!(); }}>退出游戏</Button>
+              <Button variant='danger' onClick={() => { sounds.confirm(); socket.emit('leaveRoom'); onLeave!(); }}>退出游戏</Button>
             </div>
           </div>
         </div>
