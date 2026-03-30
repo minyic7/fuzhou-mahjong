@@ -5,6 +5,8 @@ import { TILE_BACK_URL } from "../tileSvg";
 
 interface TileWallProps {
   wallRemaining: number;
+  wallDrawCount: number;
+  wallSupplementCount: number;
   gold: GoldState | null;
   canDraw?: boolean;
   onDraw?: () => void;
@@ -16,28 +18,24 @@ const TOTAL_STACKS = STACKS_PER_SIDE * 4;
 interface StackState { hasUpper: boolean; hasLower: boolean; }
 
 /**
- * Given wallRemaining, compute which stacks still have tiles.
+ * Given actual draw and supplement counts from the server,
+ * compute which stacks still have tiles.
  * Draw end depletes from head (stack 0 forward), supplement from tail (stack 71 backward).
- * Roughly 85% drawn from head, 15% supplement from tail.
  */
-function computeWallStacks(wallRemaining: number): StackState[][] {
-  const tilesGone = 144 - wallRemaining;
+function computeWallStacks(drawCount: number, supplementCount: number): StackState[][] {
   const stacks: StackState[] = Array.from({ length: TOTAL_STACKS }, () => ({
     hasUpper: true, hasLower: true,
   }));
 
-  const supplementRemoved = Math.min(Math.floor(tilesGone * 0.15), tilesGone);
-  const drawRemoved = tilesGone - supplementRemoved;
-
   // Remove from draw end (head): upper first at each stack, then lower
-  let rem = drawRemoved;
+  let rem = drawCount;
   for (let i = 0; i < TOTAL_STACKS && rem > 0; i++) {
     if (stacks[i].hasUpper) { stacks[i].hasUpper = false; rem--; }
     if (rem > 0 && stacks[i].hasLower) { stacks[i].hasLower = false; rem--; }
   }
 
   // Remove from supplement end (tail): upper first, then lower
-  rem = supplementRemoved;
+  rem = supplementCount;
   for (let i = TOTAL_STACKS - 1; i >= 0 && rem > 0; i--) {
     if (stacks[i].hasUpper) { stacks[i].hasUpper = false; rem--; }
     if (rem > 0 && stacks[i].hasLower) { stacks[i].hasLower = false; rem--; }
@@ -174,8 +172,8 @@ function WallSegment({ side, stacks, drawStack, canDraw, onDraw }: {
   );
 }
 
-export function TileWall({ wallRemaining, gold, canDraw, onDraw }: TileWallProps) {
-  const sides = useMemo(() => computeWallStacks(wallRemaining), [wallRemaining]);
+export function TileWall({ wallRemaining, wallDrawCount, wallSupplementCount, gold, canDraw, onDraw }: TileWallProps) {
+  const sides = useMemo(() => computeWallStacks(wallDrawCount, wallSupplementCount), [wallDrawCount, wallSupplementCount]);
   const drawIndex = useMemo(() => findDrawStackIndex(sides), [sides]);
 
   return (

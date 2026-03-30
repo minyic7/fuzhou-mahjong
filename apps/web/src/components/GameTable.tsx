@@ -89,7 +89,7 @@ export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTile
 
       {/* Center - game info */}
       <div className="table-center-area" style={{ gridArea: "center", display: "flex", alignItems: "center", justifyContent: "center", position: "relative", zIndex: 1 }}>
-        <TileWall wallRemaining={wallRemaining} gold={gold} canDraw={canDraw} onDraw={onDraw} />
+        <TileWall wallRemaining={wallRemaining} wallDrawCount={state.wallDrawCount} wallSupplementCount={state.wallSupplementCount} gold={gold} canDraw={canDraw} onDraw={onDraw} />
         <GameInfo
           gold={null}
           wallRemaining={wallRemaining}

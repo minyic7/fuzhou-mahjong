@@ -25,6 +25,8 @@ export class ServerGameState {
   botIndices: Set<number> = new Set();
   lastDrawnTileIds: (number | null)[] = [null, null, null, null];
   firstActionTaken = false;
+  initialWallLength = 0;
+  initialWallTailLength = 0;
 
   constructor(roomId: string, playerSocketIds: string[], playerNames?: string[], botIndices?: number[], dealerIndex?: number, lianZhuangCount?: number) {
     this.roomId = roomId;
@@ -70,6 +72,9 @@ export class ServerGameState {
     for (const p of players) {
       p.hand = sortHand(p.hand, goldResult.gold);
     }
+
+    this.initialWallLength = remainingWall.length;
+    this.initialWallTailLength = goldResult.wallTail.length;
 
     this.state = {
       wall: remainingWall,
@@ -135,6 +140,8 @@ export class ServerGameState {
       lianZhuangCount: state.lianZhuangCount,
       gold: state.gold,
       wallRemaining: state.wall.length + state.wallTail.length,
+      wallDrawCount: this.initialWallLength - state.wall.length,
+      wallSupplementCount: this.initialWallTailLength - state.wallTail.length,
       lastDiscard: state.lastDiscard,
       tenpaiTiles: findTenpaiTiles(myPlayer.hand, myPlayer.melds, state.gold),
       lastDrawnTileId: this.lastDrawnTileIds[playerIndex],
