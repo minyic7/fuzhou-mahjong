@@ -9,9 +9,19 @@ interface GameTableProps {
   onTileDoubleClick?: (tile: TileInstance) => void;
   selectedTileId: number | null;
   claimableTileIds?: Set<number>;
+  canDiscard?: boolean;
+  onDiscard?: (tileInstanceId: number) => void;
+  canHu?: boolean;
+  onHu?: () => void;
+  canDraw?: boolean;
+  onDraw?: () => void;
+  kongTileIds?: Set<number>;
+  onAnGang?: (tileInstanceId: number) => void;
+  onBuGang?: (tileInstanceId: number) => void;
+  onBackgroundClick?: () => void;
 }
 
-export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTileId, claimableTileIds }: GameTableProps) {
+export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTileId, claimableTileIds, canDiscard, onDiscard, canHu, onHu, canDraw, onDraw, kongTileIds, onAnGang, onBuGang, onBackgroundClick }: GameTableProps) {
   const { myHand, myFlowers, myMelds, myDiscards, myName, otherPlayers, currentTurn, myIndex, gold, dealerIndex, lianZhuangCount, wallRemaining } = state;
   const botLabel = (name: string, isBot?: boolean) => isBot ? `${name} 🤖` : name;
   const labels = [
@@ -22,7 +32,7 @@ export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTile
   ];
 
   return (
-    <div className="game-table" style={{
+    <div className="game-table" onClick={(e) => { if (e.target === e.currentTarget) onBackgroundClick?.(); }} style={{
       display: "grid",
       gridTemplateAreas: `
         ". top ."
@@ -70,7 +80,7 @@ export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTile
 
       {/* Center - game info */}
       <div style={{ gridArea: "center", display: "flex", alignItems: "center", justifyContent: "center", position: "relative", zIndex: 1 }}>
-        <TileWall wallRemaining={wallRemaining} gold={gold} />
+        <TileWall wallRemaining={wallRemaining} gold={gold} canDraw={canDraw} onDraw={onDraw} />
         <GameInfo
           gold={null}
           wallRemaining={wallRemaining}
@@ -113,6 +123,13 @@ export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTile
           onTileDoubleClick={onTileDoubleClick}
           label={labels[0]}
           claimableTileIds={claimableTileIds}
+          canDiscard={canDiscard}
+          onDiscard={onDiscard}
+          canHu={canHu}
+          onHu={onHu}
+          kongTileIds={kongTileIds}
+          onAnGang={onAnGang}
+          onBuGang={onBuGang}
           lastDrawnTileId={(state as any).lastDrawnTileId}
           tenpaiTiles={(state as any).tenpaiTiles}
         />
