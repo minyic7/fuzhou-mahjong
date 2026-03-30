@@ -93,7 +93,7 @@
 }
 
 .hu-celebration {
-  animation: huGlow 2s ease-in-out infinite, huScale 2s ease-in-out infinite;
+  animation: huGlow 2s ease-in-out infinite;
   border-radius: 12px;
 }
 

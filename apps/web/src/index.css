@@ -843,6 +843,7 @@ button.lobby-create-btn:hover:not(:disabled) {
   padding: clamp(var(--spacing-md), 3vh, 40px);
   max-height: 100dvh;
   overflow-y: auto;
+  background: var(--color-bg-dark);
 }
 
 .game-over-layout {
