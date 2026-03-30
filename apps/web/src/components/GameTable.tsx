@@ -109,7 +109,7 @@ export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTile
       <div className="table-center-area" style={{ gridArea: "center", display: "flex", flexDirection: isCompact ? "column" : "row", alignItems: "center", justifyContent: "center", position: "relative", zIndex: 1, overflow: "hidden" }}>
         <TileWall wallRemaining={wallRemaining} wallDrawCount={state.wallDrawCount} wallSupplementCount={state.wallSupplementCount} gold={gold} canDraw={canDraw} onDraw={onDraw} compact={isCompact} />
         <GameInfo
-          gold={isCompact ? null : gold}
+          gold={gold}
           wallRemaining={wallRemaining}
           dealerIndex={dealerIndex}
           lianZhuangCount={lianZhuangCount}

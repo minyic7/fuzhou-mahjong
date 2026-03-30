@@ -14,7 +14,7 @@ interface GameInfoProps {
   compact?: boolean;
 }
 
-export function GameInfo({ gold, dealerIndex, lianZhuangCount, myIndex, lastDiscard, playerNames, compact }: GameInfoProps) {
+export function GameInfo({ gold, wallRemaining, dealerIndex, lianZhuangCount, myIndex, lastDiscard, playerNames, compact }: GameInfoProps) {
   const [goldFlip, setGoldFlip] = useState(false);
   const prevGoldRef = useRef<number | null>(null);
 
@@ -39,16 +39,16 @@ export function GameInfo({ gold, dealerIndex, lianZhuangCount, myIndex, lastDisc
   if (compact) {
     return (
       <div style={{
-        display: "flex", alignItems: "center", gap: 8,
-        padding: "2px 8px", fontSize: 11, color: "var(--color-text-secondary)",
+        display: "flex", alignItems: "center", justifyContent: "center",
+        gap: 8, padding: "2px 8px", fontSize: 11,
+        color: "var(--color-text-secondary)",
+        background: "rgba(0,0,0,0.2)", borderRadius: 4,
+        maxHeight: 28,
       }}>
+        {gold && <TileView tile={gold.indicatorTile} faceUp gold={null} small />}
+        <span>余{wallRemaining}</span>
         <span>庄:{posLabel(dealerIndex)}</span>
-        {lianZhuangCount > 0 && <span>连庄:{lianZhuangCount}</span>}
-        {lastDiscard && (
-          <span style={{ color: "var(--color-accent-orange)" }}>
-            {posLabel(lastDiscard.playerIndex)}打: <TileView tile={lastDiscard.tile} faceUp gold={gold} small />
-          </span>
-        )}
+        {lianZhuangCount > 0 && <span>连{lianZhuangCount}</span>}
         <MuteButton />
       </div>
     );
