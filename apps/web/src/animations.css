@@ -432,6 +432,19 @@
   animation: meldEntrance 0.3s ease-out;
 }
 
+/* Swipe-to-discard discovery hint */
+@keyframes swipeHintFade {
+  0% { opacity: 0; transform: translateX(-50%) translateY(4px); }
+  15% { opacity: 1; transform: translateX(-50%) translateY(0); }
+  75% { opacity: 1; transform: translateX(-50%) translateY(0); }
+  100% { opacity: 0; transform: translateX(-50%) translateY(-4px); }
+}
+
+.swipe-hint {
+  animation: swipeHintFade 3s ease-in-out forwards;
+  pointer-events: none;
+}
+
 /* Respect reduced-motion preferences */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

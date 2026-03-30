@@ -71,11 +71,29 @@ export function PlayerArea({
     }
   };
 
+  // Swipe-to-discard discovery hint
+  const [showSwipeHint, setShowSwipeHint] = useState(false);
+  const swipeHintDismissed = useRef(false);
+
+  useEffect(() => {
+    if (isMe && canDiscard && isCurrentTurn && !swipeHintDismissed.current && !localStorage.getItem("swipeHintShown")) {
+      setShowSwipeHint(true);
+      const timer = setTimeout(() => setShowSwipeHint(false), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [isMe, canDiscard, isCurrentTurn]);
+
   // Swipe-to-discard gesture
   const swipe = useSwipeGesture({
     onSwipeUp: (tileId: number) => {
       const tile = hand?.find((t) => t.id === tileId);
       if (!tile) return;
+      // Dismiss swipe hint permanently on first successful swipe
+      if (!swipeHintDismissed.current) {
+        swipeHintDismissed.current = true;
+        setShowSwipeHint(false);
+        localStorage.setItem("swipeHintShown", "1");
+      }
       const tileIsGold = !!(gold && tile.tile.kind === "suited" && tile.tile.suit === gold.wildTile.suit && tile.tile.value === gold.wildTile.value);
       if (tileIsGold) {
         // Gold tile safety: select tile to show warning bubble instead of auto-discarding
@@ -316,6 +334,15 @@ export function PlayerArea({
                   position: "absolute", top: -14, left: "50%", transform: "translateX(-50%)",
                   fontSize: "var(--font-xs)", color: "#4fc3f7", whiteSpace: "nowrap",
                 }}>新牌</div>
+              )}
+              {idx === 0 && showSwipeHint && (
+                <div className="swipe-hint" style={{
+                  position: "absolute", bottom: "100%", left: "50%",
+                  transform: "translateX(-50%)", marginBottom: 6,
+                  fontSize: "var(--font-xs)", color: "var(--color-gold-bright)",
+                  whiteSpace: "nowrap", zIndex: 10,
+                  textShadow: "0 1px 4px rgba(0,0,0,0.8)",
+                }}>↑ 上滑出牌</div>
               )}
               {/* Discard / Kong bubble */}
               {showBubble && (
