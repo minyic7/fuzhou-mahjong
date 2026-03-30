@@ -13,7 +13,7 @@ interface SwipeConfig {
  */
 export function useSwipeGesture({
   onSwipeUp,
-  threshold = 40,
+  threshold = Math.min(40, window.innerHeight * 0.08),
   enabled = true,
 }: SwipeConfig) {
   const [swipingTileId, setSwipingTileId] = useState<number | null>(null);

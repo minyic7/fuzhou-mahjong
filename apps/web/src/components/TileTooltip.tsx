@@ -65,7 +65,7 @@ export function useLongPress(gold: GoldState | null) {
     return (
       <div style={{
         position: "fixed",
-        left: Math.min(tooltip.x - 40, window.innerWidth - 120),
+        left: Math.max(8, Math.min(tooltip.x - 40, window.innerWidth - 120 - 8)),
         top: Math.max(tooltip.y - 100, 10),
         background: "var(--color-bg-dark)",
         border: isGold ? "2px solid var(--color-gold-bright)" : "1px solid var(--color-text-secondary)",
