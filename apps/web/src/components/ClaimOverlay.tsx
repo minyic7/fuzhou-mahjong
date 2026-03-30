@@ -15,11 +15,11 @@ const BTN = {
     borderRadius: 8, border: "none", minHeight: "var(--btn-min-size)", minWidth: "var(--btn-min-size)",
     cursor: "pointer",
   },
-  hu: { background: "#c41e3a", color: "#fff" },
-  peng: { background: "#1e6ec4", color: "#fff" },
-  gang: { background: "#d4760a", color: "#fff" },
-  chi: { background: "#2e8b57", color: "#fff" },
-  pass: { background: "#444", color: "#ccc" },
+  hu: { background: "var(--color-action-hu)", color: "#fff" },
+  peng: { background: "var(--color-action-peng)", color: "#fff" },
+  gang: { background: "var(--color-action-gang)", color: "#fff" },
+  chi: { background: "var(--color-action-chi)", color: "#fff" },
+  pass: { background: "var(--color-action-pass-bg)", color: "var(--color-action-pass-text)" },
 };
 
 export function ClaimOverlay({ actions, gameState, onAction }: ClaimOverlayProps) {
@@ -51,7 +51,7 @@ export function ClaimOverlay({ actions, gameState, onAction }: ClaimOverlayProps
       style={{
         position: "fixed",
         top: 0, left: 0, right: 0, bottom: 0,
-        background: "rgba(0,0,0,0.5)",
+        background: "var(--color-overlay-backdrop)",
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
@@ -65,8 +65,8 @@ export function ClaimOverlay({ actions, gameState, onAction }: ClaimOverlayProps
       }}
     >
       <div style={{
-        background: "rgba(15,30,25,0.95)",
-        border: "2px solid #ffa500",
+        background: "var(--overlay-bg)",
+        border: "2px solid var(--color-accent-orange)",
         borderRadius: 12,
         padding: "var(--overlay-padding-y) var(--overlay-padding-x)",
         display: "flex",
@@ -78,7 +78,7 @@ export function ClaimOverlay({ actions, gameState, onAction }: ClaimOverlayProps
         overflowY: "auto",
         animation: exiting ? "overlayScaleOut 0.18s ease-in forwards" : "overlayScaleIn 0.2s ease-out",
       }}>
-        <div style={{ color: "#ffa500", fontWeight: "bold", fontSize: "var(--btn-font)", marginBottom: 4 }}>
+        <div style={{ color: "var(--color-accent-orange)", fontWeight: "bold", fontSize: "var(--btn-font)", marginBottom: 4 }}>
           可以操作！请选择
         </div>
 
@@ -160,7 +160,7 @@ export function ClaimOverlay({ actions, gameState, onAction }: ClaimOverlayProps
             width: "100%",
             animation: exitingChi ? "overlayScaleOut 0.15s ease-in forwards" : "overlayScaleIn 0.15s ease-out",
           }}>
-            <div style={{ textAlign: "center", fontSize: "var(--label-font)", color: "#aaa", marginBottom: 8 }}>
+            <div style={{ textAlign: "center", fontSize: "var(--label-font)", color: "var(--color-text-secondary)", marginBottom: 8 }}>
               选择吃牌组合
             </div>
             <div className="chi-picker-scroll" style={{
@@ -201,7 +201,7 @@ export function ClaimOverlay({ actions, gameState, onAction }: ClaimOverlayProps
                     <TileView key={t.id} tile={t} faceUp small />
                   ))}
                   <div style={{
-                    border: "2px solid #ffa500",
+                    border: "2px solid var(--color-accent-orange)",
                     borderRadius: 4,
                     padding: 1,
                     marginLeft: 2,

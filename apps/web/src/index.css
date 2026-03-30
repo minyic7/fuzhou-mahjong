@@ -77,10 +77,27 @@ body {
   --color-text-secondary: #8fbc8f;
   --color-text-gold: #d4a017;
   --color-success: #4caf50;
+  --color-text-warm: #e8d5a3;
   --color-error: #ff8a80;
   --color-error-bg: rgba(255, 82, 82, 0.15);
+  --color-action-hu: #c41e3a;
+  --toast-bg: rgba(0, 0, 0, 0.85);
   --color-focus: #4fc3f7;
+  --color-accent-orange: #ffa500;
+  --color-overlay-backdrop: rgba(0, 0, 0, 0.5);
   --color-separator: rgba(184, 134, 11, 0.2);
+
+  /* Suit colors */
+  --suit-color-wan: #b71c1c;
+  --suit-color-tong: #0d47a1;
+  --suit-color-tiao: #1b5e20;
+
+  /* Action button colors */
+  --color-action-peng: #1e6ec4;
+  --color-action-gang: #d4760a;
+  --color-action-chi: #2e8b57;
+  --color-action-pass-bg: #444;
+  --color-action-pass-text: #ccc;
 
   /* Consistent border-radius */
   --radius-sm: 4px;

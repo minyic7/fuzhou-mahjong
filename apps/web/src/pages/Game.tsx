@@ -558,7 +558,7 @@ export function Game({ initialGameState, onLeave }: GameProps) {
       <div className="portrait-rotate-overlay">
         <div style={{ fontSize: 48, animation: 'rotatePhone 2s ease-in-out infinite' }}>📱</div>
         <div style={{ fontSize: 18, color: '#eee' }}>请旋转手机</div>
-        <div style={{ fontSize: 14, color: '#8fbc8f' }}>Please rotate your phone</div>
+        <div style={{ fontSize: 14, color: 'var(--color-text-secondary)' }}>Please rotate your phone</div>
       </div>
       {showFlash && (
         <>
@@ -576,9 +576,9 @@ export function Game({ initialGameState, onLeave }: GameProps) {
       }}>
         {toasts.map((t) => (
           <div key={t.id} style={{
-            background: "rgba(0,0,0,0.85)", color: "#e8d5a3", padding: "8px 20px",
+            background: "var(--toast-bg)", color: "var(--color-text-warm)", padding: "8px 20px",
             borderRadius: 8, fontSize: 14, fontWeight: "bold",
-            border: "1px solid rgba(232,213,163,0.3)",
+            border: "1px solid var(--color-gold-border)",
             animation: "pageFadeIn 0.3s ease-out",
             whiteSpace: "nowrap",
           }}>
@@ -636,8 +636,8 @@ export function Game({ initialGameState, onLeave }: GameProps) {
             aria-label="How to play"
             style={{
               width: 44, height: 44, minHeight: 44, borderRadius: "50%",
-              background: "rgba(15,30,25,0.85)", border: "1px solid rgba(184,134,11,0.4)",
-              color: "#8fbc8f", fontSize: 18, fontWeight: 700,
+              background: "var(--overlay-bg)", border: "1px solid var(--color-gold-border-hover)",
+              color: "var(--color-text-secondary)", fontSize: 18, fontWeight: 700,
               display: "flex", alignItems: "center", justifyContent: "center",
               cursor: "pointer", padding: 0,
             }}
@@ -648,8 +648,8 @@ export function Game({ initialGameState, onLeave }: GameProps) {
               aria-label="Leave game"
               style={{
                 width: 44, height: 44, minHeight: 44, borderRadius: "50%",
-                background: "rgba(15,30,25,0.85)", border: "1px solid rgba(184,134,11,0.4)",
-                color: "#ff5252", fontSize: 18, fontWeight: 700,
+                background: "var(--overlay-bg)", border: "1px solid var(--color-gold-border-hover)",
+                color: "var(--color-error)", fontSize: 18, fontWeight: 700,
                 display: "flex", alignItems: "center", justifyContent: "center",
                 cursor: "pointer", padding: 0,
               }}
@@ -665,8 +665,8 @@ export function Game({ initialGameState, onLeave }: GameProps) {
               style={{
                 position: "fixed", bottom: "calc(56px + env(safe-area-inset-bottom, 0px))", right: "calc(12px + env(safe-area-inset-right, 0px))",
                 width: 44, height: 44, minHeight: 44, borderRadius: "50%",
-                background: "rgba(15,30,25,0.85)", border: "1px solid rgba(184,134,11,0.4)",
-                color: "#ff5252", fontSize: 18, fontWeight: 700,
+                background: "var(--overlay-bg)", border: "1px solid var(--color-gold-border-hover)",
+                color: "var(--color-error)", fontSize: 18, fontWeight: 700,
                 display: "flex", alignItems: "center", justifyContent: "center",
                 cursor: "pointer", zIndex: 20, padding: 0,
               }}
@@ -678,8 +678,8 @@ export function Game({ initialGameState, onLeave }: GameProps) {
             style={{
               position: "fixed", bottom: "calc(12px + env(safe-area-inset-bottom, 0px))", right: "calc(12px + env(safe-area-inset-right, 0px))",
               width: 44, height: 44, minHeight: 44, borderRadius: "50%",
-              background: "rgba(15,30,25,0.85)", border: "1px solid rgba(184,134,11,0.4)",
-              color: "#8fbc8f", fontSize: 18, fontWeight: 700,
+              background: "var(--overlay-bg)", border: "1px solid var(--color-gold-border-hover)",
+              color: "var(--color-text-secondary)", fontSize: 18, fontWeight: 700,
               display: "flex", alignItems: "center", justifyContent: "center",
               cursor: "pointer", zIndex: 20, padding: 0,
             }}
@@ -691,7 +691,7 @@ export function Game({ initialGameState, onLeave }: GameProps) {
         <div className="confirm-modal-backdrop">
           <div className="confirm-modal">
             <p style={{ fontSize: 18, marginBottom: 8 }}>确定要退出吗？</p>
-            <p style={{ fontSize: 13, color: '#8fbc8f', marginBottom: 0 }}>退出后本局将由机器人代打</p>
+            <p style={{ fontSize: 13, color: 'var(--color-text-secondary)', marginBottom: 0 }}>退出后本局将由机器人代打</p>
             <div style={{ display: 'flex', gap: 12, justifyContent: 'center', marginTop: 16 }}>
               <Button variant='secondary' onClick={() => setShowLeaveConfirm(false)}>取消</Button>
               <Button variant='danger' onClick={() => { socket.emit('leaveRoom'); onLeave!(); }}>退出游戏</Button>

@@ -40,12 +40,12 @@ export function GameInfo({ gold, dealerIndex, lianZhuangCount, myIndex, lastDisc
     return (
       <div style={{
         display: "flex", alignItems: "center", gap: 8,
-        padding: "2px 8px", fontSize: 11, color: "#8fbc8f",
+        padding: "2px 8px", fontSize: 11, color: "var(--color-text-secondary)",
       }}>
         <span>庄:{posLabel(dealerIndex)}</span>
         {lianZhuangCount > 0 && <span>连庄:{lianZhuangCount}</span>}
         {lastDiscard && (
-          <span style={{ color: "#ffa500" }}>
+          <span style={{ color: "var(--color-accent-orange)" }}>
             {posLabel(lastDiscard.playerIndex)}打: <TileView tile={lastDiscard.tile} faceUp gold={gold} small />
           </span>
         )}
@@ -65,7 +65,7 @@ export function GameInfo({ gold, dealerIndex, lianZhuangCount, myIndex, lastDisc
       borderRadius: 8,
     }}>
       <div style={{ marginBottom: 8 }}>
-        <span style={{ color: "#aaa", fontSize: 12 }}>金牌: </span>
+        <span style={{ color: "var(--color-text-secondary)", fontSize: 12 }}>金牌: </span>
         {gold && <TileView tile={gold.indicatorTile} faceUp gold={null} small className={`gold-indicator-glow${goldFlip ? " gold-flip-reveal" : ""}`} />}
       </div>
 
@@ -77,14 +77,14 @@ export function GameInfo({ gold, dealerIndex, lianZhuangCount, myIndex, lastDisc
           borderRadius: 6,
           border: "1px solid rgba(255,165,0,0.4)",
         }}>
-          <div style={{ fontSize: 11, color: "#ffa500", marginBottom: 4 }}>
+          <div style={{ fontSize: 11, color: "var(--color-accent-orange)", marginBottom: 4 }}>
             {posLabel(lastDiscard.playerIndex)} 打出:
           </div>
           <TileView tile={lastDiscard.tile} faceUp gold={gold} />
         </div>
       )}
 
-      <div style={{ fontSize: 12, color: "#8fbc8f" }}>
+      <div style={{ fontSize: 12, color: "var(--color-text-secondary)" }}>
         庄:{posLabel(dealerIndex)} | 连庄:{lianZhuangCount}
       </div>
       <MuteButton />
@@ -100,7 +100,7 @@ function MuteButton() {
       style={{
         marginTop: 6, padding: "2px 8px", fontSize: 12,
         background: "transparent", border: "1px solid #555",
-        color: "#8fbc8f", borderRadius: 4, minHeight: 44,
+        color: "var(--color-text-secondary)", borderRadius: 4, minHeight: 44,
         cursor: "pointer",
       }}
     >

@@ -21,7 +21,7 @@ interface TileProps {
 }
 
 const SUIT_CHARS: Record<string, string> = { wan: "万", bing: "饼", tiao: "条" };
-const SUIT_COLORS: Record<string, string> = { wan: "#b71c1c", bing: "#0d47a1", tiao: "#1b5e20" };
+const SUIT_COLORS: Record<string, string> = { wan: "var(--suit-color-wan)", bing: "var(--suit-color-tong)", tiao: "var(--suit-color-tiao)" };
 
 const FLOWER_CHARS: Record<string, Record<string, string>> = {
   wind: { east: "東", south: "南", west: "西", north: "北" },
