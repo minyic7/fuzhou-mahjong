@@ -332,14 +332,21 @@ export function Game({ initialGameState, onLeave }: GameProps) {
       return other?.name || `玩家${idx}`;
     };
 
+    const [showAllHands, setShowAllHands] = useState(false);
+    const isCompact = window.innerHeight <= 500;
+
     const isWin = gameOver.winnerId !== null;
     const confettiColors = ["#ff6b6b", "#ffd700", "#4caf50", "#2196f3", "#ff9800", "#e91e63"];
 
     return (
       <div>
+        <div className="portrait-rotate-overlay">
+          <div style={{ fontSize: 48, animation: 'rotatePhone 2s ease-in-out infinite' }}>📱</div>
+          <div style={{ fontSize: 18, color: '#eee' }}>请旋转手机</div>
+        </div>
         {isWin && (
           <div className="confetti-container">
-            {Array.from({ length: 30 }).map((_, i) => (
+            {Array.from({ length: isCompact ? 10 : 30 }).map((_, i) => (
               <div
                 key={i}
                 className="confetti"
@@ -356,7 +363,7 @@ export function Game({ initialGameState, onLeave }: GameProps) {
             ))}
           </div>
         )}
-      <div className={isWin ? "hu-celebration" : ""} style={{ textAlign: "center", padding: 40 }}>
+      <div className={isWin ? "hu-celebration" : ""} style={{ textAlign: "center", padding: "clamp(12px, 3vh, 40px)", maxHeight: "100dvh", overflowY: "auto" }}>
         <h2 style={{ fontSize: 28, marginBottom: 16 }}>
           {isWin ? `🎉 ${getPlayerName(gameOver.winnerId!)} 胡了!` : "流局 / Draw"}
         </h2>
@@ -368,8 +375,11 @@ export function Game({ initialGameState, onLeave }: GameProps) {
         {gameOver.breakdown && isWin && (
           <div style={{ marginBottom: 12, padding: 10, background: "rgba(255,255,255,0.05)", borderRadius: 6, display: "inline-block" }}>
             <div style={{ fontSize: 12, color: "var(--color-text-secondary)", marginBottom: 4 }}>得分明细</div>
-            <div style={{ fontSize: 13, color: "var(--color-text-primary)" }}>
-              花分: {gameOver.breakdown.flowerScore} | 金: {gameOver.breakdown.goldScore} | 连庄: {gameOver.breakdown.lianZhuangCount} | 特殊: {gameOver.breakdown.specialMultiplier}x
+            <div style={{ display: "flex", flexWrap: "wrap", gap: "4px 12px", justifyContent: "center", fontSize: 13, color: "var(--color-text-primary)" }}>
+              <span>花分: {gameOver.breakdown.flowerScore}</span>
+              <span>金: {gameOver.breakdown.goldScore}</span>
+              <span>连庄: {gameOver.breakdown.lianZhuangCount}</span>
+              <span>特殊: {gameOver.breakdown.specialMultiplier}x</span>
             </div>
             <div style={{ fontSize: 14, color: "var(--color-text-gold)", marginTop: 4 }}>
               总分: {gameOver.breakdown.totalScore}
@@ -433,10 +443,18 @@ export function Game({ initialGameState, onLeave }: GameProps) {
         {/* All player hands */}
         {gameOver.allHands && gameOver.allHands.length > 0 && (
           <div style={{ marginBottom: 20, textAlign: "left" }}>
-            <div style={{ fontSize: 12, color: "var(--color-text-secondary)", marginBottom: 8, textAlign: "center" }}>
-              所有玩家手牌 / All Hands
-            </div>
-            {gameOver.allHands.map((playerHand, idx) => {
+            <button
+              onClick={() => setShowAllHands(!showAllHands)}
+              style={{
+                display: "block", width: "100%", padding: "8px 0", marginBottom: 8,
+                background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)",
+                borderRadius: 6, color: "var(--color-text-secondary)", fontSize: 13,
+                cursor: "pointer", textAlign: "center",
+              }}
+            >
+              {showAllHands ? "收起手牌 ▲" : "查看所有手牌 ▼"}
+            </button>
+            {(showAllHands || !isCompact) && gameOver.allHands.map((playerHand, idx) => {
               const isWinner = idx === gameOver.winnerId;
               const name = (gameOver.playerNames ?? [])[idx] || getPlayerName(idx);
               return (
@@ -482,7 +500,7 @@ export function Game({ initialGameState, onLeave }: GameProps) {
           </div>
         )}
 
-        <Button variant="gold" size="lg" onClick={handleNextRound}>
+        <Button variant="gold" size="lg" onClick={handleNextRound} style={{ minHeight: 48 }}>
           下一局 / Next Round
         </Button>
         {onLeave && (
@@ -499,7 +517,7 @@ export function Game({ initialGameState, onLeave }: GameProps) {
                 socket.emit("leaveRoom");
                 onLeave();
               }
-            }} style={{ marginLeft: 10 }}>
+            }} style={{ marginLeft: 10, minHeight: 48 }}>
             离开 / Leave
           </Button>
         )}
