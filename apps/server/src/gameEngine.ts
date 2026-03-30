@@ -164,7 +164,9 @@ export function handlePlayerAction(
   // Direct actions (during player's own turn)
   const state = game.state;
   if (state.currentTurn !== playerIndex) {
-    if (botPlayerIndex === undefined) {
+    if (botPlayerIndex !== undefined) {
+      console.warn(`Bot ${playerIndex} action rejected: not their turn (current: ${state.currentTurn})`);
+    } else {
       const socket = io.sockets.sockets.get(socketIdOrRoomId);
       socket?.emit('actionError', { message: 'Not your turn', code: 'WRONG_TURN' });
     }
@@ -881,18 +883,33 @@ function emitOrBotAction(
 ): void {
   if (game.isBot(playerIndex)) {
     setTimeout(() => {
-      const player = game.state.players[playerIndex];
-      const botContext: BotContext = {
-        wallRemaining: game.state.wall.length + game.state.wallTail.length - game.state.retainCount,
-        opponentMelds: game.state.players
-          .filter((_, i) => i !== playerIndex)
-          .map(p => p.melds),
-        opponentDiscards: game.state.players
-          .filter((_, i) => i !== playerIndex)
-          .map(p => p.discards),
-      };
-      const botAction = decideBotAction(player.hand, player.melds, actions, playerIndex, game.state.gold, lastDiscardTile, botContext);
-      handlePlayerAction(io, game.roomId, botAction, playerIndex);
+      try {
+        // Check if game state is still valid for this bot action
+        if (game.state.phase !== GamePhase.Playing) {
+          console.warn(`Bot ${playerIndex} action skipped: game phase is ${game.state.phase}`);
+          return;
+        }
+        const player = game.state.players[playerIndex];
+        const botContext: BotContext = {
+          wallRemaining: game.state.wall.length + game.state.wallTail.length - game.state.retainCount,
+          opponentMelds: game.state.players
+            .filter((_, i) => i !== playerIndex)
+            .map(p => p.melds),
+          opponentDiscards: game.state.players
+            .filter((_, i) => i !== playerIndex)
+            .map(p => p.discards),
+        };
+        const botAction = decideBotAction(player.hand, player.melds, actions, playerIndex, game.state.gold, lastDiscardTile, botContext);
+        handlePlayerAction(io, game.roomId, botAction, playerIndex);
+      } catch (err) {
+        console.error(`Bot ${playerIndex} action error:`, err);
+        // Fallback: try to pass to prevent game freeze
+        try {
+          handlePlayerAction(io, game.roomId, { type: ActionType.Pass, playerIndex }, playerIndex);
+        } catch (fallbackErr) {
+          console.error(`Bot ${playerIndex} fallback pass also failed:`, fallbackErr);
+        }
+      }
     }, 300 + Math.random() * 500);
   } else {
     io.to(game.getSocketId(playerIndex)).emit("actionRequired", actions);
