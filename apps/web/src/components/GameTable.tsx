@@ -67,9 +67,7 @@ export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTile
       display: "grid",
       gridTemplateAreas: isFirstPersonMobile
         ? `"left top right" "left center right" "bottom bottom bottom"`
-        : isCompact
-        ? `". top ." "left center right" ". bottom ."`
-        : `". top ." "left center right" "bottom bottom bottom"`,
+        : `". top ." "left center right" ". bottom ."`,
       gridTemplateColumns: isFirstPersonMobile ? "var(--fp-side-col) 1fr var(--fp-side-col)" : isCompact ? "var(--grid-side-col) 1fr var(--grid-side-col)" : "1fr 2fr 1fr",
       gridTemplateRows: isFirstPersonMobile ? "var(--fp-top-row) 1fr minmax(55%, 65%)" : isCompact ? "var(--grid-top-row) var(--grid-center-row) 1fr" : "auto 1fr auto",
       flex: 1,
@@ -80,7 +78,7 @@ export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTile
       perspectiveOrigin: "50% 60%",
     }}>
       {/* Top player (index 2 in otherPlayers = across from me) */}
-      <div style={{ gridArea: "top", position: "relative", zIndex: 1, overflow: "hidden" }}>
+      <div style={{ gridArea: "top", position: "relative", zIndex: 1 }}>
         <PlayerArea
           isMe={false}
           handCount={otherPlayers[1]?.handCount ?? 0}
@@ -100,9 +98,8 @@ export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTile
         />
       </div>
 
-      {/* Left player — rotated 90° clockwise to face left */}
-      <div style={{ gridArea: "left", position: "relative", zIndex: 1, overflow: "hidden" }}>
-      <div style={{ transform: "rotate(90deg)", transformOrigin: "center center", width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      {/* Left player */}
+      <div style={{ gridArea: "left", position: "relative", zIndex: 1 }}>
         <PlayerArea
           isMe={false}
           handCount={otherPlayers[2]?.handCount ?? 0}
@@ -121,10 +118,9 @@ export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTile
           cumulativeScore={roundsPlayed > 0 ? cumulativeScores[(myIndex + 3) % 4] : undefined}
         />
       </div>
-      </div>
 
       {/* Center - game info */}
-      <div className="table-center-area" style={{ gridArea: "center", display: "flex", flexDirection: isCompact ? "column" : "row", alignItems: "center", justifyContent: "center", position: "relative", zIndex: 1, overflow: "hidden", padding: isCompact ? 0 : "12px" }}>
+      <div className="table-center-area" style={{ gridArea: "center", display: "flex", flexDirection: isCompact ? "column" : "row", alignItems: "center", justifyContent: "center", position: "relative", zIndex: 1, overflow: "hidden" }}>
         {isCompact && (
           <TileWall wallRemaining={wallRemaining} wallDrawCount={state.wallDrawCount} wallSupplementCount={state.wallSupplementCount} gold={gold} canDraw={canDraw} onDraw={onDraw} compact />
         )}
@@ -143,26 +139,25 @@ export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTile
       {/* Wall segments along table edges (non-compact only) */}
       {!isCompact && (
         <>
-          <div style={{ gridArea: "center", alignSelf: "start", justifySelf: "center", zIndex: 2, marginTop: "15%" }}>
+          <div style={{ gridArea: "center", alignSelf: "start", justifySelf: "center", zIndex: 2 }}>
             <TileWall segment="top" wallRemaining={wallRemaining} wallDrawCount={state.wallDrawCount} wallSupplementCount={state.wallSupplementCount} gold={gold} canDraw={canDraw} onDraw={onDraw} />
           </div>
-          <div style={{ gridArea: "center", alignSelf: "center", justifySelf: "start", zIndex: 2, marginLeft: "15%" }}>
+          <div style={{ gridArea: "center", alignSelf: "center", justifySelf: "start", zIndex: 2 }}>
             <TileWall segment="left" wallRemaining={wallRemaining} wallDrawCount={state.wallDrawCount} wallSupplementCount={state.wallSupplementCount} gold={gold} canDraw={canDraw} onDraw={onDraw} />
           </div>
-          <div style={{ gridArea: "center", alignSelf: "center", justifySelf: "end", zIndex: 2, marginRight: "15%" }}>
+          <div style={{ gridArea: "center", alignSelf: "center", justifySelf: "end", zIndex: 2 }}>
             <TileWall segment="right" wallRemaining={wallRemaining} wallDrawCount={state.wallDrawCount} wallSupplementCount={state.wallSupplementCount} gold={gold} canDraw={canDraw} onDraw={onDraw} />
           </div>
           {!isFirstPersonMobile && (
-            <div style={{ gridArea: "center", alignSelf: "end", justifySelf: "center", zIndex: 2, marginBottom: "15%" }}>
+            <div style={{ gridArea: "center", alignSelf: "end", justifySelf: "center", zIndex: 2 }}>
               <TileWall segment="bottom" wallRemaining={wallRemaining} wallDrawCount={state.wallDrawCount} wallSupplementCount={state.wallSupplementCount} gold={gold} canDraw={canDraw} onDraw={onDraw} />
             </div>
           )}
         </>
       )}
 
-      {/* Right player — rotated 90° counter-clockwise to face right */}
-      <div style={{ gridArea: "right", position: "relative", zIndex: 1, overflow: "hidden" }}>
-      <div style={{ transform: "rotate(-90deg)", transformOrigin: "center center", width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      {/* Right player */}
+      <div style={{ gridArea: "right", position: "relative", zIndex: 1 }}>
         <PlayerArea
           isMe={false}
           handCount={otherPlayers[0]?.handCount ?? 0}
@@ -181,10 +176,9 @@ export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTile
           cumulativeScore={roundsPlayed > 0 ? cumulativeScores[(myIndex + 1) % 4] : undefined}
         />
       </div>
-      </div>
 
       {/* Bottom - my area */}
-      <div style={{ gridArea: "bottom", position: "relative", zIndex: 1, overflow: "hidden" }}>
+      <div style={{ gridArea: "bottom", position: "relative", zIndex: 1 }}>
         <PlayerArea
           isMe
           hand={myHand}

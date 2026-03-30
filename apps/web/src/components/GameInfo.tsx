@@ -49,6 +49,7 @@ export function GameInfo({ gold, wallRemaining, dealerIndex, lianZhuangCount, my
         <span>余{wallRemaining}</span>
         <span>庄:{posLabel(dealerIndex)}</span>
         {lianZhuangCount > 0 && <span>连{lianZhuangCount}</span>}
+        <MuteButton />
       </div>
     );
   }
@@ -105,6 +106,7 @@ export function GameInfo({ gold, wallRemaining, dealerIndex, lianZhuangCount, my
           牌墙将尽
         </div>
       )}
+      <MuteButton />
     </div>
   );
 }
