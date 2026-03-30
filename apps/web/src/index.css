@@ -975,7 +975,7 @@ button.lobby-create-btn:hover:not(:disabled) {
 
 /* Toast notifications */
 .game-toast-container { position: fixed; top: 16px; left: 50%; transform: translateX(-50%); z-index: 9000; display: flex; flex-direction: column; gap: 8px; align-items: center; pointer-events: none; }
-.game-toast-container.compact { top: auto; bottom: calc(70px + env(safe-area-inset-bottom, 0px)); }
+.game-toast-container.compact { top: auto; bottom: calc(clamp(40px, 18vh, 70px) + env(safe-area-inset-bottom, 0px)); }
 .game-toast { background: var(--toast-bg); color: var(--color-text-warm); padding: 8px 20px; border-radius: 8px; font-size: var(--label-font); font-weight: bold; border: 1px solid var(--color-gold-border); animation: pageFadeIn 0.3s ease-out; white-space: nowrap; }
 
 /* ── Game-over overlay ── */
