@@ -16,6 +16,34 @@ interface GameProps {
 }
 
 export function Game({ initialGameState, onLeave }: GameProps) {
+  // Lock orientation to landscape on mount; release on unmount
+  useEffect(() => {
+    const lockOrientation = async () => {
+      try {
+        // screen.orientation.lock() is not in all TS DOM libs yet
+        const orientation = screen.orientation as ScreenOrientation & {
+          lock?: (type: string) => Promise<void>;
+          unlock?: () => void;
+        };
+        await orientation.lock?.('landscape');
+      } catch {
+        // Not supported or not allowed — CSS fallback handles it
+      }
+    };
+    lockOrientation();
+
+    return () => {
+      try {
+        const orientation = screen.orientation as ScreenOrientation & {
+          unlock?: () => void;
+        };
+        orientation.unlock?.();
+      } catch {
+        // ignore
+      }
+    };
+  }, []);
+
   const [gameState, setGameState] = useState<ClientGameState | null>(initialGameState ?? null);
   const [selectedTileId, setSelectedTileId] = useState<number | null>(null);
   const [gameOver, setGameOver] = useState<GameOverResult | null>(null);
@@ -320,6 +348,11 @@ export function Game({ initialGameState, onLeave }: GameProps) {
 
   return (
     <div className="game-wrapper">
+      <div className="portrait-rotate-overlay">
+        <div style={{ fontSize: 48, animation: 'rotatePhone 2s ease-in-out infinite' }}>📱</div>
+        <div style={{ fontSize: 18, color: '#eee' }}>请旋转手机</div>
+        <div style={{ fontSize: 14, color: '#8fbc8f' }}>Please rotate your phone</div>
+      </div>
       {showFlash && (
         <>
           <div className="screen-flash" />
