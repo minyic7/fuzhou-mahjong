@@ -143,7 +143,7 @@ function WallSegment({ side, stacks, drawStack, canDraw, onDraw, standalone }: {
               </div>
               {/* Upper tile, offset slightly */}
               <div style={{
-                position: "absolute", bottom: 3, left: 0,
+                position: "absolute", bottom: "min(3px, calc(var(--wall-tw) * 0.4))", left: 0,
                 opacity: s.hasUpper ? 1 : 0,
                 transform: s.hasUpper ? "scale(1)" : "scale(0.5)",
                 transition: "opacity 0.15s ease-out, transform 0.15s ease-out",
