@@ -10,6 +10,13 @@ interface ClaimOverlayProps {
   onAction: (action: GameAction) => void;
 }
 
+/**
+ * Touch-target audit (iPhone SE landscape 667×375, 2026-03-30):
+ * All buttons use minHeight/minWidth = var(--btn-min-size) = 44px (≥390px breakpoint)
+ * with box-sizing:border-box, so padding is included — 44×44 touch targets meet Apple HIG.
+ * Chi picker items: isCompact ? 44 : 56 — 44px at 375px height. ✓
+ * 4-button flex row fits in ~584px with 10px gaps (≈206px total). No overlap. ✓
+ */
 const BTN = {
   base: {
     padding: "var(--btn-padding)", fontSize: "var(--btn-font)", fontWeight: "bold" as const,
