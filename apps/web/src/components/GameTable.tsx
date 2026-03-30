@@ -1,3 +1,4 @@
+import { useState, useEffect, useRef } from "react";
 import type { ClientGameState, TileInstance } from "@fuzhou-mahjong/shared";
 import { PlayerArea } from "./PlayerArea";
 import { GameInfo } from "./GameInfo";
@@ -37,6 +38,17 @@ interface GameTableProps {
 export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTileId, claimableTileIds, canDiscard, onDiscard, canHu, onHu, canDraw, onDraw, kongTileIds, onAnGang, onBuGang, onBackgroundClick, disconnectedPlayers, drawAnimation, departingTileId }: GameTableProps) {
   const isCompact = useIsCompactLandscape();
   const isFirstPersonMobile = useIsFirstPersonMobile();
+
+  // Discard fly overlay — triggered when a tile departs the hand
+  const [discardFlyKey, setDiscardFlyKey] = useState<number | null>(null);
+  const discardFlyKeyRef = useRef(0);
+  useEffect(() => {
+    if (departingTileId != null) {
+      const key = ++discardFlyKeyRef.current;
+      setDiscardFlyKey(key);
+      setTimeout(() => setDiscardFlyKey((cur) => (cur === key ? null : cur)), 500);
+    }
+  }, [departingTileId]);
   const { myHand, myFlowers, myMelds, myDiscards, myName, otherPlayers, currentTurn, myIndex, gold, dealerIndex, lianZhuangCount, wallRemaining, myHasDiscardedGold, cumulativeScores, roundsPlayed } = state;
   const lastDiscardTileId = state.lastDiscard?.tile.id ?? null;
   const lastDiscardPlayerIndex = state.lastDiscard?.playerIndex ?? -1;
@@ -173,6 +185,35 @@ export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTile
           cumulativeScore={roundsPlayed > 0 ? cumulativeScores[myIndex] : undefined}
         />
       </div>
+
+      {/* Discard fly overlay — tile travels from hand toward discard pool */}
+      {discardFlyKey != null && (
+        <div
+          key={discardFlyKey}
+          style={{
+            position: "absolute",
+            bottom: "15%",
+            left: "50%",
+            marginLeft: -6,
+            pointerEvents: "none",
+            zIndex: 20,
+            animation: "discardFlyToPool 0.3s ease-in forwards",
+          }}
+        >
+          <img
+            src={TILE_BACK_URL}
+            alt=""
+            style={{
+              width: "var(--wall-tw)",
+              height: "var(--wall-th)",
+              display: "block",
+              borderRadius: 2,
+              boxShadow: "0 1px 4px rgba(0,0,0,0.4)",
+            }}
+            draggable={false}
+          />
+        </div>
+      )}
 
       {/* Draw fly animation overlay */}
       {drawAnimation && (
