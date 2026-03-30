@@ -74,33 +74,37 @@ export function Lobby({ onJoined }: LobbyProps) {
         />
       </div>
 
-      <Button
-        variant="gold"
-        size="lg"
-        onClick={handleQuickStart}
-        disabled={quickStarting}
-        className="lobby-create-btn"
-        style={{ width: "100%", background: "linear-gradient(135deg, var(--color-bg-button) 0%, #2a6f4a 100%)", border: "2px solid rgba(212, 160, 23, 0.8)", boxShadow: "0 0 12px rgba(212, 160, 23, 0.3)" }}
-      >
-        {quickStarting ? "启动中... / Starting..." : "⚡ 快速开始 / Quick Start"}
-      </Button>
-      <p style={{ color: "var(--color-text-secondary)", fontSize: 13, textAlign: "center", marginTop: -12 }}>
-        一键开局，自动匹配 3 个机器人
-      </p>
+      <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+        <Button
+          variant="gold"
+          size="lg"
+          onClick={handleQuickStart}
+          disabled={quickStarting}
+          className="lobby-create-btn"
+          style={{ width: "100%", background: "linear-gradient(135deg, var(--color-bg-button) 0%, #2a6f4a 100%)", border: "2px solid rgba(212, 160, 23, 0.8)", boxShadow: "0 0 12px rgba(212, 160, 23, 0.3)" }}
+        >
+          {quickStarting ? "启动中... / Starting..." : "⚡ 快速开始 / Quick Start"}
+        </Button>
+        <p style={{ color: "var(--color-text-secondary)", fontSize: 13, textAlign: "center" }}>
+          一键开局，自动匹配 3 个机器人
+        </p>
+      </div>
 
-      <Button
-        variant="gold"
-        size="lg"
-        onClick={handleCreate}
-        disabled={!name.trim()}
-        className="lobby-create-btn"
-        style={{ width: "100%" }}
-      >
-        创建房间 / Create Room
-      </Button>
-      <p style={{ color: "var(--color-text-secondary)", fontSize: 13, textAlign: "center", marginTop: -12 }}>
-        创建房间后可邀请朋友或添加机器人
-      </p>
+      <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+        <Button
+          variant="gold"
+          size="lg"
+          onClick={handleCreate}
+          disabled={!name.trim()}
+          className="lobby-create-btn"
+          style={{ width: "100%" }}
+        >
+          创建房间 / Create Room
+        </Button>
+        <p style={{ color: "var(--color-text-secondary)", fontSize: 13, textAlign: "center" }}>
+          创建房间后可邀请朋友或添加机器人
+        </p>
+      </div>
 
       <hr />
 

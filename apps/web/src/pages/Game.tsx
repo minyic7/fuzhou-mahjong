@@ -126,6 +126,16 @@ export function Game({ initialGameState, onLeave }: GameProps) {
         sounds.draw();
       }
 
+      // Detect gold tile flip
+      if (prev && state.gold && (!prev.gold || prev.gold.indicatorTile.id !== state.gold.indicatorTile.id)) {
+        sounds.goldFlip();
+      }
+
+      // Detect low wall count warning (≤16 tiles remaining)
+      if (prev && state.wallRemaining <= 16 && prev.wallRemaining > 16) {
+        sounds.warning();
+      }
+
       // Detect wall draw/supplement for fly animation
       if (prev) {
         const drawDelta = state.wallDrawCount - prev.wallDrawCount;
@@ -206,6 +216,7 @@ export function Game({ initialGameState, onLeave }: GameProps) {
     socket.on("gameOver", (result) => {
       setGameOver(result);
       if (result.winnerId !== null) sounds.hu();
+      else sounds.gameDraw();
     });
     socket.on("playerDisconnected", (event: PlayerDisconnectedEvent) => {
       setDisconnectedPlayers((prev) => new Set(prev).add(event.playerIndex));
@@ -220,6 +231,7 @@ export function Game({ initialGameState, onLeave }: GameProps) {
       addToast(`${event.playerName} 已重连 / reconnected`);
     });
     socket.on("actionError", (error: { message: string; code: string }) => {
+      sounds.error();
       addToast(`操作失败: ${error.message}`);
       socket.emit("resyncState");
     });
@@ -340,18 +352,18 @@ export function Game({ initialGameState, onLeave }: GameProps) {
         <h2 style={{ fontSize: 28, marginBottom: 16 }}>
           {isWin ? `🎉 ${getPlayerName(gameOver.winnerId!)} 胡了!` : "流局 / Draw"}
         </h2>
-        <p style={{ fontSize: 18, color: "#ffd700", marginBottom: 12 }}>
+        <p style={{ fontSize: 18, color: "var(--color-text-gold)", marginBottom: 12 }}>
           {winTypeNames[gameOver.winType] || gameOver.winType}
         </p>
 
         {/* Score breakdown */}
         {gameOver.breakdown && isWin && (
           <div style={{ marginBottom: 12, padding: 10, background: "rgba(255,255,255,0.05)", borderRadius: 6, display: "inline-block" }}>
-            <div style={{ fontSize: 12, color: "#aaa", marginBottom: 4 }}>得分明细</div>
-            <div style={{ fontSize: 13, color: "#ccc" }}>
+            <div style={{ fontSize: 12, color: "var(--color-text-secondary)", marginBottom: 4 }}>得分明细</div>
+            <div style={{ fontSize: 13, color: "var(--color-text-primary)" }}>
               花分: {gameOver.breakdown.flowerScore} | 金: {gameOver.breakdown.goldScore} | 连庄: {gameOver.breakdown.lianZhuangCount} | 特殊: {gameOver.breakdown.specialMultiplier}x
             </div>
-            <div style={{ fontSize: 14, color: "#ffd700", marginTop: 4 }}>
+            <div style={{ fontSize: 14, color: "var(--color-text-gold)", marginTop: 4 }}>
               总分: {gameOver.breakdown.totalScore}
             </div>
           </div>
@@ -359,7 +371,7 @@ export function Game({ initialGameState, onLeave }: GameProps) {
 
         {/* Round scores */}
         <div style={{ marginBottom: 12 }}>
-          <div style={{ fontSize: 12, color: "#aaa", marginBottom: 6 }}>本局得分</div>
+          <div style={{ fontSize: 12, color: "var(--color-text-secondary)", marginBottom: 6 }}>本局得分</div>
           {gameOver.scores
             .map((score, i) => ({ name: (gameOver.playerNames ?? [])[i] || getPlayerName(i), score, i }))
             .sort((a, b) => b.score - a.score)
@@ -368,13 +380,13 @@ export function Game({ initialGameState, onLeave }: GameProps) {
                 display: "flex", justifyContent: "space-between", alignItems: "center",
                 padding: "6px 16px", marginBottom: 4, borderRadius: 4,
                 background: p.score > 0 ? "rgba(76,175,80,0.15)" : p.score < 0 ? "rgba(244,67,54,0.1)" : "transparent",
-                border: rank === 0 && p.score > 0 ? "1px solid #4caf50" : "1px solid transparent",
+                border: rank === 0 && p.score > 0 ? "1px solid var(--color-success)" : "1px solid transparent",
               }}>
                 <span>
                   {rank === 0 && p.score > 0 ? "🏆 " : `${rank + 1}. `}
                   {p.name}
                 </span>
-                <span style={{ fontWeight: "bold", color: p.score > 0 ? "#4caf50" : p.score < 0 ? "#f44336" : "#aaa" }}>
+                <span style={{ fontWeight: "bold", color: p.score > 0 ? "var(--color-success)" : p.score < 0 ? "var(--color-error)" : "var(--color-text-secondary)" }}>
                   {p.score > 0 ? "+" : ""}{p.score}
                 </span>
               </div>
@@ -384,7 +396,7 @@ export function Game({ initialGameState, onLeave }: GameProps) {
         {/* Cumulative standings */}
         {gameOver.cumulative && gameOver.cumulative.roundsPlayed > 0 && (
           <div style={{ marginBottom: 20 }}>
-            <div style={{ fontSize: 12, color: "#aaa", marginBottom: 6 }}>
+            <div style={{ fontSize: 12, color: "var(--color-text-secondary)", marginBottom: 6 }}>
               累计排名 ({gameOver.cumulative.roundsPlayed} 局)
             </div>
             {gameOver.cumulative.scores
@@ -401,7 +413,7 @@ export function Game({ initialGameState, onLeave }: GameProps) {
                     {rank === 0 ? "👑 " : `${rank + 1}. `}
                     {p.name}
                   </span>
-                  <span style={{ fontWeight: "bold", color: p.score > 0 ? "#ffd700" : p.score < 0 ? "#f44336" : "#aaa" }}>
+                  <span style={{ fontWeight: "bold", color: p.score > 0 ? "var(--color-text-gold)" : p.score < 0 ? "var(--color-error)" : "var(--color-text-secondary)" }}>
                     {p.score > 0 ? "+" : ""}{p.score}
                   </span>
                 </div>
@@ -411,7 +423,7 @@ export function Game({ initialGameState, onLeave }: GameProps) {
         {/* All player hands */}
         {gameOver.allHands && gameOver.allHands.length > 0 && (
           <div style={{ marginBottom: 20, textAlign: "left" }}>
-            <div style={{ fontSize: 12, color: "#aaa", marginBottom: 8, textAlign: "center" }}>
+            <div style={{ fontSize: 12, color: "var(--color-text-secondary)", marginBottom: 8, textAlign: "center" }}>
               所有玩家手牌 / All Hands
             </div>
             {gameOver.allHands.map((playerHand, idx) => {
@@ -423,7 +435,7 @@ export function Game({ initialGameState, onLeave }: GameProps) {
                   background: isWinner ? "rgba(255,215,0,0.1)" : "rgba(255,255,255,0.03)",
                   border: isWinner ? "1px solid rgba(255,215,0,0.4)" : "1px solid rgba(255,255,255,0.08)",
                 }}>
-                  <div style={{ fontSize: 13, fontWeight: isWinner ? "bold" : "normal", color: isWinner ? "#ffd700" : "#ccc", marginBottom: 4 }}>
+                  <div style={{ fontSize: 13, fontWeight: isWinner ? "bold" : "normal", color: isWinner ? "var(--color-text-gold)" : "var(--color-text-primary)", marginBottom: 4 }}>
                     {isWinner ? "🏆 " : ""}{name}
                   </div>
                   <div style={{ display: "flex", flexWrap: "wrap", gap: 4, alignItems: "flex-end" }}>
@@ -460,19 +472,13 @@ export function Game({ initialGameState, onLeave }: GameProps) {
           </div>
         )}
 
-        <button
-          onClick={handleNextRound}
-          style={{ padding: "12px 32px", fontSize: 18, background: "#0f3460", color: "#eee", border: "none", borderRadius: 6, cursor: "pointer" }}
-        >
+        <Button variant="gold" size="lg" onClick={handleNextRound}>
           下一局 / Next Round
-        </button>
+        </Button>
         {onLeave && (
-          <button
-            onClick={() => { socket.emit("leaveRoom"); onLeave(); }}
-            style={{ marginLeft: 10, padding: "12px 32px", fontSize: 18, background: "#444", color: "#eee", border: "none", borderRadius: 6, cursor: "pointer" }}
-          >
+          <Button variant="secondary" onClick={() => { socket.emit("leaveRoom"); onLeave(); }} style={{ marginLeft: 10 }}>
             离开 / Leave
-          </button>
+          </Button>
         )}
       </div>
       </div>
