@@ -386,9 +386,32 @@ body {
     padding: 6px 12px;
   }
   .lobby-page hr, .room-page hr { margin: 8px 0; }
-  /* Reduce vertical spacing between lobby sections */
-  .lobby-content { gap: 12px !important; }
-  .room-page h2 { margin-bottom: 10px !important; }
+  /* Lobby 2-column layout for landscape mobile */
+  .lobby-content {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem !important;
+    max-width: 100%;
+  }
+  .lobby-header {
+    grid-column: 1 / -1;
+  }
+  .lobby-left { gap: 12px; }
+  .lobby-right { gap: 12px; overflow-y: auto; max-height: 70vh; }
+
+  /* Room page compact: reduce spacing to fit above fold */
+  .room-page h2 { margin-bottom: 6px !important; }
+  .room-actions { gap: 8px; }
+  .room-start-row { gap: 8px; }
+  /* Side-by-side bot controls + action buttons */
+  .room-controls-row {
+    margin-top: 12px;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+  }
 
   /* Tighter seat layout for landscape mobile */
   .seat-layout {
@@ -540,6 +563,14 @@ hr {
   gap: 20px;
 }
 
+/* Lobby left/right wrappers — stack by default */
+.lobby-left,
+.lobby-right {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
 /* Room content column */
 .room-content {
   max-width: 480px;
@@ -655,9 +686,16 @@ hr {
   margin-bottom: 20px;
 }
 
+/* Room controls wrapper — stacks vertically by default */
+.room-controls-row {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
 /* Room action button rows */
 .room-actions {
-  margin-top: 24px;
   display: flex;
   gap: 10px;
   flex-wrap: wrap;
@@ -665,7 +703,6 @@ hr {
 }
 
 .room-start-row {
-  margin-top: 10px;
   display: flex;
   gap: 10px;
 }

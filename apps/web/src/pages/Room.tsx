@@ -88,40 +88,42 @@ export function Room({ initialRoomState, sessionScores }: RoomProps) {
         </div>
       </div>
 
-      {/* Action buttons */}
-      <div className="room-actions">
-        <Button
-          onClick={() => socket.emit("addBot")}
-          disabled={room.players.length >= 4}
-          style={{ flex: 1, minWidth: 120 }}
-        >
-          +机器人 / +Bot
-        </Button>
-        <Button
-          variant="secondary"
-          onClick={() => socket.emit("removeBot")}
-          disabled={!room.players.some((p) => p.isBot)}
-        >
-          -机器人
-        </Button>
-      </div>
-      <div className="room-start-row">
-        <Button
-          variant="gold"
-          size="lg"
-          onClick={handleStart}
-          disabled={room.players.length < 4}
-          className="lobby-create-btn"
-          style={{ flex: 1 }}
-        >
-          开始游戏 / Start
-        </Button>
-        <Button
-          variant="danger"
-          onClick={() => setShowLeaveConfirm(true)}
-        >
-          离开 / Leave
-        </Button>
+      {/* Action buttons — all in one row on landscape compact */}
+      <div className="room-controls-row">
+        <div className="room-actions">
+          <Button
+            onClick={() => socket.emit("addBot")}
+            disabled={room.players.length >= 4}
+            style={{ flex: 1, minWidth: 120 }}
+          >
+            +机器人 / +Bot
+          </Button>
+          <Button
+            variant="secondary"
+            onClick={() => socket.emit("removeBot")}
+            disabled={!room.players.some((p) => p.isBot)}
+          >
+            -机器人
+          </Button>
+        </div>
+        <div className="room-start-row">
+          <Button
+            variant="gold"
+            size="lg"
+            onClick={handleStart}
+            disabled={room.players.length < 4}
+            className="lobby-create-btn"
+            style={{ flex: 1 }}
+          >
+            开始游戏 / Start
+          </Button>
+          <Button
+            variant="danger"
+            onClick={() => setShowLeaveConfirm(true)}
+          >
+            离开 / Leave
+          </Button>
+        </div>
       </div>
       {showLeaveConfirm && (
         <div className="confirm-modal-backdrop">
