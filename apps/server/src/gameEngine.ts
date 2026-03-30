@@ -1159,8 +1159,17 @@ export function emitOrBotAction(
   playerIndex: number,
   actions: import("@fuzhou-mahjong/shared").AvailableActions,
   lastDiscardTile?: TileInstance,
+  depth = 0,
 ): void {
   if (game.isBot(playerIndex)) {
+    // Guard against infinite recursion from stale re-triggers
+    if (depth > 3) {
+      const tag = `[Bot:${game.roomId}:p${playerIndex}:t${game.state.currentTurn}]`;
+      console.error(`${tag} Recursion depth limit exceeded (depth=${depth}) — forcing emergency discard`);
+      const player = game.state.players[playerIndex];
+      handlePlayerAction(io, game.roomId, emergencyDiscard(player.hand, playerIndex, game.state.gold), playerIndex);
+      return;
+    }
     const version = nextBotVersion(game.roomId, playerIndex);
     const turnNumber = game.state.currentTurn;
     const tag = `[Bot:${game.roomId}:p${playerIndex}:t${turnNumber}]`;
@@ -1193,7 +1202,7 @@ export function emitOrBotAction(
             const currentActions = getPostDrawActions(game, playerIndex, inFinal);
             console.warn(`[Bot:FALLBACK] ${tag} Stale safety re-trigger on own turn (roomId=${game.roomId}, playerIndex=${playerIndex}, turn=${turnNumber}, phase=${game.state.phase}, hasActionWindow=false) ts=${Date.now()}`);
             try {
-              emitOrBotAction(io, game, playerIndex, currentActions);
+              emitOrBotAction(io, game, playerIndex, currentActions, undefined, depth + 1);
             } catch (e) {
               console.error(`${tag} Stale safety re-trigger failed:`, e);
               const player = game.state.players[playerIndex];
@@ -1236,7 +1245,6 @@ export function emitOrBotAction(
     setTimeout(() => {
       try {
       acted = true;  // FIRST — prevent safety timer from also firing
-      } finally { clearTimeout(safetyTimer); }
       const currentV = getBotVersion(game.roomId, playerIndex);
       console.log(`${tag} Callback fired (version=${version}, current=${currentV}, phase=${game.state.phase}) ts=${Date.now()}`);
       // Stale check: if version has advanced, another action superseded this one
@@ -1253,7 +1261,7 @@ export function emitOrBotAction(
             const currentActions = getPostDrawActions(game, playerIndex, inFinal);
             console.warn(`[Bot:FALLBACK] ${tag} Stale callback re-trigger on own turn (roomId=${game.roomId}, playerIndex=${playerIndex}, turn=${turnNumber}, phase=${game.state.phase}, hasActionWindow=false) ts=${Date.now()}`);
             try {
-              emitOrBotAction(io, game, playerIndex, currentActions);
+              emitOrBotAction(io, game, playerIndex, currentActions, undefined, depth + 1);
             } catch (e) {
               console.error(`${tag} Stale callback re-trigger failed:`, e);
               const player = game.state.players[playerIndex];
@@ -1265,7 +1273,6 @@ export function emitOrBotAction(
         }
         return;
       }
-      try {
         // Restore the snapshotted drawn tile ID so downstream handlers
         // (e.g. handleSelfDrawHu, getPostDrawActions) see the correct value
         game.lastDrawnTileIds[playerIndex] = snapshotDrawnTileId;
@@ -1297,7 +1304,7 @@ export function emitOrBotAction(
           throw new Error(`Bot action ${botAction.type} was rejected by handlePlayerAction`);
         }
       } catch (err) {
-        console.error(`${tag} Action error:`, err);
+        console.error(`${tag} Bot callback unhandled error:`, err);
         // Fallback: try pass first, then discard if pass not allowed
         console.warn(`${tag} Entering fallback chain (canPass=${actions.canPass}) ts=${Date.now()}`);
         if (game.state.phase !== GamePhase.Playing) {
@@ -1330,6 +1337,8 @@ export function emitOrBotAction(
             advanceToNextPlayer(io, game, playerIndex);
           }
         }
+      } finally {
+        clearTimeout(safetyTimer);
       }
     }, delay);
   } else {
