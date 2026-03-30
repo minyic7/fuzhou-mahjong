@@ -278,7 +278,8 @@ export function PlayerArea({
 
       {/* Hand */}
       <div style={{
-        display: "flex", flexWrap: "wrap", gap: firstPerson ? "var(--fp-hand-gap)" : 1, marginBottom: 4, alignItems: "flex-end",
+        display: "flex", flexWrap: "nowrap", gap: firstPerson ? "var(--fp-hand-gap)" : 1, marginBottom: 4, alignItems: "flex-end",
+        justifyContent: isMe ? "center" : undefined,
         paddingTop: isMe ? "var(--hand-padding-top)" : 0, overflow: "visible", position: "relative",
         ...(firstPerson ? { "--tile-w": "var(--fp-tile-w)", "--tile-h": "var(--fp-tile-h)" } as React.CSSProperties : {}),
       }}>
@@ -429,31 +430,16 @@ export function PlayerArea({
         </div>
       )}
 
-      {/* Discards - horizontal scroll on compact landscape / first-person, grid otherwise */}
-      {discards.length > 0 && (isMe && (isCompactLandscape || firstPerson) ? (
+      {/* Discards - always single row */}
+      {discards.length > 0 && (
         <div className="compact-discards" style={{
           display: "flex",
           gap: 1,
           overflowX: "auto",
           overflowY: "hidden",
           padding: "var(--game-padding)",
-          maxHeight: "var(--tile-h-sm)",
-        }}>
-          {discards.map((d) => (
-            <TileView key={d.id} tile={d} faceUp gold={gold} small
-              className={lastDiscardedTileId === d.id ? "discard-arrive last-discard" : undefined}
-            />
-          ))}
-        </div>
-      ) : (
-        <div style={{
-          display: "grid",
-          gridTemplateColumns: `repeat(var(--discard-cols), auto)`,
-          gap: 1,
-          padding: "var(--game-padding)",
           background: isMe ? "rgba(0,100,200,0.08)" : "rgba(255,255,255,0.03)",
           borderRadius: 4,
-          ...(!isMe && { maxWidth: "min(300px, 90vw)" }),
         }}>
           {discards.map((d) => (
             <TileView key={d.id} tile={d} faceUp gold={gold} small
@@ -461,7 +447,7 @@ export function PlayerArea({
             />
           ))}
         </div>
-      ))}
+      )}
     </div>
     </>
   );
