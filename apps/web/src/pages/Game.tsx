@@ -454,7 +454,7 @@ export function Game({ initialGameState, onLeave }: GameProps) {
         position: 'fixed',
         top: 'calc(8px + env(safe-area-inset-top, 0px))',
         right: 'calc(8px + env(safe-area-inset-right, 0px))',
-        zIndex: 20,
+        zIndex: 30,
       }}>
         <button
           onClick={() => setSettingsOpen((v) => !v)}
