@@ -244,8 +244,9 @@ export function Game({ initialGameState, onLeave }: GameProps) {
           </div>
         )}
 
-        {/* Player ranking */}
-        <div style={{ marginBottom: 20 }}>
+        {/* Round scores */}
+        <div style={{ marginBottom: 12 }}>
+          <div style={{ fontSize: 12, color: "#aaa", marginBottom: 6 }}>本局得分</div>
           {gameOver.scores
             .map((score, i) => ({ name: (gameOver.playerNames ?? [])[i] || getPlayerName(i), score, i }))
             .sort((a, b) => b.score - a.score)
@@ -266,6 +267,34 @@ export function Game({ initialGameState, onLeave }: GameProps) {
               </div>
             ))}
         </div>
+
+        {/* Cumulative standings */}
+        {gameOver.cumulative && gameOver.cumulative.roundsPlayed > 0 && (
+          <div style={{ marginBottom: 20 }}>
+            <div style={{ fontSize: 12, color: "#aaa", marginBottom: 6 }}>
+              累计排名 ({gameOver.cumulative.roundsPlayed} 局)
+            </div>
+            {gameOver.cumulative.scores
+              .map((score, i) => ({ name: (gameOver.playerNames ?? [])[i] || getPlayerName(i), score, i }))
+              .sort((a, b) => b.score - a.score)
+              .map((p, rank) => (
+                <div key={p.i} style={{
+                  display: "flex", justifyContent: "space-between", alignItems: "center",
+                  padding: "6px 16px", marginBottom: 4, borderRadius: 4,
+                  background: rank === 0 ? "rgba(255,215,0,0.12)" : "transparent",
+                  border: rank === 0 ? "1px solid rgba(255,215,0,0.4)" : "1px solid transparent",
+                }}>
+                  <span>
+                    {rank === 0 ? "👑 " : `${rank + 1}. `}
+                    {p.name}
+                  </span>
+                  <span style={{ fontWeight: "bold", color: p.score > 0 ? "#ffd700" : p.score < 0 ? "#f44336" : "#aaa" }}>
+                    {p.score > 0 ? "+" : ""}{p.score}
+                  </span>
+                </div>
+              ))}
+          </div>
+        )}
         <button
           onClick={handleNextRound}
           style={{ padding: "12px 32px", fontSize: 18, background: "#0f3460", color: "#eee", border: "none", borderRadius: 6, cursor: "pointer" }}

@@ -68,12 +68,18 @@ export interface ScoreBreakdown {
   totalScore: number;
 }
 
+export interface CumulativeData {
+  scores: number[];  // cumulative total per seat index (matches scores array order)
+  roundsPlayed: number;
+}
+
 export interface GameOverResult {
   winnerId: number | null;
   winType: string;
   scores: number[];
   breakdown?: ScoreBreakdown;
   playerNames?: string[];
+  cumulative?: CumulativeData;
 }
 
 // ─── Room List ───────────────────────────────────────────────────

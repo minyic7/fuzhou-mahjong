@@ -49,6 +49,7 @@ export type {
   ActionResult,
   ScoreBreakdown,
   GameOverResult,
+  CumulativeData,
   ClientEvents,
   ServerEvents,
 } from './events.js';

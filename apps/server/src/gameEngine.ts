@@ -779,6 +779,14 @@ function endGameWin(
 
   broadcastState(io, game);
 
+  // Update cumulative scores in the room
+  const room = findRoom(game.roomId);
+  let cumulative: { scores: number[]; roundsPlayed: number } | undefined;
+  if (room) {
+    room.addRoundScores(scoreResult.payments);
+    cumulative = room.getCumulativeData();
+  }
+
   io.to(game.roomId).emit("gameOver", {
     winnerId: winnerIndex,
     winType: winResult.winType,
@@ -791,6 +799,7 @@ function endGameWin(
       totalScore: scoreResult.totalScore,
     },
     playerNames: game.playerNames,
+    cumulative,
   });
 }
 
@@ -809,10 +818,19 @@ function endGameDraw(io: GameServer, game: ServerGameState): void {
 
   broadcastState(io, game);
 
+  // Update cumulative scores in the room (draw = no score change, but increment round)
+  const room = findRoom(game.roomId);
+  let cumulative: { scores: number[]; roundsPlayed: number } | undefined;
+  if (room) {
+    room.addRoundScores([0, 0, 0, 0]);
+    cumulative = room.getCumulativeData();
+  }
+
   io.to(game.roomId).emit("gameOver", {
     winnerId: null,
     winType: "draw",
     scores: [0, 0, 0, 0],
+    cumulative,
   });
 }
 

@@ -17,9 +17,22 @@ export class Room {
   readonly maxPlayers = 4 as const;
   gameStarted = false;
   disconnectTimers = new Map<string, ReturnType<typeof setTimeout>>();
+  cumulativeScores: number[] = [0, 0, 0, 0];  // per seat index
+  roundsPlayed = 0;
 
   constructor(id: string) {
     this.id = id;
+  }
+
+  addRoundScores(payments: number[]): void {
+    for (let i = 0; i < payments.length; i++) {
+      this.cumulativeScores[i] = (this.cumulativeScores[i] ?? 0) + payments[i];
+    }
+    this.roundsPlayed++;
+  }
+
+  getCumulativeData(): { scores: number[]; roundsPlayed: number } {
+    return { scores: [...this.cumulativeScores], roundsPlayed: this.roundsPlayed };
   }
 
   addPlayer(socketId: string, name: string): Player {

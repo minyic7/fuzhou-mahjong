@@ -183,10 +183,13 @@ export function registerRoomHandlers(io: GameServer, socket: GameSocket): void {
             io.to(room.players[i].socketId!).emit("gameStateUpdate", game.getClientGameState(i));
           }
         }
+        const tianhuScores = [0, 0, 0, 0];
+        room.addRoundScores(tianhuScores);
         io.to(room.id).emit("gameOver", {
           winnerId: game.state.dealerIndex,
           winType: tianhuResult.winType,
-          scores: [0, 0, 0, 0],
+          scores: tianhuScores,
+          cumulative: room.getCumulativeData(),
         });
         return;
       }
