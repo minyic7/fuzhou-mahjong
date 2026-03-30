@@ -33,6 +33,7 @@ interface PlayerAreaProps {
   hasDiscardedGold?: boolean;
   isDisconnected?: boolean;
   compact?: boolean;
+  cumulativeScore?: number;
 }
 
 const BUBBLE_BTN = {
@@ -47,7 +48,7 @@ export function PlayerArea({
   isCurrentTurn, isDealer, gold, selectedTileId, onTileClick, label,
   claimableTileIds, onTileDoubleClick, lastDrawnTileId, lastDiscardedTileId, tenpaiTiles,
   canDiscard, onDiscard, canHu, onHu, kongTileIds, onAnGang, onBuGang, hasDiscardedGold,
-  isDisconnected, compact,
+  isDisconnected, compact, cumulativeScore,
 }: PlayerAreaProps) {
   const { onTouchStart: lpTouchStart, onTouchEnd: lpTouchEnd, onMouseEnter, onMouseLeave, Tooltip } = useLongPress(gold);
 
@@ -146,6 +147,15 @@ export function PlayerArea({
 
         {/* Flower count */}
         <span style={{ fontSize: 11, color: "#8fbc8f", flexShrink: 0, marginLeft: "auto" }}>🌸{flowers.length}</span>
+        {cumulativeScore != null && (
+          <span className="cumulative-score-badge" style={{
+            fontSize: 11, fontWeight: "bold",
+            color: cumulativeScore > 0 ? "#ffd700" : cumulativeScore < 0 ? "#f44336" : "#8fbc8f",
+            padding: "1px 6px", borderRadius: 3, background: "rgba(0,0,0,0.3)",
+          }}>
+            {cumulativeScore > 0 ? "+" : ""}{cumulativeScore}
+          </span>
+        )}
       </div>
     );
   }
@@ -181,6 +191,15 @@ export function PlayerArea({
         <span style={{ fontSize: 11, color: "#8fbc8f", marginLeft: "auto" }}>
           🌸{flowers.length}
         </span>
+        {cumulativeScore != null && (
+          <span className="cumulative-score-badge" style={{
+            fontSize: 11, fontWeight: "bold",
+            color: cumulativeScore > 0 ? "#ffd700" : cumulativeScore < 0 ? "#f44336" : "#8fbc8f",
+            padding: "1px 6px", borderRadius: 3, background: "rgba(0,0,0,0.3)",
+          }}>
+            {cumulativeScore > 0 ? "+" : ""}{cumulativeScore}
+          </span>
+        )}
       </div>
 
       {/* Hand */}

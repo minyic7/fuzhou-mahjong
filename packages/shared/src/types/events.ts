@@ -43,6 +43,8 @@ export interface ClientGameState {
   tenpaiTiles: import('../types/tile.js').SuitedTile[];
   lastDrawnTileId: number | null;
   myHasDiscardedGold: boolean;
+  cumulativeScores: number[];
+  roundsPlayed: number;
 }
 
 // ─── Actions ─────────────────────────────────────────────────────
