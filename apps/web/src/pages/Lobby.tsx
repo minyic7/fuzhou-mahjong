@@ -57,11 +57,11 @@ export function Lobby({ onJoined }: LobbyProps) {
   };
 
   return (
-    <div className="lobby-page" style={{ display: "flex", justifyContent: "center", padding: "max(16px, 3vh) max(12px, 3vw)" }}>
-    <div className="lobby-content" style={{ maxWidth: 560, width: "100%", display: "flex", flexDirection: "column", gap: 20 }}>
-      <div style={{ textAlign: "center", marginBottom: 8 }}>
-        <h1 style={{ color: "var(--color-text-primary)", marginBottom: 4 }}>福州麻将</h1>
-        <h2 style={{ color: "var(--color-text-secondary)", fontWeight: 400 }}>Fuzhou Mahjong</h2>
+    <div className="lobby-page">
+    <div className="lobby-content">
+      <div className="lobby-header">
+        <h1>福州麻将</h1>
+        <h2>Fuzhou Mahjong</h2>
       </div>
 
       <div>
@@ -74,7 +74,7 @@ export function Lobby({ onJoined }: LobbyProps) {
         />
       </div>
 
-      <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+      <div className="lobby-section">
         <Button
           variant="gold"
           size="lg"
@@ -85,12 +85,12 @@ export function Lobby({ onJoined }: LobbyProps) {
         >
           {quickStarting ? "启动中... / Starting..." : "⚡ 快速开始 / Quick Start"}
         </Button>
-        <p style={{ color: "var(--color-text-secondary)", fontSize: "var(--label-font)", textAlign: "center" }}>
+        <p className="lobby-hint">
           一键开局，自动匹配 3 个机器人
         </p>
       </div>
 
-      <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
+      <div className="lobby-section">
         <Button
           variant="gold"
           size="lg"
@@ -101,21 +101,21 @@ export function Lobby({ onJoined }: LobbyProps) {
         >
           创建房间 / Create Room
         </Button>
-        <p style={{ color: "var(--color-text-secondary)", fontSize: "var(--label-font)", textAlign: "center" }}>
+        <p className="lobby-hint">
           创建房间后可邀请朋友或添加机器人
         </p>
       </div>
 
       <hr />
 
-      <h3 style={{ color: "var(--color-text-gold)", fontSize: 15, letterSpacing: 1 }}>可用房间 / Available Rooms</h3>
+      <h3 className="lobby-section-heading">可用房间 / Available Rooms</h3>
       {rooms.length === 0 ? (
-        <p style={{ color: "var(--color-text-secondary)", textAlign: "center", padding: "20px 0" }}>暂无房间 / No rooms available</p>
+        <p className="lobby-empty-msg">暂无房间 / No rooms available</p>
       ) : (
         <div className="room-card-list">
           {rooms.map((room) => (
             <div key={room.roomId} className="room-card">
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+              <div className="room-card-row">
                 <span style={{ fontFamily: "monospace", fontSize: 22, fontWeight: "bold", color: "var(--color-text-primary)", letterSpacing: 4 }}>
                   {room.roomId}
                 </span>
@@ -123,9 +123,9 @@ export function Lobby({ onJoined }: LobbyProps) {
                   {room.playerCount >= room.maxPlayers ? "已满 / Full" : "等待中 / Waiting"}
                 </span>
               </div>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
+              <div className="room-card-row">
                 <div>
-                  <div style={{ display: "flex", gap: 6, marginBottom: 4 }}>
+                  <div className="player-dots">
                     {Array.from({ length: room.maxPlayers }).map((_, i) => (
                       <span key={i} style={{ width: 10, height: 10, borderRadius: "var(--radius-sm)", background: i < room.playerCount ? "var(--color-bg-button-hover)" : "rgba(184, 134, 11, 0.15)", border: "1px solid rgba(184, 134, 11, 0.3)", display: "inline-block" }} />
                     ))}
@@ -148,8 +148,8 @@ export function Lobby({ onJoined }: LobbyProps) {
 
       <hr />
 
-      <h3 style={{ color: "var(--color-text-gold)", fontSize: 15, letterSpacing: 1 }}>手动加入 / Join by Code</h3>
-      <div style={{ display: "flex", gap: 10 }}>
+      <h3 className="lobby-section-heading">手动加入 / Join by Code</h3>
+      <div className="lobby-join-row">
         <input
           type="text"
           placeholder="房间号 / Room Code"

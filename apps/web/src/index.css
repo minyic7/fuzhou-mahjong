@@ -444,6 +444,123 @@ hr {
   min-height: 100dvh;
   overflow-y: auto;
   position: relative;
+  display: flex;
+  justify-content: center;
+  padding: max(16px, 3vh) max(12px, 3vw);
+}
+
+/* Lobby content column */
+.lobby-content {
+  max-width: 560px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Room content column */
+.room-content {
+  max-width: 480px;
+  width: 100%;
+}
+
+/* Lobby header block */
+.lobby-header {
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.lobby-header h1 {
+  color: var(--color-text-primary);
+  margin-bottom: 4px;
+}
+
+.lobby-header h2 {
+  color: var(--color-text-secondary);
+  font-weight: 400;
+}
+
+/* Lobby section with button + hint */
+.lobby-section {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+/* Section heading (available rooms, join by code) */
+.lobby-section-heading {
+  color: var(--color-text-gold);
+  font-size: 15px;
+  letter-spacing: 1px;
+}
+
+/* Hint text below buttons */
+.lobby-hint {
+  color: var(--color-text-secondary);
+  font-size: var(--label-font);
+  text-align: center;
+}
+
+/* Empty rooms placeholder */
+.lobby-empty-msg {
+  color: var(--color-text-secondary);
+  text-align: center;
+  padding: 20px 0;
+}
+
+/* Join-by-code input row */
+.lobby-join-row {
+  display: flex;
+  gap: 10px;
+}
+
+/* Room card header/footer rows */
+.room-card-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.room-card-row + .room-card-row {
+  margin-top: 10px;
+}
+
+/* Player dot indicators */
+.player-dots {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 4px;
+}
+
+/* Room heading */
+.room-heading {
+  text-align: center;
+  color: var(--color-text-secondary);
+  font-size: var(--label-font);
+  font-weight: 400;
+  margin-bottom: 20px;
+}
+
+/* Room action button rows */
+.room-actions {
+  margin-top: 24px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.room-start-row {
+  margin-top: 10px;
+  display: flex;
+  gap: 10px;
+}
+
+/* Confirm dialog button row */
+.confirm-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
 }
 
 /* Subtle vignette for lobby/room */
