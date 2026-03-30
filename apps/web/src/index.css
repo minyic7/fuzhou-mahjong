@@ -189,6 +189,14 @@ body {
   --seat-card-min-height: 70px;
   --table-center-padding: 20px 12px;
   --table-center-min-height: 100px;
+
+  /* Font sizing — used by JSX for badges, labels, tile overlays, dots */
+  --font-badge: 12px;
+  --font-uc-label: 12px;
+  --font-uc-badge: 12px;
+  --font-uc-tile: 11px;
+  --font-dot: 9px;
+  --font-overflow: 10px;
 }
 
 /* BREAKPOINTS.TABLET_WIDTH */
@@ -285,6 +293,12 @@ body {
     --seat-card-min-height: 48px;
     --table-center-padding: 10px 8px;
     --table-center-min-height: 70px;
+    --font-badge: max(10px, 1.8vh);
+    --font-uc-label: max(10px, 1.8vh);
+    --font-uc-badge: max(10px, 1.5vh);
+    --font-uc-tile: max(9px, 1.4vh);
+    --font-dot: max(9px, 1.3vh);
+    --font-overflow: max(9px, 1.4vh);
   }
 }
 
@@ -307,35 +321,55 @@ body {
 /* BREAKPOINTS.SMALL_PHONE_HEIGHT */
 @media (orientation: landscape) and (max-height: 390px) {
   :root {
-    --game-gap: 1px;
-    --game-padding: 1px;
-    --tile-w: 30px;
-    --tile-h: 44px;
-    --tile-font: 10px;
-    --tile-suit-font: 7px;
-    --tile-suit-font-sm: 5px;
-    --wall-tw: 7px;
-    --wall-th: 10px;
-    --overlay-padding-y: 6px;
-    --overlay-padding-x: 8px;
-    --btn-font: 12px;
-    --btn-padding: 6px 10px;
-    --hand-padding-top: 4px;
-    --hand-new-tile-margin: 4px;
+    --game-gap: max(1px, 0.25vh);
+    --game-padding: max(1px, 0.25vh);
+    --tile-w: clamp(30px, 9vh, 40px);
+    --tile-h: clamp(40px, 11.5vh, 54px);
+    --tile-font: max(10px, 2.6vh);
+    --tile-suit-font: max(7px, 1.8vh);
+    --tile-suit-font-sm: max(5px, 1.3vh);
+    --wall-tw: max(7px, 1.8vh);
+    --wall-th: max(10px, 2.6vh);
+    --overlay-padding-y: max(4px, 1vh);
+    --overlay-padding-x: max(6px, 1.5vh);
+    --btn-font: max(12px, 3.2vh);
+    --btn-padding: max(6px, 1.5vh) max(10px, 2.6vh);
+    --hand-padding-top: max(2px, 0.5vh);
+    --hand-new-tile-margin: max(4px, 1vh);
     --tile-margin: 2px;
-    --compact-gap: 4px;
-    --compact-padding: 2px 4px;
-    --compact-label-font: 10px;
-    --compact-info-font: 9px;
-    --fp-tile-w: clamp(32px, 5.5vw, 40px);
-    --fp-tile-h: clamp(46px, 12vh, 56px);
-    --fp-opponent-tile-w: 20px;
-    --fp-opponent-tile-h: 28px;
+    --compact-gap: max(2px, 0.5vh);
+    --compact-padding: max(2px, 0.5vh) max(4px, 1vh);
+    --compact-label-font: max(10px, 2.6vh);
+    --compact-info-font: max(9px, 2.3vh);
+    --fp-tile-w: clamp(28px, 8.5vh, 38px);
+    --fp-tile-h: clamp(40px, 12vh, 56px);
+    --fp-opponent-tile-w: clamp(16px, 5.3vh, 24px);
+    --fp-opponent-tile-h: clamp(22px, 7.2vh, 32px);
     --fp-hand-gap: 1px;
-    --grid-side-col: 50px;
-    --wall-progress-w: 60px;
-    --fp-side-col: 36px;
-    --fp-top-row: 20px;
+    --grid-side-col: clamp(40px, 13vh, 60px);
+    --wall-progress-w: clamp(50px, 16vh, 80px);
+    --fp-side-col: clamp(30px, 9.5vh, 44px);
+    --fp-top-row: clamp(16px, 5.3vh, 24px);
+    --font-badge: max(10px, 2.6vh);
+    --font-uc-label: max(10px, 2.6vh);
+    --font-uc-badge: max(10px, 2.6vh);
+    --font-uc-tile: max(9px, 2.3vh);
+    --font-dot: max(9px, 2.3vh);
+    --font-overflow: max(9px, 2.3vh);
+  }
+}
+
+/* iPhone SE landscape (667×375) — reclaim space from gaps/padding, not tile size */
+@media (orientation: landscape) and (max-height: 340px) {
+  :root {
+    --game-gap: max(0px, 0.15vh);
+    --game-padding: max(0px, 0.15vh);
+    --overlay-padding-y: max(3px, 0.8vh);
+    --overlay-padding-x: max(5px, 1.2vh);
+    --compact-gap: max(1px, 0.3vh);
+    --compact-padding: max(1px, 0.3vh) max(2px, 0.6vh);
+    --hand-padding-top: max(1px, 0.3vh);
+    --hand-new-tile-margin: max(2px, 0.6vh);
   }
 }
 

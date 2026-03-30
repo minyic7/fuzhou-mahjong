@@ -117,14 +117,14 @@ export function PlayerArea({
           opacity: isDisconnected ? 0.5 : 1,
           overflow: "hidden",
           minHeight: 0,
-          fontSize: 10,
+          fontSize: "var(--font-uc-label)",
         }}
       >
         <div style={{ display: "flex", alignItems: "center", gap: 2 }}>
-          <span style={{ fontSize: 10, fontWeight: "bold", color: "var(--color-text-warm)", whiteSpace: "nowrap" }}>{label}</span>
-          {isDealer && <span style={{ fontSize: 7, background: "var(--color-dealer-bg)", color: "var(--color-gold-bright)", padding: "0 2px", borderRadius: 2, fontWeight: "bold" }}>庄</span>}
-          {isCurrentTurn && <span style={{ fontSize: 7, background: "rgba(255,215,0,0.2)", color: "var(--color-gold-bright)", padding: "0 2px", borderRadius: 2 }}>出牌</span>}
-          <span style={{ fontSize: 10, color: "var(--color-text-secondary)", marginLeft: "auto" }}>{handCount ?? 0}张 🌸{flowers.length}</span>
+          <span style={{ fontSize: "var(--font-uc-label)", fontWeight: "bold", color: "var(--color-text-warm)", whiteSpace: "nowrap" }}>{label}</span>
+          {isDealer && <span style={{ fontSize: "var(--font-uc-badge)", background: "var(--color-dealer-bg)", color: "var(--color-gold-bright)", padding: "0 2px", borderRadius: 2, fontWeight: "bold" }}>庄</span>}
+          {isCurrentTurn && <span style={{ fontSize: "var(--font-uc-badge)", background: "rgba(255,215,0,0.2)", color: "var(--color-gold-bright)", padding: "0 2px", borderRadius: 2 }}>出牌</span>}
+          <span style={{ fontSize: "var(--font-uc-label)", color: "var(--color-text-secondary)", marginLeft: "auto" }}>{handCount ?? 0}张 🌸{flowers.length}</span>
         </div>
         {melds.length > 0 && (
           <div style={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
@@ -133,7 +133,7 @@ export function PlayerArea({
                 {m.tiles.map((t, ti) => (
                   <TileView key={ti} tile={t} faceUp={m.type !== MeldType.AnGang} gold={gold} small
                     className={newestMeldIdx === mi && m.type === MeldType.AnGang ? "angang-flip-reveal" : undefined}
-                    style={{ width: "var(--fp-opponent-tile-w)", height: "var(--fp-opponent-tile-h)", fontSize: 6 }}
+                    style={{ width: "var(--fp-opponent-tile-w)", height: "var(--fp-opponent-tile-h)", fontSize: "var(--font-uc-tile)" }}
                   />
                 ))}
               </div>
@@ -144,11 +144,11 @@ export function PlayerArea({
           <div className="compact-discards" style={{ display: "flex", gap: 0, overflowX: "auto", overflowY: "hidden", minWidth: 0, alignItems: "center" }}>
             {discards.slice(-6).map((d) => (
               <TileView key={d.id} tile={d} faceUp gold={gold} small
-                style={{ width: "var(--fp-opponent-tile-w)", height: "var(--fp-opponent-tile-h)", fontSize: 6 }}
+                style={{ width: "var(--fp-opponent-tile-w)", height: "var(--fp-opponent-tile-h)", fontSize: "var(--font-uc-tile)" }}
                 className={lastDiscardedTileId === d.id ? "discard-arrive last-discard" : undefined}
               />
             ))}
-            {discards.length > 6 && <span style={{ fontSize: 8, color: "var(--color-text-muted)" }}>+{discards.length - 6}</span>}
+            {discards.length > 6 && <span style={{ fontSize: "var(--font-overflow)", color: "var(--color-text-muted)" }}>+{discards.length - 6}</span>}
           </div>
         )}
       </div>
