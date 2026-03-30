@@ -174,7 +174,13 @@ export function Game({ initialGameState, onLeave }: GameProps) {
       // so stale claim actions don't block future actionRequired events
       if (prev && (state.currentTurn !== prev.currentTurn || (!state.lastDiscard && prev.lastDiscard))) {
         setPendingClaim(false);
-        setActions(null);
+        // Only clear actions if it's NOT my turn now.
+        // If it IS my turn, actionRequired will set the correct actions.
+        // Clearing unconditionally caused a race: gameStateUpdate would wipe
+        // the actions set by a near-simultaneous actionRequired event.
+        if (state.currentTurn !== state.myIndex) {
+          setActions(null);
+        }
       }
 
       prevStateRef.current = state;
