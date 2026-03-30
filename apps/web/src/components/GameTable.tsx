@@ -139,17 +139,17 @@ export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTile
       {/* Wall segments along table edges (non-compact only) */}
       {!isCompact && (
         <>
-          <div style={{ gridArea: "center", alignSelf: "start", justifySelf: "center", zIndex: 2 }}>
+          <div style={{ gridArea: "center", alignSelf: "start", justifySelf: "center", zIndex: 2, marginTop: "15%" }}>
             <TileWall segment="top" wallRemaining={wallRemaining} wallDrawCount={state.wallDrawCount} wallSupplementCount={state.wallSupplementCount} gold={gold} canDraw={canDraw} onDraw={onDraw} />
           </div>
-          <div style={{ gridArea: "center", alignSelf: "center", justifySelf: "start", zIndex: 2 }}>
+          <div style={{ gridArea: "center", alignSelf: "center", justifySelf: "start", zIndex: 2, marginLeft: "15%" }}>
             <TileWall segment="left" wallRemaining={wallRemaining} wallDrawCount={state.wallDrawCount} wallSupplementCount={state.wallSupplementCount} gold={gold} canDraw={canDraw} onDraw={onDraw} />
           </div>
-          <div style={{ gridArea: "center", alignSelf: "center", justifySelf: "end", zIndex: 2 }}>
+          <div style={{ gridArea: "center", alignSelf: "center", justifySelf: "end", zIndex: 2, marginRight: "15%" }}>
             <TileWall segment="right" wallRemaining={wallRemaining} wallDrawCount={state.wallDrawCount} wallSupplementCount={state.wallSupplementCount} gold={gold} canDraw={canDraw} onDraw={onDraw} />
           </div>
           {!isFirstPersonMobile && (
-            <div style={{ gridArea: "center", alignSelf: "end", justifySelf: "center", zIndex: 2 }}>
+            <div style={{ gridArea: "center", alignSelf: "end", justifySelf: "center", zIndex: 2, marginBottom: "15%" }}>
               <TileWall segment="bottom" wallRemaining={wallRemaining} wallDrawCount={state.wallDrawCount} wallSupplementCount={state.wallSupplementCount} gold={gold} canDraw={canDraw} onDraw={onDraw} />
             </div>
           )}
