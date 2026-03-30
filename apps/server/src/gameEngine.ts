@@ -441,8 +441,8 @@ function handleDiscard(
       existingWindow.cancel();
     }
     const window = new ActionWindow(pendingPlayers, playerIndex, (winner) => {
-      resolveActionWindow(io, game, winner, playerIndex, tile);
       activeWindows.delete(game.roomId);
+      resolveActionWindow(io, game, winner, playerIndex, tile);
     });
     activeWindows.set(game.roomId, window);
   }
@@ -633,13 +633,13 @@ function handleBuGang(
       existingWindow.cancel();
     }
     const window = new ActionWindow(canRob, playerIndex, (winner) => {
+      activeWindows.delete(game.roomId);
       if (winner && winner.action.type === ActionType.Hu) {
         endGameWin(io, game, winner.playerIndex, tile, false, true);
       } else {
         // No one robbed, proceed with bu gang
         executeBuGang(io, game, playerIndex, tile, meldIdx);
       }
-      activeWindows.delete(game.roomId);
     });
     activeWindows.set(game.roomId, window);
   } else {
