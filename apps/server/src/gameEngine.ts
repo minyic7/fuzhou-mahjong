@@ -113,6 +113,10 @@ class ActionWindow {
     return distA < distB;
   }
 
+  isPending(playerIndex: number): boolean {
+    return this.pendingPlayers.has(playerIndex);
+  }
+
   cancel(): void {
     if (this.timer) { clearTimeout(this.timer); this.timer = null; }
   }
@@ -155,6 +159,23 @@ function startBotWatchdog(roomId: string, playerIndex: number, io: GameServer): 
       console.log(`[Bot:${roomId}:p${playerIndex}:watchdog] Fired but game ended (phase=${game?.state.phase ?? "deleted"}) ts=${Date.now()}`);
       return;
     }
+    // Check if this bot is in an action window context
+    const window = activeWindows.get(roomId);
+    if (window) {
+      if (!window.isPending(playerIndex)) {
+        console.log(`[Bot:${roomId}:p${playerIndex}:watchdog] Fired but bot already responded to action window ts=${Date.now()}`);
+        return;
+      }
+      console.warn(`[Bot:${roomId}:p${playerIndex}:watchdog] Firing for action window bot — forcing Pass ts=${Date.now()}`);
+      try {
+        handlePlayerAction(io, roomId, { type: ActionType.Pass, playerIndex }, playerIndex);
+      } catch (e) {
+        console.error(`[Bot:${roomId}:p${playerIndex}:watchdog] Action window Pass failed:`, e);
+      }
+      return;
+    }
+
+    // Turn-based context: check if currentTurn is a bot
     if (!game.isBot(game.state.currentTurn)) {
       console.log(`[Bot:${roomId}:p${playerIndex}:watchdog] Fired but currentTurn=${game.state.currentTurn} is not a bot ts=${Date.now()}`);
       return;
@@ -170,14 +191,6 @@ function startBotWatchdog(roomId: string, playerIndex: number, io: GameServer): 
     );
 
     try {
-      // If there's a stale action window, force-resolve it
-      const window = activeWindows.get(roomId);
-      if (window) {
-        console.warn(`[Bot:${roomId}:p${turn}:watchdog] Cancelling stale action window`);
-        window.cancel();
-        activeWindows.delete(roomId);
-      }
-
       const fallback = emergencyDiscard(player.hand, playerIndex, game.state.gold);
       console.log(`[Bot:${roomId}:p${turn}:watchdog] Emergency discard ts=${Date.now()}`);
       handlePlayerAction(io, roomId, fallback, turn);
@@ -513,6 +526,11 @@ function handleAnGang(
   gangDraw(io, game, playerIndex);
   // Safety timeout: if gangDraw leaves game stuck, force advance
   const anGangSafetyTimer = setTimeout(() => {
+    // Self-cleanup
+    const timers = gangSafetyTimeouts.get(game.roomId);
+    if (timers) {
+      gangSafetyTimeouts.set(game.roomId, timers.filter(t => t !== anGangSafetyTimer));
+    }
     if (game.state.currentTurn === playerIndex && game.state.phase === GamePhase.Playing) {
       const player = game.state.players[playerIndex];
       console.warn(`[GameEngine] gangDraw safety timeout fired for AnGang (roomId=${game.roomId}, playerIndex=${playerIndex}, turn=${game.state.currentTurn}, phase=${game.state.phase})`);
@@ -625,6 +643,11 @@ function executeBuGang(
   gangDraw(io, game, playerIndex);
   // Safety timeout: if gangDraw leaves game stuck, force advance
   const buGangSafetyTimer = setTimeout(() => {
+    // Self-cleanup
+    const timers = gangSafetyTimeouts.get(game.roomId);
+    if (timers) {
+      gangSafetyTimeouts.set(game.roomId, timers.filter(t => t !== buGangSafetyTimer));
+    }
     if (game.state.currentTurn === playerIndex && game.state.phase === GamePhase.Playing) {
       const player = game.state.players[playerIndex];
       console.warn(`[GameEngine] gangDraw safety timeout fired for BuGang (roomId=${game.roomId}, playerIndex=${playerIndex}, turn=${game.state.currentTurn}, phase=${game.state.phase})`);
@@ -821,6 +844,11 @@ function resolveActionWindow(
         gangDraw(io, game, gangPlayerIdx);
         // Safety timeout: if gangDraw leaves game stuck, force advance
         const mingGangSafetyTimer = setTimeout(() => {
+          // Self-cleanup
+          const timers = gangSafetyTimeouts.get(game.roomId);
+          if (timers) {
+            gangSafetyTimeouts.set(game.roomId, timers.filter(t => t !== mingGangSafetyTimer));
+          }
           if (game.state.currentTurn === gangPlayerIdx && game.state.phase === GamePhase.Playing) {
             const player = game.state.players[gangPlayerIdx];
             console.warn(`[GameEngine] gangDraw safety timeout fired for MingGang (roomId=${game.roomId}, playerIndex=${gangPlayerIdx}, turn=${game.state.currentTurn}, phase=${game.state.phase})`);
@@ -1198,7 +1226,7 @@ export function emitOrBotAction(
             console.warn(`[Bot:FALLBACK] ${tag} Stale safety re-trigger during action window — passing (roomId=${game.roomId}, playerIndex=${playerIndex}, turn=${turnNumber}, phase=${game.state.phase}, hasActionWindow=true) ts=${Date.now()}`);
             handlePlayerAction(io, game.roomId, { type: ActionType.Pass, playerIndex }, playerIndex);
           } else if (game.isBot(game.state.currentTurn) && game.state.currentTurn === playerIndex) {
-            const inFinal = game.state.wall.length <= game.state.retainCount;
+            const inFinal = (game.state.wall.length + game.state.wallTail.length) <= game.state.retainCount;
             const currentActions = getPostDrawActions(game, playerIndex, inFinal);
             console.warn(`[Bot:FALLBACK] ${tag} Stale safety re-trigger on own turn (roomId=${game.roomId}, playerIndex=${playerIndex}, turn=${turnNumber}, phase=${game.state.phase}, hasActionWindow=false) ts=${Date.now()}`);
             try {
@@ -1257,7 +1285,7 @@ export function emitOrBotAction(
             console.warn(`[Bot:FALLBACK] ${tag} Stale callback re-trigger during action window — passing (roomId=${game.roomId}, playerIndex=${playerIndex}, turn=${turnNumber}, phase=${game.state.phase}, hasActionWindow=true) ts=${Date.now()}`);
             handlePlayerAction(io, game.roomId, { type: ActionType.Pass, playerIndex }, playerIndex);
           } else if (game.isBot(game.state.currentTurn) && game.state.currentTurn === playerIndex) {
-            const inFinal = game.state.wall.length <= game.state.retainCount;
+            const inFinal = (game.state.wall.length + game.state.wallTail.length) <= game.state.retainCount;
             const currentActions = getPostDrawActions(game, playerIndex, inFinal);
             console.warn(`[Bot:FALLBACK] ${tag} Stale callback re-trigger on own turn (roomId=${game.roomId}, playerIndex=${playerIndex}, turn=${turnNumber}, phase=${game.state.phase}, hasActionWindow=false) ts=${Date.now()}`);
             try {
