@@ -1,6 +1,7 @@
-import { useEffect, useRef, useState } from "react";
+import { useMemo } from "react";
 import type { GoldState } from "@fuzhou-mahjong/shared";
 import { TileView } from "./Tile";
+import { TILE_BACK_URL } from "../tileSvg";
 
 interface TileWallProps {
   wallRemaining: number;
@@ -9,88 +10,195 @@ interface TileWallProps {
   onDraw?: () => void;
 }
 
-export function TileWall({ wallRemaining, gold, canDraw, onDraw }: TileWallProps) {
-  const prevRef = useRef(wallRemaining);
-  const [flash, setFlash] = useState(false);
+const STACKS_PER_SIDE = 18;
+const TOTAL_STACKS = STACKS_PER_SIDE * 4;
 
-  // Flash animation when a tile is drawn
-  useEffect(() => {
-    if (wallRemaining < prevRef.current) {
-      setFlash(true);
-      const t = setTimeout(() => setFlash(false), 400);
-      prevRef.current = wallRemaining;
-      return () => clearTimeout(t);
-    }
-    prevRef.current = wallRemaining;
-  }, [wallRemaining]);
+interface StackState { hasUpper: boolean; hasLower: boolean; }
 
-  // Distribute tiles exactly across 4 walls (top, right, bottom, left)
-  const base = Math.floor(wallRemaining / 4);
-  const extra = wallRemaining % 4;
-  const wallTiles: [number, number, number, number] = [
-    base + (extra > 0 ? 1 : 0), // top (draw side)
-    base + (extra > 1 ? 1 : 0), // right
-    base + (extra > 2 ? 1 : 0), // bottom (tail side)
-    base + (extra > 3 ? 1 : 0), // left
+/**
+ * Given wallRemaining, compute which stacks still have tiles.
+ * Draw end depletes from head (stack 0 forward), supplement from tail (stack 71 backward).
+ * Roughly 85% drawn from head, 15% supplement from tail.
+ */
+function computeWallStacks(wallRemaining: number): StackState[][] {
+  const tilesGone = 144 - wallRemaining;
+  const stacks: StackState[] = Array.from({ length: TOTAL_STACKS }, () => ({
+    hasUpper: true, hasLower: true,
+  }));
+
+  const supplementRemoved = Math.min(Math.floor(tilesGone * 0.15), tilesGone);
+  const drawRemoved = tilesGone - supplementRemoved;
+
+  // Remove from draw end (head): upper first at each stack, then lower
+  let rem = drawRemoved;
+  for (let i = 0; i < TOTAL_STACKS && rem > 0; i++) {
+    if (stacks[i].hasUpper) { stacks[i].hasUpper = false; rem--; }
+    if (rem > 0 && stacks[i].hasLower) { stacks[i].hasLower = false; rem--; }
+  }
+
+  // Remove from supplement end (tail): upper first, then lower
+  rem = supplementRemoved;
+  for (let i = TOTAL_STACKS - 1; i >= 0 && rem > 0; i--) {
+    if (stacks[i].hasUpper) { stacks[i].hasUpper = false; rem--; }
+    if (rem > 0 && stacks[i].hasLower) { stacks[i].hasLower = false; rem--; }
+  }
+
+  return [
+    stacks.slice(0, STACKS_PER_SIDE),
+    stacks.slice(STACKS_PER_SIDE, STACKS_PER_SIDE * 2),
+    stacks.slice(STACKS_PER_SIDE * 2, STACKS_PER_SIDE * 3),
+    stacks.slice(STACKS_PER_SIDE * 3),
   ];
+}
 
-  const renderWall = (tileCount: number, side: "top" | "bottom" | "left" | "right") => {
-    const isH = side === "top" || side === "bottom";
-    const isDrawSide = side === "top"; // head side for drawing
+/** Find first stack from head that still has a tile (= draw position). */
+function findDrawStackIndex(sides: StackState[][]): { side: number; stack: number } | null {
+  const flat = sides.flat();
+  for (let i = 0; i < flat.length; i++) {
+    if (flat[i].hasUpper || flat[i].hasLower) {
+      return { side: Math.floor(i / STACKS_PER_SIDE), stack: i % STACKS_PER_SIDE };
+    }
+  }
+  return null;
+}
 
-    return (
-      <div style={{
-        display: "flex",
-        flexDirection: isH ? "row" : "column",
-        justifyContent: "center",
-        gap: 1,
-        position: "absolute" as const,
-        transition: "all 0.5s ease-out",
-        ...(side === "top" && { top: 0, left: "50%", transform: "translateX(-50%)" }),
-        ...(side === "bottom" && { bottom: 0, left: "50%", transform: "translateX(-50%)" }),
-        ...(side === "left" && { left: 0, top: "50%", transform: "translateY(-50%)" }),
-        ...(side === "right" && { right: 0, top: "50%", transform: "translateY(-50%)" }),
-      }}>
-        {Array.from({ length: tileCount }).map((_, i) => {
-          const isEdgeTile = isDrawSide && i === tileCount - 1;
-          return (
-            <div
-              key={`${side}-${i}`}
-              style={{
-                width: isH ? 6 : 14,
-                height: isH ? 14 : 6,
-                background: isEdgeTile && flash
-                  ? "rgba(255,215,0,0.6)"
-                  : "linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%)",
-                border: "1px solid #1a3c2a",
-                borderRadius: 1,
-                borderBottom: isH ? "2px solid #0d3320" : undefined,
-                borderRight: !isH ? "2px solid #0d3320" : undefined,
-                transition: "all 0.3s ease-out",
-                transform: isEdgeTile && flash ? "scale(0.5)" : "scale(1)",
-                opacity: isEdgeTile && flash ? 0 : 1,
-              }}
-            />
-          );
-        })}
-      </div>
-    );
-  };
+type Side = "top" | "right" | "bottom" | "left";
+const SIDES: Side[] = ["top", "right", "bottom", "left"];
 
+function WallTile() {
   return (
     <div style={{
+      width: "var(--wall-tw)",
+      height: "var(--wall-th)",
+      borderRadius: 2,
+      borderBottom: "1.5px solid #1a3c2a",
+      borderRight: "1px solid #1e4530",
+      overflow: "hidden",
+      boxShadow: "0 1px 2px rgba(0,0,0,0.35)",
+      flexShrink: 0,
+      transition: "opacity 0.25s ease-out, transform 0.25s ease-out",
+    }}>
+      <img src={TILE_BACK_URL} alt="" style={{ width: "100%", height: "100%", display: "block" }} loading="lazy" draggable={false} />
+    </div>
+  );
+}
+
+function WallSegment({ side, stacks, drawStack, canDraw, onDraw }: {
+  side: Side;
+  stacks: StackState[];
+  drawStack: number | null;
+  canDraw?: boolean;
+  onDraw?: () => void;
+}) {
+  const isH = side === "top" || side === "bottom";
+  // Reverse order for bottom and left so depletion visually proceeds correctly
+  const ordered = side === "bottom" || side === "left" ? [...stacks].reverse() : stacks;
+  const drawIdx = drawStack !== null
+    ? (side === "bottom" || side === "left" ? stacks.length - 1 - drawStack : drawStack)
+    : null;
+
+  return (
+    <div className={`wall-segment wall-${side}`} style={{
+      display: "flex",
+      flexDirection: isH ? "row" : "column",
+      gap: 0,
+      position: "absolute",
+      ...(side === "top" && { top: 0, left: "50%", transform: "translateX(-50%)" }),
+      ...(side === "bottom" && { bottom: 0, left: "50%", transform: "translateX(-50%)" }),
+      ...(side === "left" && { left: 0, top: "50%", transform: "translateY(-50%)" }),
+      ...(side === "right" && { right: 0, top: "50%", transform: "translateY(-50%)" }),
+    }}>
+      {ordered.map((s, i) => {
+        const empty = !s.hasUpper && !s.hasLower;
+        const isTarget = drawIdx === i;
+        return (
+          <div key={i} style={{
+            position: "relative",
+            width: isH ? "var(--wall-tw)" : "calc(var(--wall-th) + 3px)",
+            height: isH ? "calc(var(--wall-th) + 3px)" : "var(--wall-tw)",
+            flexShrink: 0,
+          }}>
+            {!empty && (
+              <div style={{
+                position: "absolute",
+                inset: 0,
+                display: "flex",
+                flexDirection: isH ? "column" : "row",
+                justifyContent: "flex-end",
+                ...(!isH && { transform: "rotate(90deg)", transformOrigin: "center" }),
+              }}>
+                {/* Lower tile */}
+                {s.hasLower && (
+                  <div style={{ position: "absolute", bottom: 0, left: 0 }}>
+                    <WallTile />
+                  </div>
+                )}
+                {/* Upper tile, offset slightly */}
+                {s.hasUpper && (
+                  <div style={{ position: "absolute", bottom: 3, left: 0 }}>
+                    <WallTile />
+                  </div>
+                )}
+              </div>
+            )}
+            {/* Draw button on the draw-target stack */}
+            {isTarget && canDraw && (
+              <button
+                className="draw-button-pulse"
+                onClick={onDraw}
+                style={{
+                  position: "absolute",
+                  top: "50%", left: "50%",
+                  transform: "translate(-50%, -50%)",
+                  padding: "6px 16px",
+                  fontSize: 14,
+                  fontWeight: "bold",
+                  background: "#6a5acd",
+                  color: "#fff",
+                  border: "none",
+                  borderRadius: 6,
+                  boxShadow: "0 0 12px rgba(106,90,205,0.6)",
+                  whiteSpace: "nowrap",
+                  minHeight: 44,
+                  minWidth: 44,
+                  zIndex: 10,
+                }}
+              >
+                摸牌
+              </button>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+export function TileWall({ wallRemaining, gold, canDraw, onDraw }: TileWallProps) {
+  const sides = useMemo(() => computeWallStacks(wallRemaining), [wallRemaining]);
+  const drawIndex = useMemo(() => findDrawStackIndex(sides), [sides]);
+
+  return (
+    <div className="tile-wall-container" style={{
       position: "relative",
-      width: 220,
-      height: 220,
+      /* Width ≈ 18 stacks + side thickness on each end */
+      width: "calc(var(--wall-tw) * 18 + 2 * var(--wall-th) + 26px)",
+      height: "calc(var(--wall-tw) * 18 + 2 * var(--wall-th) + 26px)",
       margin: "0 auto",
       flexShrink: 0,
     }}>
-      {renderWall(wallTiles[0], "top")}
-      {renderWall(wallTiles[1], "right")}
-      {renderWall(wallTiles[2], "bottom")}
-      {renderWall(wallTiles[3], "left")}
+      {SIDES.map((side, i) => (
+        <WallSegment
+          key={side}
+          side={side}
+          stacks={sides[i]}
+          drawStack={drawIndex?.side === i ? drawIndex.stack : null}
+          canDraw={canDraw}
+          onDraw={onDraw}
+        />
+      ))}
 
-      {/* Center: gold + remaining */}
+      {/* Center: gold indicator */}
       <div style={{
         position: "absolute",
         top: "50%", left: "50%",
@@ -106,49 +214,21 @@ export function TileWall({ wallRemaining, gold, canDraw, onDraw }: TileWallProps
             <TileView tile={gold.indicatorTile} faceUp gold={null} small />
           </div>
         )}
-        <div
-          className={wallRemaining <= 20 ? "wall-low-pulse" : ""}
-          style={{
-            fontSize: wallRemaining <= 10 ? 22 : wallRemaining <= 20 ? 20 : 18,
-            fontWeight: "bold",
-            color: wallRemaining <= 10 ? "#f44336" : wallRemaining <= 20 ? "#ffa726" : "#8fbc8f",
-            padding: "4px 12px",
-            borderRadius: 6,
-            background: wallRemaining <= 10
-              ? "rgba(244,67,54,0.15)"
-              : wallRemaining <= 20
-              ? "rgba(255,167,38,0.12)"
-              : "transparent",
-            border: wallRemaining <= 20
-              ? `1px solid ${wallRemaining <= 10 ? "rgba(244,67,54,0.4)" : "rgba(255,167,38,0.3)"}`
-              : "1px solid transparent",
-            transition: "all 0.3s ease",
-          }}
-        >
-          余 {wallRemaining}
-        </div>
+        {wallRemaining <= 10 && (
+          <div
+            className="wall-low-pulse"
+            style={{
+              fontSize: 11,
+              color: "#f44336",
+              padding: "2px 6px",
+              borderRadius: 4,
+              background: "rgba(244,67,54,0.15)",
+            }}
+          >
+            牌墙将尽
+          </div>
+        )}
       </div>
-
-      {/* Direction labels / Draw button */}
-      {canDraw ? (
-        <button
-          className="draw-button-pulse"
-          onClick={onDraw}
-          style={{
-            position: "absolute", top: 18, left: "50%", transform: "translateX(-50%)",
-            padding: "6px 16px", fontSize: 14, fontWeight: "bold",
-            background: "#6a5acd", color: "#fff", border: "none", borderRadius: 6,
-            boxShadow: "0 0 12px rgba(106,90,205,0.6)",
-            whiteSpace: "nowrap", minHeight: 44, minWidth: 44,
-            zIndex: 10,
-          }}
-        >
-          摸牌
-        </button>
-      ) : (
-        <div style={{ position: "absolute", top: 18, left: "50%", transform: "translateX(-50%)", fontSize: 9, color: "#8a9a8a" }}>摸牌 →</div>
-      )}
-      <div style={{ position: "absolute", bottom: 18, left: "50%", transform: "translateX(-50%)", fontSize: 9, color: "#8a9a8a" }}>← 补牌</div>
     </div>
   );
 }
