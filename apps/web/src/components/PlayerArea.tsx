@@ -1,7 +1,9 @@
+import { useRef } from "react";
 import type { TileInstance, Meld, GoldState } from "@fuzhou-mahjong/shared";
 import { MeldType } from "@fuzhou-mahjong/shared";
 import { TileView } from "./Tile";
 import { useLongPress } from "./TileTooltip";
+import { useSwipeGesture } from "../hooks/useSwipeGesture";
 
 interface PlayerAreaProps {
   isMe: boolean;
@@ -46,7 +48,38 @@ export function PlayerArea({
   canDiscard, onDiscard, canHu, onHu, kongTileIds, onAnGang, onBuGang, hasDiscardedGold,
   isDisconnected,
 }: PlayerAreaProps) {
-  const { onTouchStart, onTouchEnd, onMouseEnter, onMouseLeave, Tooltip } = useLongPress(gold);
+  const { onTouchStart: lpTouchStart, onTouchEnd: lpTouchEnd, onMouseEnter, onMouseLeave, Tooltip } = useLongPress(gold);
+
+  // Double-tap detection for reliable mobile double-tap
+  const lastTapRef = useRef<{ id: number; time: number } | null>(null);
+  const handleTap = (t: TileInstance) => {
+    const now = Date.now();
+    if (lastTapRef.current?.id === t.id && now - lastTapRef.current.time < 300) {
+      // Double-tap detected
+      lastTapRef.current = null;
+      onTileDoubleClick?.(t);
+    } else {
+      lastTapRef.current = { id: t.id, time: now };
+      onTileClick?.(t);
+    }
+  };
+
+  // Swipe-to-discard gesture
+  const swipe = useSwipeGesture({
+    onSwipeUp: (tileId: number) => {
+      const tile = hand?.find((t) => t.id === tileId);
+      if (!tile) return;
+      const tileIsGold = !!(gold && tile.tile.kind === "suited" && tile.tile.suit === gold.wildTile.suit && tile.tile.value === gold.wildTile.value);
+      if (tileIsGold) {
+        // Gold tile safety: select tile to show warning bubble instead of auto-discarding
+        onTileClick?.(tile);
+      } else {
+        onDiscard?.(tileId);
+      }
+    },
+    enabled: !!canDiscard,
+    threshold: 40,
+  });
 
   return (
     <>
@@ -93,12 +126,25 @@ export function PlayerArea({
             const isGoldTile = !!(gold && t.tile.kind === "suited" && t.tile.suit === gold.wildTile.suit && t.tile.value === gold.wildTile.value);
             const isAnGang = !!(isKong && onAnGang);
             const isBuGang = !!(isKong && onBuGang);
+            const isSwiping = swipe.swipingTileId === t.id;
+            const tileSwipeOffset = isSwiping ? swipe.swipeOffset : 0;
+            const swipeReady = isSwiping && swipe.swipeOffset < -40;
             return (
-            <div key={t.id} style={{
-              display: "inline-flex",
-              marginLeft: lastDrawnTileId === t.id ? "var(--hand-new-tile-margin)" : 0,
-              position: "relative",
-            }}>
+            <div
+              key={t.id}
+              onTouchStart={(e) => swipe.onTouchStart(t.id, e)}
+              onTouchMove={swipe.onTouchMove}
+              onTouchEnd={(e) => { swipe.onTouchEnd(); }}
+              style={{
+                display: "inline-flex",
+                marginLeft: lastDrawnTileId === t.id ? "var(--hand-new-tile-margin)" : 0,
+                position: "relative",
+                transform: tileSwipeOffset < 0 ? `translateY(${tileSwipeOffset}px)` : undefined,
+                opacity: isSwiping ? 1 - Math.min(0.5, Math.abs(tileSwipeOffset) / 100) : 1,
+                transition: isSwiping ? "none" : "transform 0.2s ease, opacity 0.2s ease",
+                boxShadow: swipeReady ? "0 0 12px rgba(0,184,148,0.6)" : undefined,
+              }}
+            >
               {lastDrawnTileId === t.id && (
                 <div style={{
                   position: "absolute", top: -14, left: "50%", transform: "translateX(-50%)",
@@ -166,12 +212,11 @@ export function PlayerArea({
                 selected={selectedTileId === t.id}
                 claimable={claimableTileIds?.has(t.id) || !!isKong}
                 className={lastDrawnTileId === t.id ? "tile-new" : undefined}
-                onTouchStart={(e) => onTouchStart(t, e)}
-                onTouchEnd={onTouchEnd}
+                onTouchStart={(e) => lpTouchStart(t, e)}
+                onTouchEnd={lpTouchEnd}
                 onMouseEnter={(e) => onMouseEnter(t, e)}
                 onMouseLeave={onMouseLeave}
-                onClick={() => onTileClick?.(t)}
-                onDoubleClick={() => onTileDoubleClick?.(t)}
+                onClick={() => handleTap(t)}
               />
             </div>
             );
