@@ -132,4 +132,17 @@ export const sounds = {
     playTone(880, 0.1, "sine", 0.12);
     setTimeout(() => playTone(660, 0.12, "sine", 0.1), 120);
   },
+
+  buttonTap() {
+    playTone(600, 0.04, "sine", 0.1);
+  },
+
+  confirm() {
+    playTone(800, 0.08, "sine", 0.12);
+    setTimeout(() => playTone(1000, 0.06, "sine", 0.1), 60);
+  },
+
+  toggle() {
+    playTone(500, 0.05, "triangle", 0.08);
+  },
 };
