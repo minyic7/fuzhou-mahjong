@@ -58,7 +58,7 @@ export function Lobby({ onJoined }: LobbyProps) {
 
   return (
     <div className="lobby-page" style={{ display: "flex", justifyContent: "center", padding: "max(16px, 3vh) max(12px, 3vw)" }}>
-    <div style={{ maxWidth: 560, width: "100%", display: "flex", flexDirection: "column", gap: 20 }}>
+    <div className="lobby-content" style={{ maxWidth: 560, width: "100%", display: "flex", flexDirection: "column", gap: 20 }}>
       <div style={{ textAlign: "center", marginBottom: 8 }}>
         <h1 style={{ fontSize: 36, color: "var(--color-text-primary)", marginBottom: 4 }}>福州麻将</h1>
         <h2 style={{ fontSize: 16, color: "var(--color-text-secondary)", fontWeight: 400 }}>Fuzhou Mahjong</h2>
@@ -81,7 +81,7 @@ export function Lobby({ onJoined }: LobbyProps) {
           onClick={handleQuickStart}
           disabled={quickStarting}
           className="lobby-create-btn"
-          style={{ width: "100%", background: "linear-gradient(135deg, var(--color-bg-button) 0%, #2a6f4a 100%)", border: "2px solid rgba(212, 160, 23, 0.8)", boxShadow: "0 0 12px rgba(212, 160, 23, 0.3)" }}
+          style={{ width: "100%", background: "linear-gradient(135deg, var(--color-bg-button) 0%, var(--color-bg-button-hover) 100%)", border: "2px solid rgba(212, 160, 23, 0.8)", boxShadow: "0 0 12px rgba(212, 160, 23, 0.3)" }}
         >
           {quickStarting ? "启动中... / Starting..." : "⚡ 快速开始 / Quick Start"}
         </Button>
@@ -177,7 +177,7 @@ export function Lobby({ onJoined }: LobbyProps) {
           fontSize: 14,
           background: "transparent",
           border: "1px solid rgba(184,134,11,0.3)",
-          color: "#8fbc8f",
+          color: "var(--color-text-secondary)",
         }}
       >
         游戏规则 / How to Play

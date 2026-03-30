@@ -184,9 +184,9 @@ body {
 /* Landscape compact layout for lobby/room */
 @media (orientation: landscape) and (max-height: 500px) {
   .lobby-page, .room-page {
-    padding: 16px 20px;
+    padding: 12px 20px;
   }
-  .lobby-page h1 { font-size: 24px; }
+  .lobby-page h1 { font-size: 24px; margin-bottom: 0; }
   .lobby-page h2 { font-size: 13px; }
   .lobby-page input, .lobby-page button,
   .room-page input, .room-page button {
@@ -194,6 +194,23 @@ body {
     padding: 6px 12px;
   }
   .lobby-page hr, .room-page hr { margin: 8px 0; }
+  /* Reduce vertical spacing between lobby sections */
+  .lobby-content { gap: 12px !important; }
+  .room-page h2 { margin-bottom: 10px !important; }
+
+  /* Tighter seat layout for landscape mobile */
+  .seat-layout {
+    gap: 6px;
+    max-width: 360px;
+  }
+  .seat-card {
+    padding: 6px 4px;
+    min-height: 48px;
+  }
+  .table-center {
+    padding: 10px 8px;
+    min-height: 70px;
+  }
 }
 
 /* Game area gets felt table background */
