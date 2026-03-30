@@ -348,7 +348,7 @@ export function PlayerArea({
             >
               {lastDrawnTileId === t.id && !isCompactLandscape && (
                 <div style={{
-                  position: "absolute", top: -14, left: "50%", transform: "translateX(-50%)",
+                  position: "absolute", top: "clamp(-8px, -3.5dvh, -14px)", left: "50%", transform: "translateX(-50%)",
                   fontSize: "var(--font-xs)", color: "#4fc3f7", whiteSpace: "nowrap",
                 }}>新牌</div>
               )}
