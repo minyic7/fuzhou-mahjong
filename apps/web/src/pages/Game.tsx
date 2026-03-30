@@ -415,8 +415,8 @@ export function Game({ initialGameState, onLeave }: GameProps) {
             ))}
           </div>
         )}
-      <div className={isWin ? "hu-celebration" : ""} style={{ textAlign: "center", padding: "clamp(12px, 3vh, 40px)", maxHeight: "100dvh", overflowY: "auto" }}>
-        <div style={{ display: isCompact ? "grid" : "block", gridTemplateColumns: isCompact ? "1fr 1fr" : undefined, gap: 12 }}>
+      <div className={`game-over-wrapper${isWin ? " hu-celebration" : ""}`}>
+        <div className={`game-over-layout${isCompact ? " compact" : ""}`}>
           <div>
         <h2 style={{ fontSize: isCompact ? 20 : 28, marginBottom: isCompact ? 8 : 16 }}>
           {isWin ? `🎉 ${getPlayerName(gameOver.winnerId!)} 胡了!` : "流局 / Draw"}
@@ -427,7 +427,7 @@ export function Game({ initialGameState, onLeave }: GameProps) {
 
         {/* Score breakdown */}
         {gameOver.breakdown && isWin && (
-          <div style={{ marginBottom: 12, padding: 10, background: "rgba(255,255,255,0.05)", borderRadius: 6, display: "inline-block" }}>
+          <div className="score-breakdown">
             <div style={{ fontSize: 12, color: "var(--color-text-secondary)", marginBottom: 4 }}>得分明细</div>
             <div style={{ display: "flex", flexWrap: "wrap", gap: "4px 12px", justifyContent: "center", fontSize: 13, color: "var(--color-text-primary)" }}>
               <span>花分: {gameOver.breakdown.flowerScore}</span>
@@ -449,11 +449,8 @@ export function Game({ initialGameState, onLeave }: GameProps) {
             .map((score, i) => ({ name: (gameOver.playerNames ?? [])[i] || getPlayerName(i), score, i }))
             .sort((a, b) => b.score - a.score)
             .map((p, rank) => (
-              <div key={p.i} style={{
-                display: "flex", justifyContent: "space-between", alignItems: "center",
-                padding: "6px 16px", marginBottom: 4, borderRadius: 4, fontSize: isCompact ? 12 : 14,
-                background: p.score > 0 ? "rgba(76,175,80,0.15)" : p.score < 0 ? "rgba(244,67,54,0.1)" : "transparent",
-                border: rank === 0 && p.score > 0 ? "1px solid var(--color-success)" : "1px solid transparent",
+              <div key={p.i} className={`score-row${rank === 0 && p.score > 0 ? " top-positive" : p.score > 0 ? " positive" : p.score < 0 ? " negative" : ""}`} style={{
+                fontSize: isCompact ? 12 : 14,
                 animation: `scoreReveal 0.3s ease-out ${rank * 0.1}s both`,
               }}>
                 <span>
@@ -477,11 +474,8 @@ export function Game({ initialGameState, onLeave }: GameProps) {
               .map((score, i) => ({ name: (gameOver.playerNames ?? [])[i] || getPlayerName(i), score, i }))
               .sort((a, b) => b.score - a.score)
               .map((p, rank) => (
-                <div key={p.i} style={{
-                  display: "flex", justifyContent: "space-between", alignItems: "center",
-                  padding: "6px 16px", marginBottom: 4, borderRadius: 4, fontSize: isCompact ? 12 : 14,
-                  background: rank === 0 ? "rgba(255,215,0,0.12)" : "transparent",
-                  border: rank === 0 ? "1px solid rgba(255,215,0,0.4)" : "1px solid transparent",
+                <div key={p.i} className={`score-row${rank === 0 ? " cumulative-top" : ""}`} style={{
+                  fontSize: isCompact ? 12 : 14,
                   animation: `scoreReveal 0.3s ease-out ${rank * 0.1}s both`,
                 }}>
                   <span>
@@ -499,15 +493,10 @@ export function Game({ initialGameState, onLeave }: GameProps) {
         </div>
         {/* All player hands */}
         {gameOver.allHands && gameOver.allHands.length > 0 && (
-          <div style={{ marginBottom: 20, textAlign: "left" }}>
+          <div className="all-hands-section">
             <button
               onClick={() => setShowAllHands(!showAllHands)}
-              style={{
-                display: "block", width: "100%", padding: "8px 0", marginBottom: 8,
-                background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)",
-                borderRadius: 6, color: "var(--color-text-secondary)", fontSize: 13,
-                cursor: "pointer", textAlign: "center",
-              }}
+              className="all-hands-toggle"
             >
               {showAllHands ? "收起手牌 ▲" : "查看所有手牌 ▼"}
             </button>
@@ -515,11 +504,7 @@ export function Game({ initialGameState, onLeave }: GameProps) {
               const isWinner = idx === gameOver.winnerId;
               const name = (gameOver.playerNames ?? [])[idx] || getPlayerName(idx);
               return (
-                <div key={idx} style={{
-                  marginBottom: 8, padding: "8px 12px", borderRadius: 6,
-                  background: isWinner ? "rgba(255,215,0,0.1)" : "rgba(255,255,255,0.03)",
-                  border: isWinner ? "1px solid rgba(255,215,0,0.4)" : "1px solid rgba(255,255,255,0.08)",
-                }}>
+                <div key={idx} className={`hand-reveal-row${isWinner ? " winner" : ""}`}>
                   <div style={{ fontSize: 13, fontWeight: isWinner ? "bold" : "normal", color: isWinner ? "var(--color-text-gold)" : "var(--color-text-primary)", marginBottom: 4 }}>
                     {isWinner ? "🏆 " : ""}{name}
                   </div>
@@ -557,27 +542,29 @@ export function Game({ initialGameState, onLeave }: GameProps) {
           </div>
         )}
 
-        <Button variant="gold" size="lg" onClick={handleNextRound} style={{ minHeight: 48 }}>
-          下一局 / Next Round
-        </Button>
-        {onLeave && (
-          <Button variant="secondary" onClick={() => {
-              const cum = gameOver.cumulative;
-              if (cum && cum.roundsPlayed > 0) {
-                setSessionSummary({
-                  playerNames: gameOver.playerNames ?? [],
-                  cumulativeScores: cum.scores,
-                  roundsPlayed: cum.roundsPlayed,
-                  roundHistory,
-                });
-              } else {
-                socket.emit("leaveRoom");
-                onLeave();
-              }
-            }} style={{ marginLeft: 10, minHeight: 48 }}>
-            离开 / Leave
+        <div className="game-over-actions">
+          <Button variant="gold" size="lg" onClick={handleNextRound} style={{ minHeight: 48 }}>
+            下一局 / Next Round
           </Button>
-        )}
+          {onLeave && (
+            <Button variant="secondary" onClick={() => {
+                const cum = gameOver.cumulative;
+                if (cum && cum.roundsPlayed > 0) {
+                  setSessionSummary({
+                    playerNames: gameOver.playerNames ?? [],
+                    cumulativeScores: cum.scores,
+                    roundsPlayed: cum.roundsPlayed,
+                    roundHistory,
+                  });
+                } else {
+                  socket.emit("leaveRoom");
+                  onLeave();
+                }
+              }} style={{ minHeight: 48 }}>
+              离开 / Leave
+            </Button>
+          )}
+        </div>
       </div>
       {sessionSummary && (
         <SessionSummary
