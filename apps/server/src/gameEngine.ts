@@ -136,35 +136,42 @@ function startBotWatchdog(roomId: string, playerIndex: number, io: GameServer): 
   const watchdog = setTimeout(() => {
     botWatchdogs.delete(roomId);
     const game = getGame(roomId);
-    if (!game || game.state.phase !== GamePhase.Playing) return;
-    if (!game.isBot(game.state.currentTurn)) return;
+    if (!game || game.state.phase !== GamePhase.Playing) {
+      console.log(`[Bot:${roomId}:p${playerIndex}:watchdog] Fired but game ended (phase=${game?.state.phase ?? "deleted"}) ts=${Date.now()}`);
+      return;
+    }
+    if (!game.isBot(game.state.currentTurn)) {
+      console.log(`[Bot:${roomId}:p${playerIndex}:watchdog] Fired but currentTurn=${game.state.currentTurn} is not a bot ts=${Date.now()}`);
+      return;
+    }
 
     const turn = game.state.currentTurn;
     const player = game.state.players[turn];
     console.warn(
-      `[Watchdog] Bot ${turn} in room ${roomId} exceeded ${BOT_WATCHDOG_MS}ms — forcing default action. ` +
+      `[Bot:${roomId}:p${turn}:t${turn}:watchdog] Exceeded ${BOT_WATCHDOG_MS}ms — forcing default action. ` +
       `phase=${game.state.phase}, handSize=${player.hand.length}, ` +
       `wallRemaining=${game.state.wall.length + game.state.wallTail.length}, ` +
-      `currentTurn=${turn}, pendingWindow=${activeWindows.has(roomId)}`,
+      `currentTurn=${turn}, pendingWindow=${activeWindows.has(roomId)}, ts=${Date.now()}`,
     );
 
     try {
       // If there's a stale action window, force-resolve it
       const window = activeWindows.get(roomId);
       if (window) {
-        console.warn(`[Watchdog] Cancelling stale action window for room ${roomId}`);
+        console.warn(`[Bot:${roomId}:p${turn}:watchdog] Cancelling stale action window`);
         window.cancel();
         activeWindows.delete(roomId);
       }
 
       const fallback = emergencyDiscard(player.hand, playerIndex, game.state.gold);
+      console.log(`[Bot:${roomId}:p${turn}:watchdog] Emergency discard ts=${Date.now()}`);
       handlePlayerAction(io, roomId, fallback, turn);
     } catch (e) {
-      console.error(`[Watchdog] Fallback for bot ${turn} in room ${roomId} failed:`, e);
+      console.error(`[Bot:${roomId}:p${turn}:watchdog] Fallback failed:`, e);
       try {
         advanceToNextPlayer(io, game, turn);
       } catch (e2) {
-        console.error(`[Watchdog] advanceToNextPlayer also failed for room ${roomId}:`, e2);
+        console.error(`[Bot:${roomId}:p${turn}:watchdog] advanceToNextPlayer also failed:`, e2);
       }
     }
   }, BOT_WATCHDOG_MS);
@@ -1039,29 +1046,57 @@ export function emitOrBotAction(
 ): void {
   if (game.isBot(playerIndex)) {
     const version = nextBotVersion(game.roomId, playerIndex);
+    const turnNumber = game.state.currentTurn;
+    const tag = `[Bot:${game.roomId}:p${playerIndex}:t${turnNumber}]`;
+    const delay = 300 + Math.random() * 500;
     startBotWatchdog(game.roomId, playerIndex, io);
     let acted = false;
 
+    console.log(`${tag} Scheduling action (version=${version}, delay=${Math.round(delay)}ms, phase=${game.state.phase}) ts=${Date.now()}`);
+
     const safetyTimer = setTimeout(() => {
-      if (acted) return;
-      // 5-second safety timeout: if bot callback hasn't fired, force discard
-      if (getBotVersion(game.roomId, playerIndex) !== version) return; // stale
-      if (game.state.phase !== GamePhase.Playing) return;
+      if (acted) {
+        console.log(`${tag} Safety timer fired but already acted (version=${version}) ts=${Date.now()}`);
+        return;
+      }
+      const currentV = getBotVersion(game.roomId, playerIndex);
+      if (currentV !== version) {
+        console.log(`${tag} Safety timer STALE — bailing (had=${version}, now=${currentV}) ts=${Date.now()}`);
+        // Check if game is stuck after bailing
+        if (game.state.phase === GamePhase.Playing && game.isBot(game.state.currentTurn)) {
+          console.warn(`${tag} Game may be stuck after stale bail — re-checking (currentTurn=${game.state.currentTurn}, phase=${game.state.phase}) ts=${Date.now()}`);
+        }
+        return;
+      }
+      if (game.state.phase !== GamePhase.Playing) {
+        console.log(`${tag} Safety timer skipped — game phase=${game.state.phase} ts=${Date.now()}`);
+        return;
+      }
       acted = true;
-      console.warn(`Bot ${playerIndex} safety timeout — forcing emergency discard`);
+      console.warn(`${tag} Safety timeout — forcing emergency discard (version=${version}, phase=${game.state.phase}) ts=${Date.now()}`);
       try {
         const player = game.state.players[playerIndex];
         handlePlayerAction(io, game.roomId, emergencyDiscard(player.hand, playerIndex, game.state.gold), playerIndex);
       } catch (e) {
-        console.error(`Bot ${playerIndex} safety timeout fallback failed:`, e);
+        console.error(`${tag} Safety timeout fallback failed:`, e);
       }
     }, 5_000);
 
     setTimeout(() => {
-      if (acted) return;
+      if (acted) {
+        console.log(`${tag} Callback fired but already acted (version=${version}) ts=${Date.now()}`);
+        return;
+      }
+      const currentV = getBotVersion(game.roomId, playerIndex);
+      console.log(`${tag} Callback fired (version=${version}, current=${currentV}, phase=${game.state.phase}) ts=${Date.now()}`);
       // Stale check: if version has advanced, another action superseded this one
-      if (getBotVersion(game.roomId, playerIndex) !== version) {
+      if (currentV !== version) {
+        console.log(`${tag} STALE — bailing (had=${version}, now=${currentV}) ts=${Date.now()}`);
         clearTimeout(safetyTimer);
+        // Check if game is stuck after bailing
+        if (game.state.phase === GamePhase.Playing && game.isBot(game.state.currentTurn)) {
+          console.warn(`${tag} Game may be stuck after stale bail — re-checking (currentTurn=${game.state.currentTurn}, phase=${game.state.phase}) ts=${Date.now()}`);
+        }
         return;
       }
       try {
@@ -1069,11 +1104,11 @@ export function emitOrBotAction(
         clearTimeout(safetyTimer);
         // Check if game state is still valid for this bot action
         if (game.state.phase !== GamePhase.Playing) {
-          console.warn(`Bot ${playerIndex} action skipped: game phase is ${game.state.phase}, attempting Pass fallback`);
+          console.warn(`${tag} Action skipped: phase=${game.state.phase}, attempting Pass fallback ts=${Date.now()}`);
           try {
             handlePlayerAction(io, game.roomId, { type: ActionType.Pass, playerIndex }, playerIndex);
           } catch (e) {
-            console.error(`Bot ${playerIndex} phase-check Pass fallback failed:`, e);
+            console.error(`${tag} Phase-check Pass fallback failed:`, e);
           }
           return;
         }
@@ -1088,30 +1123,35 @@ export function emitOrBotAction(
             .map(p => p.discards),
         };
         const botAction = decideBotAction(player.hand, player.melds, actions, playerIndex, game.state.gold, lastDiscardTile, botContext);
+        console.log(`${tag} Decided action=${botAction.type} (version=${version}) ts=${Date.now()}`);
         handlePlayerAction(io, game.roomId, botAction, playerIndex);
       } catch (err) {
-        console.error(`Bot ${playerIndex} action error:`, err);
+        console.error(`${tag} Action error:`, err);
         // Fallback: try pass first, then discard if pass not allowed
+        console.warn(`${tag} Entering fallback chain (canPass=${actions.canPass}) ts=${Date.now()}`);
         try {
           if (actions.canPass) {
             handlePlayerAction(io, game.roomId, { type: ActionType.Pass, playerIndex }, playerIndex);
           } else {
             const player = game.state.players[playerIndex];
+            console.warn(`${tag} Fallback: emergency discard ts=${Date.now()}`);
             handlePlayerAction(io, game.roomId, emergencyDiscard(player.hand, playerIndex, game.state.gold), playerIndex);
           }
         } catch (fallbackErr) {
-          console.error(`[GameEngine] Bot ${playerIndex} fallback also failed:`, fallbackErr);
+          console.error(`${tag} Fallback also failed:`, fallbackErr);
           // Last resort: force Pass to prevent permanent hang
           try {
+            console.warn(`${tag} Last-resort Pass ts=${Date.now()}`);
             handlePlayerAction(io, game.roomId, { type: ActionType.Pass, playerIndex }, playerIndex);
           } catch (lastResortErr) {
-            console.error(`[GameEngine] Bot ${playerIndex} last-resort Pass also failed:`, lastResortErr);
+            console.error(`${tag} Last-resort Pass also failed:`, lastResortErr);
             // Force advance turn as absolute last resort
+            console.warn(`${tag} Force advancing turn ts=${Date.now()}`);
             advanceToNextPlayer(io, game, playerIndex);
           }
         }
       }
-    }, 300 + Math.random() * 500);
+    }, delay);
   } else {
     const socketId = game.getSocketId(playerIndex);
     const socket = io.sockets.sockets.get(socketId);
