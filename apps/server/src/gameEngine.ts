@@ -1264,7 +1264,7 @@ export function emitOrBotAction(
 
     console.log(`${tag} Scheduling action (version=${version}, delay=${Math.round(delay)}ms, phase=${game.state.phase}) ts=${Date.now()}`);
 
-    let mainTimer: NodeJS.Timeout;
+    let mainTimer: NodeJS.Timeout | null = null;
     const safetyTimer = setTimeout(() => {
       if (acted) {
         // Verify the turn actually advanced — if still on this bot, something went wrong
@@ -1283,7 +1283,7 @@ export function emitOrBotAction(
       }
       const currentV = getBotVersion(game.roomId, playerIndex);
       if (currentV !== version) {
-        clearTimeout(mainTimer);
+        if (mainTimer) clearTimeout(mainTimer);
         console.log(`${tag} Safety timer STALE — bailing (had=${version}, now=${currentV}), cleared mainTimer ts=${Date.now()}`);
         // Re-trigger if game is stuck
         if (game.state.phase === GamePhase.Playing) {
