@@ -29,7 +29,7 @@ import type {
   WinContext,
   BotContext,
 } from "@fuzhou-mahjong/shared";
-import { ServerGameState, getGame } from "./gameState.js";
+import { ServerGameState, getGame, setOnGameDeleted } from "./gameState.js";
 import { findRoom, findRoomBySocket } from "./room.js";
 
 type GameServer = Server<ClientEvents, ServerEvents>;
@@ -135,12 +135,26 @@ function getBotVersion(roomId: string): number {
   return botActionVersion.get(roomId) ?? 0;
 }
 
-/** Pick first non-gold tile to discard as emergency fallback. */
+// Clean up per-room state when a game is deleted
+setOnGameDeleted((roomId) => {
+  botActionVersion.delete(roomId);
+  const window = activeWindows.get(roomId);
+  if (window) {
+    window.cancel();
+    activeWindows.delete(roomId);
+  }
+});
+
+/** Pick first non-gold tile to discard as emergency fallback. Returns Pass if hand is empty. */
 function emergencyDiscard(
   hand: TileInstance[],
   playerIndex: number,
   gold: import("@fuzhou-mahjong/shared").GoldState | null,
 ): GameAction {
+  if (hand.length === 0) {
+    console.warn(`[GameEngine] emergencyDiscard: player ${playerIndex} has empty hand, passing`);
+    return { type: ActionType.Pass, playerIndex };
+  }
   const tile = hand.find(t => !gold || !isGoldTile(t, gold)) ?? hand[0];
   return { type: ActionType.Discard, playerIndex, tile };
 }
@@ -212,7 +226,12 @@ export function handlePlayerAction(
     case ActionType.Draw:
       handleDraw(io, game, playerIndex);
       break;
+    case ActionType.Pass:
+      // Pass during own turn: advance to next player's draw
+      advanceToNextPlayer(io, game, playerIndex);
+      break;
     default:
+      console.warn(`[GameEngine] Unhandled action type in handlePlayerAction: ${action.type}`);
       break;
   }
 }
@@ -889,7 +908,11 @@ function endGameDraw(io: GameServer, game: ServerGameState): void {
 function broadcastState(io: GameServer, game: ServerGameState): void {
   for (let i = 0; i < 4; i++) {
     if (!game.isBot(i)) {
-      io.to(game.getSocketId(i)).emit("gameStateUpdate", game.getClientGameState(i));
+      const socketId = game.getSocketId(i);
+      const socket = io.sockets.sockets.get(socketId);
+      if (socket) {
+        socket.emit("gameStateUpdate", game.getClientGameState(i));
+      }
     }
   }
 }
@@ -972,6 +995,17 @@ export function emitOrBotAction(
       }
     }, 300 + Math.random() * 500);
   } else {
-    io.to(game.getSocketId(playerIndex)).emit("actionRequired", actions);
+    const socketId = game.getSocketId(playerIndex);
+    const socket = io.sockets.sockets.get(socketId);
+    if (socket) {
+      socket.emit("actionRequired", actions);
+    } else {
+      // Disconnected human player — auto-pass to prevent game freeze
+      console.warn(`[GameEngine] Player ${playerIndex} has no valid socket, auto-passing`);
+      setTimeout(() => {
+        if (game.state.phase !== GamePhase.Playing) return;
+        handlePlayerAction(io, game.roomId, { type: ActionType.Pass, playerIndex }, playerIndex);
+      }, 100);
+    }
   }
 }

@@ -259,6 +259,13 @@ export function registerRoomHandlers(io: GameServer, socket: GameSocket): void {
       if (!player) return;
 
       const playerIndex = room.getPlayerIndexByPlayerId(player.playerId);
+
+      // Sync the game's socketIds so broadcastState/emitOrBotAction see this player as disconnected
+      const game = getGame(room.id);
+      if (game && playerIndex >= 0) {
+        game.updateSocketId(playerIndex, `disconnected-${player.playerId}`);
+      }
+
       io.to(room.id).emit("playerDisconnected", { playerIndex, playerName: player.name, timeoutMs: RECONNECT_TIMEOUT_MS });
       io.to(room.id).emit("roomUpdated", room.getState());
       console.log(`Player ${player.name} disconnected from game in room ${room.id}`);
