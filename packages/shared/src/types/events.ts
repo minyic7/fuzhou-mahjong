@@ -109,6 +109,7 @@ export interface ClientEvents {
   listRooms: () => void;
   startGame: () => void;
   playerAction: (action: GameAction) => void;
+  resyncState: () => void;
   rejoinGame: (playerId: string) => void;
   nextRound: () => void;
   addBot: () => void;
@@ -137,6 +138,7 @@ export interface ServerEvents {
   actionRequired: (availableActions: AvailableActions) => void;
   actionResult: (result: ActionResult) => void;
   gameOver: (result: GameOverResult) => void;
+  actionError: (error: { message: string; code: string }) => void;
   error: (message: string) => void;
   playerIdAssigned: (playerId: string) => void;
   playerDisconnected: (event: PlayerDisconnectedEvent) => void;

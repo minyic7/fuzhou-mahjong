@@ -139,12 +139,17 @@ export function handlePlayerAction(
     playerIndex = botPlayerIndex;
     room = findRoom(game.roomId);
     if (!room) return;
+    // Bots don't need error feedback
   } else {
     // Human action: resolve by socket ID
     room = findRoomBySocket(socketIdOrRoomId);
     if (!room) return;
     game = getGame(room.id);
-    if (!game || game.state.phase !== GamePhase.Playing) return;
+    if (!game || game.state.phase !== GamePhase.Playing) {
+      const socket = io.sockets.sockets.get(socketIdOrRoomId);
+      socket?.emit('actionError', { message: 'Invalid game phase', code: 'WRONG_PHASE' });
+      return;
+    }
     playerIndex = game.getPlayerIndex(socketIdOrRoomId);
     if (playerIndex === -1) return;
   }
@@ -158,7 +163,13 @@ export function handlePlayerAction(
 
   // Direct actions (during player's own turn)
   const state = game.state;
-  if (state.currentTurn !== playerIndex) return;
+  if (state.currentTurn !== playerIndex) {
+    if (botPlayerIndex === undefined) {
+      const socket = io.sockets.sockets.get(socketIdOrRoomId);
+      socket?.emit('actionError', { message: 'Not your turn', code: 'WRONG_TURN' });
+    }
+    return;
+  }
 
   switch (action.type) {
     case ActionType.Discard:
@@ -192,7 +203,12 @@ function handleDiscard(
 
   // Remove tile from hand
   const tileIdx = player.hand.findIndex((t) => t.id === tile.id);
-  if (tileIdx === -1) return;
+  if (tileIdx === -1) {
+    const socketId = game.getSocketId(playerIndex);
+    const socket = io.sockets.sockets.get(socketId);
+    socket?.emit('actionError', { message: 'Tile not found in hand', code: 'TILE_NOT_FOUND' });
+    return;
+  }
   player.hand.splice(tileIdx, 1);
   player.discards.push(tile);
   state.lastDiscard = { tile, playerIndex };

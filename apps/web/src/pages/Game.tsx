@@ -219,6 +219,10 @@ export function Game({ initialGameState, onLeave }: GameProps) {
       });
       addToast(`${event.playerName} 已重连 / reconnected`);
     });
+    socket.on("actionError", (error: { message: string; code: string }) => {
+      addToast(`操作失败: ${error.message}`);
+      socket.emit("resyncState");
+    });
 
     return () => {
       socket.off("gameStateUpdate");
@@ -226,6 +230,7 @@ export function Game({ initialGameState, onLeave }: GameProps) {
       socket.off("gameOver");
       socket.off("playerDisconnected");
       socket.off("playerReconnected");
+      socket.off("actionError");
     };
   }, []);
 
