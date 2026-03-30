@@ -310,7 +310,7 @@ export function PlayerArea({
                 boxShadow: swipeReady ? "0 0 12px rgba(0,184,148,0.6)" : undefined,
               }}
             >
-              {lastDrawnTileId === t.id && (
+              {lastDrawnTileId === t.id && !isCompactLandscape && (
                 <div style={{
                   position: "absolute", top: -14, left: "50%", transform: "translateX(-50%)",
                   fontSize: 10, color: "#4fc3f7", whiteSpace: "nowrap",

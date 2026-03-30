@@ -299,8 +299,8 @@ body {
     --compact-padding: 2px 4px;
     --compact-label-font: 10px;
     --compact-info-font: 9px;
-    --fp-tile-w: 32px;
-    --fp-tile-h: 46px;
+    --fp-tile-w: clamp(32px, 5.5vw, 40px);
+    --fp-tile-h: clamp(46px, 12vh, 56px);
     --fp-opponent-tile-w: 20px;
     --fp-opponent-tile-h: 28px;
     --fp-hand-gap: 1px;
