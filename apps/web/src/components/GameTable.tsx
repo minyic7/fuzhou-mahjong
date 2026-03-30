@@ -98,8 +98,8 @@ export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTile
         />
       </div>
 
-      {/* Left player */}
-      <div style={{ gridArea: "left", position: "relative", zIndex: 1 }}>
+      {/* Left player — rotated 90° clockwise to face left */}
+      <div style={{ gridArea: "left", position: "relative", zIndex: 1, transform: "rotate(90deg)", transformOrigin: "center center", display: "flex", alignItems: "center", justifyContent: "center" }}>
         <PlayerArea
           isMe={false}
           handCount={otherPlayers[2]?.handCount ?? 0}
@@ -120,7 +120,7 @@ export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTile
       </div>
 
       {/* Center - game info */}
-      <div className="table-center-area" style={{ gridArea: "center", display: "flex", flexDirection: isCompact ? "column" : "row", alignItems: "center", justifyContent: "center", position: "relative", zIndex: 1, overflow: "hidden" }}>
+      <div className="table-center-area" style={{ gridArea: "center", display: "flex", flexDirection: isCompact ? "column" : "row", alignItems: "center", justifyContent: "center", position: "relative", zIndex: 1, overflow: "hidden", padding: isCompact ? 0 : "12px" }}>
         {isCompact && (
           <TileWall wallRemaining={wallRemaining} wallDrawCount={state.wallDrawCount} wallSupplementCount={state.wallSupplementCount} gold={gold} canDraw={canDraw} onDraw={onDraw} compact />
         )}
@@ -156,8 +156,8 @@ export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTile
         </>
       )}
 
-      {/* Right player */}
-      <div style={{ gridArea: "right", position: "relative", zIndex: 1 }}>
+      {/* Right player — rotated 90° counter-clockwise to face right */}
+      <div style={{ gridArea: "right", position: "relative", zIndex: 1, transform: "rotate(-90deg)", transformOrigin: "center center", display: "flex", alignItems: "center", justifyContent: "center" }}>
         <PlayerArea
           isMe={false}
           handCount={otherPlayers[0]?.handCount ?? 0}
