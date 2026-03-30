@@ -132,6 +132,7 @@ export function PlayerArea({
               <div key={mi} className={newestMeldIdx === mi ? "meld-new" : undefined} style={{ display: "flex", gap: 0 }}>
                 {m.tiles.map((t, ti) => (
                   <TileView key={ti} tile={t} faceUp={m.type !== MeldType.AnGang} gold={gold} small
+                    className={newestMeldIdx === mi && m.type === MeldType.AnGang ? "angang-flip-reveal" : undefined}
                     style={{ width: "var(--fp-opponent-tile-w)", height: "var(--fp-opponent-tile-h)", fontSize: 6 }}
                   />
                 ))}
@@ -190,7 +191,9 @@ export function PlayerArea({
             {melds.map((m, mi) => (
               <div key={mi} className={newestMeldIdx === mi ? "meld-new" : undefined} style={{ display: "flex", gap: 0 }}>
                 {m.tiles.map((t, ti) => (
-                  <TileView key={ti} tile={t} faceUp={m.type !== MeldType.AnGang} gold={gold} small />
+                  <TileView key={ti} tile={t} faceUp={m.type !== MeldType.AnGang} gold={gold} small
+                    className={newestMeldIdx === mi && m.type === MeldType.AnGang ? "angang-flip-reveal" : undefined}
+                  />
                 ))}
               </div>
             ))}
@@ -407,6 +410,7 @@ export function PlayerArea({
                   faceUp={m.type !== MeldType.AnGang}
                   gold={gold}
                   small
+                  className={newestMeldIdx === mi && m.type === MeldType.AnGang ? "angang-flip-reveal" : undefined}
                 />
               ))}
             </div>
