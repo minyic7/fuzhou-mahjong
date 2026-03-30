@@ -999,6 +999,13 @@ function endGameWin(
   const state = game.state;
   state.phase = GamePhase.Finished;
 
+  const staleWindow = activeWindows.get(game.roomId);
+  if (staleWindow) {
+    console.warn("[ActionWindow] Cleaning up leaked window for room", game.roomId, "(endGameWin)");
+    staleWindow.cancel();
+    activeWindows.delete(game.roomId);
+  }
+
   const winner = state.players[winnerIndex];
   const winResult = checkWin(winner, winningTile, state.gold, {
     isSelfDraw,
@@ -1067,6 +1074,13 @@ function endGameWin(
 function endGameDraw(io: GameServer, game: ServerGameState): void {
   const state = game.state;
   state.phase = GamePhase.Draw;
+
+  const staleWindow = activeWindows.get(game.roomId);
+  if (staleWindow) {
+    console.warn("[ActionWindow] Cleaning up leaked window for room", game.roomId, "(endGameDraw)");
+    staleWindow.cancel();
+    activeWindows.delete(game.roomId);
+  }
 
   // Dealer rotation on draw
   const { nextDealer, nextLianZhuang } = getNextDealer(
