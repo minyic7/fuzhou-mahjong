@@ -224,6 +224,11 @@ function handleDiscard(
     advanceToNextPlayer(io, game, playerIndex);
   } else {
     // Open action window
+    const existingWindow = activeWindows.get(game.roomId);
+    if (existingWindow) {
+      console.warn(`[GameEngine] Overwriting existing action window for room ${game.roomId} (discard)`);
+      existingWindow.cancel();
+    }
     const window = new ActionWindow(pendingPlayers, playerIndex, (winner) => {
       activeWindows.delete(game.roomId);
       resolveActionWindow(io, game, winner, playerIndex, tile);
@@ -296,9 +301,17 @@ function handleAnGang(
   if (matching.length < 4) return;
 
   // Remove from hand
+  const anGangIds = matching.map(m => m.id);
+  if (new Set(anGangIds).size !== anGangIds.length) {
+    console.warn(`[GameEngine] Duplicate tile IDs in matching: ${anGangIds}`);
+  }
   for (const m of matching) {
     const idx = player.hand.findIndex((t) => t.id === m.id);
-    if (idx >= 0) player.hand.splice(idx, 1);
+    if (idx < 0) {
+      console.warn(`[GameEngine] Tile ${m.id} not found in hand during AnGang`);
+      continue;
+    }
+    player.hand.splice(idx, 1);
   }
 
   // Create meld
@@ -357,6 +370,11 @@ function handleBuGang(
       emitOrBotAction(io, game, i, actions, tile);
     }
 
+    const existingWindow = activeWindows.get(game.roomId);
+    if (existingWindow) {
+      console.warn(`[GameEngine] Overwriting existing action window for room ${game.roomId} (BuGang rob check)`);
+      existingWindow.cancel();
+    }
     const window = new ActionWindow(canRob, playerIndex, (winner) => {
       activeWindows.delete(game.roomId);
       if (winner && winner.action.type === ActionType.Hu) {
@@ -383,7 +401,11 @@ function executeBuGang(
 
   // Remove tile from hand
   const handIdx = player.hand.findIndex((t) => t.id === tile.id);
-  if (handIdx >= 0) player.hand.splice(handIdx, 1);
+  if (handIdx < 0) {
+    console.warn(`[GameEngine] Tile ${tile.id} not found in hand during BuGang`);
+  } else {
+    player.hand.splice(handIdx, 1);
+  }
 
   // Upgrade peng to bu gang
   player.melds[meldIdx].type = MeldType.BuGang;
@@ -484,9 +506,17 @@ function resolveActionWindow(
         (t) => isSuitedTile(t.tile) && isSuitedTile(discardTile.tile) &&
                t.tile.suit === discardTile.tile.suit && t.tile.value === discardTile.tile.value,
       );
+      const pengIds = matching.map(m => m.id);
+      if (new Set(pengIds).size !== pengIds.length) {
+        console.warn(`[GameEngine] Duplicate tile IDs in matching: ${pengIds}`);
+      }
       for (let i = 0; i < 2 && i < matching.length; i++) {
         const idx = player.hand.findIndex((t) => t.id === matching[i].id);
-        if (idx >= 0) player.hand.splice(idx, 1);
+        if (idx < 0) {
+          console.warn(`[GameEngine] Tile ${matching[i].id} not found in hand during Peng`);
+          continue;
+        }
+        player.hand.splice(idx, 1);
       }
       // Remove from discarder's discards
       const discardIdx = state.players[discarderIndex].discards.findIndex((t) => t.id === discardTile.id);
@@ -513,9 +543,17 @@ function resolveActionWindow(
         (t) => isSuitedTile(t.tile) && isSuitedTile(discardTile.tile) &&
                t.tile.suit === discardTile.tile.suit && t.tile.value === discardTile.tile.value,
       );
+      const mingGangIds = matching.map(m => m.id);
+      if (new Set(mingGangIds).size !== mingGangIds.length) {
+        console.warn(`[GameEngine] Duplicate tile IDs in matching: ${mingGangIds}`);
+      }
       for (let i = 0; i < 3 && i < matching.length; i++) {
         const idx = player.hand.findIndex((t) => t.id === matching[i].id);
-        if (idx >= 0) player.hand.splice(idx, 1);
+        if (idx < 0) {
+          console.warn(`[GameEngine] Tile ${matching[i].id} not found in hand during MingGang`);
+          continue;
+        }
+        player.hand.splice(idx, 1);
       }
       const discardIdx = state.players[discarderIndex].discards.findIndex((t) => t.id === discardTile.id);
       if (discardIdx >= 0) state.players[discarderIndex].discards.splice(discardIdx, 1);
