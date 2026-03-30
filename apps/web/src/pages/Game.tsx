@@ -613,21 +613,9 @@ export function Game({ initialGameState, onLeave }: GameProps) {
         </>
       )}
       {/* Toast notifications */}
-      <div style={{
-        position: "fixed",
-        ...(isCompactMain ? { bottom: "calc(60px + env(safe-area-inset-bottom, 0px))" } : { top: 16 }),
-        left: "50%", transform: "translateX(-50%)",
-        zIndex: 9000, display: "flex", flexDirection: "column", gap: 8, alignItems: "center",
-        pointerEvents: "none",
-      }}>
+      <div className={`game-toast-container${isCompactMain ? ' compact' : ''}`}>
         {toasts.map((t) => (
-          <div key={t.id} style={{
-            background: "var(--toast-bg)", color: "var(--color-text-warm)", padding: "8px 20px",
-            borderRadius: 8, fontSize: 14, fontWeight: "bold",
-            border: "1px solid var(--color-gold-border)",
-            animation: "pageFadeIn 0.3s ease-out",
-            whiteSpace: "nowrap",
-          }}>
+          <div key={t.id} className="game-toast">
             {t.message}
           </div>
         ))}
@@ -730,9 +718,9 @@ export function Game({ initialGameState, onLeave }: GameProps) {
       {showLeaveConfirm && (
         <div className="confirm-modal-backdrop">
           <div className="confirm-modal">
-            <p style={{ fontSize: 18, marginBottom: 8 }}>确定要退出吗？</p>
-            <p style={{ fontSize: 13, color: 'var(--color-text-secondary)', marginBottom: 0 }}>退出后本局将由机器人代打</p>
-            <div style={{ display: 'flex', gap: 12, justifyContent: 'center', marginTop: 16 }}>
+            <p className="confirm-modal-title">确定要退出吗？</p>
+            <p className="confirm-modal-subtitle">退出后本局将由机器人代打</p>
+            <div className="confirm-modal-actions">
               <Button variant='secondary' onClick={() => setShowLeaveConfirm(false)}>取消</Button>
               <Button variant='danger' onClick={() => { sounds.confirm(); socket.emit('leaveRoom'); onLeave!(); }}>退出游戏</Button>
             </div>
