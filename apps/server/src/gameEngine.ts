@@ -182,25 +182,24 @@ function startBotWatchdog(roomId: string, playerIndex: number, io: GameServer): 
       return;
     }
 
-    const turn = game.state.currentTurn;
-    const player = game.state.players[turn];
+    const player = game.state.players[playerIndex];
     console.warn(
-      `[Bot:${roomId}:p${turn}:t${turn}:watchdog] Exceeded ${BOT_WATCHDOG_MS}ms — forcing default action. ` +
+      `[Bot:${roomId}:p${playerIndex}:t${game.state.currentTurn}:watchdog] Exceeded ${BOT_WATCHDOG_MS}ms — forcing default action. ` +
       `phase=${game.state.phase}, handSize=${player.hand.length}, ` +
       `wallRemaining=${game.state.wall.length + game.state.wallTail.length}, ` +
-      `currentTurn=${turn}, pendingWindow=${activeWindows.has(roomId)}, ts=${Date.now()}`,
+      `currentTurn=${game.state.currentTurn}, pendingWindow=${activeWindows.has(roomId)}, ts=${Date.now()}`,
     );
 
     try {
       const fallback = emergencyDiscard(player.hand, playerIndex, game.state.gold);
-      console.log(`[Bot:${roomId}:p${turn}:watchdog] Emergency discard ts=${Date.now()}`);
-      handlePlayerAction(io, roomId, fallback, turn);
+      console.log(`[Bot:${roomId}:p${playerIndex}:watchdog] Emergency discard ts=${Date.now()}`);
+      handlePlayerAction(io, roomId, fallback, playerIndex);
     } catch (e) {
-      console.error(`[Bot:${roomId}:p${turn}:watchdog] Fallback failed:`, e);
+      console.error(`[Bot:${roomId}:p${playerIndex}:watchdog] Fallback failed:`, e);
       try {
-        advanceToNextPlayer(io, game, turn);
+        advanceToNextPlayer(io, game, playerIndex);
       } catch (e2) {
-        console.error(`[Bot:${roomId}:p${turn}:watchdog] advanceToNextPlayer also failed:`, e2);
+        console.error(`[Bot:${roomId}:p${playerIndex}:watchdog] advanceToNextPlayer also failed:`, e2);
       }
     }
   }, BOT_WATCHDOG_MS);
@@ -1217,12 +1216,21 @@ export function emitOrBotAction(
     if (depth > 3) {
       const tag = `[Bot:${game.roomId}:p${playerIndex}:t${game.state.currentTurn}]`;
       console.error(`${tag} Recursion depth limit exceeded (depth=${depth})`);
-      const window = activeWindows.get(game.roomId);
-      if (window) {
-        handlePlayerAction(io, game.roomId, { type: ActionType.Pass, playerIndex }, playerIndex);
-      } else {
-        const player = game.state.players[playerIndex];
-        handlePlayerAction(io, game.roomId, emergencyDiscard(player.hand, playerIndex, game.state.gold), playerIndex);
+      try {
+        const window = activeWindows.get(game.roomId);
+        if (window) {
+          handlePlayerAction(io, game.roomId, { type: ActionType.Pass, playerIndex }, playerIndex);
+        } else {
+          const player = game.state.players[playerIndex];
+          handlePlayerAction(io, game.roomId, emergencyDiscard(player.hand, playerIndex, game.state.gold), playerIndex);
+        }
+      } catch (e) {
+        console.error(`${tag} Depth-limit rescue failed:`, e);
+        try {
+          advanceToNextPlayer(io, game, playerIndex);
+        } catch (e2) {
+          console.error(`${tag} advanceToNextPlayer also failed:`, e2);
+        }
       }
       return;
     }
@@ -1238,6 +1246,7 @@ export function emitOrBotAction(
 
     console.log(`${tag} Scheduling action (version=${version}, delay=${Math.round(delay)}ms, phase=${game.state.phase}) ts=${Date.now()}`);
 
+    let mainTimer: NodeJS.Timeout;
     const safetyTimer = setTimeout(() => {
       if (acted) {
         // Verify the turn actually advanced — if still on this bot, something went wrong
@@ -1310,7 +1319,7 @@ export function emitOrBotAction(
       }
     }, 5_000);
 
-    const mainTimer = setTimeout(() => {
+    mainTimer = setTimeout(() => {
       try {
       const currentV = getBotVersion(game.roomId, playerIndex);
       console.log(`${tag} Callback fired (version=${version}, current=${currentV}, phase=${game.state.phase}) ts=${Date.now()}`);
