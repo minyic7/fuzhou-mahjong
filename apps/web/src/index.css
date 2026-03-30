@@ -1134,3 +1134,17 @@ button.lobby-create-btn:active:not(:disabled) {
     padding: clamp(12px, 2dvh, 16px);
   }
 }
+
+/* Mid-size landscape phones (≤480px width) */
+@media (orientation: landscape) and (max-width: 480px) {
+  :root {
+    --game-gap: 4px;
+    --game-padding: 4px;
+  }
+  .confirm-modal {
+    padding: 16px;
+  }
+  .table-center-area {
+    padding: 8px;
+  }
+}
