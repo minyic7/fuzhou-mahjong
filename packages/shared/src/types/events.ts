@@ -82,6 +82,11 @@ export interface GameOverResult {
   breakdown?: ScoreBreakdown;
   playerNames?: string[];
   cumulative?: CumulativeData;
+  allHands?: {
+    hand: TileInstance[];
+    melds: Meld[];
+    flowers: TileInstance[];
+  }[];
 }
 
 // ─── Room List ───────────────────────────────────────────────────

@@ -800,6 +800,11 @@ function endGameWin(
     },
     playerNames: game.playerNames,
     cumulative,
+    allHands: state.players.map((p) => ({
+      hand: p.hand,
+      melds: p.melds,
+      flowers: p.flowers,
+    })),
   });
 }
 
@@ -831,6 +836,11 @@ function endGameDraw(io: GameServer, game: ServerGameState): void {
     winType: "draw",
     scores: [0, 0, 0, 0],
     cumulative,
+    allHands: state.players.map((p) => ({
+      hand: p.hand,
+      melds: p.melds,
+      flowers: p.flowers,
+    })),
   });
 }
 
