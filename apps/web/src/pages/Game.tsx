@@ -126,6 +126,16 @@ export function Game({ initialGameState, onLeave }: GameProps) {
         sounds.draw();
       }
 
+      // Detect gold tile flip
+      if (prev && state.gold && (!prev.gold || prev.gold.indicatorTile.id !== state.gold.indicatorTile.id)) {
+        sounds.goldFlip();
+      }
+
+      // Detect low wall count warning (≤16 tiles remaining)
+      if (prev && state.wallRemaining <= 16 && prev.wallRemaining > 16) {
+        sounds.warning();
+      }
+
       // Detect wall draw/supplement for fly animation
       if (prev) {
         const drawDelta = state.wallDrawCount - prev.wallDrawCount;
@@ -206,6 +216,7 @@ export function Game({ initialGameState, onLeave }: GameProps) {
     socket.on("gameOver", (result) => {
       setGameOver(result);
       if (result.winnerId !== null) sounds.hu();
+      else sounds.gameDraw();
     });
     socket.on("playerDisconnected", (event: PlayerDisconnectedEvent) => {
       setDisconnectedPlayers((prev) => new Set(prev).add(event.playerIndex));
@@ -220,6 +231,7 @@ export function Game({ initialGameState, onLeave }: GameProps) {
       addToast(`${event.playerName} 已重连 / reconnected`);
     });
     socket.on("actionError", (error: { message: string; code: string }) => {
+      sounds.error();
       addToast(`操作失败: ${error.message}`);
       socket.emit("resyncState");
     });
