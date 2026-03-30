@@ -27,16 +27,23 @@ export function ClaimOverlay({ actions, gameState, onAction }: ClaimOverlayProps
   const myIndex = gameState.myIndex;
 
   return (
-    <div style={{
-      position: "fixed",
-      top: 0, left: 0, right: 0, bottom: 0,
-      background: "rgba(0,0,0,0.5)",
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      zIndex: 40,
-      animation: "overlayFadeIn 0.2s ease-out",
-    }}>
+    <div
+      style={{
+        position: "fixed",
+        top: 0, left: 0, right: 0, bottom: 0,
+        background: "rgba(0,0,0,0.5)",
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        zIndex: 40,
+        animation: "overlayFadeIn 0.2s ease-out",
+      }}
+      onClick={(e) => {
+        if (e.target === e.currentTarget && showChiPicker) {
+          setShowChiPicker(false);
+        }
+      }}
+    >
       <div style={{
         background: "rgba(15,30,25,0.95)",
         border: "2px solid #ffa500",
@@ -126,37 +133,77 @@ export function ClaimOverlay({ actions, gameState, onAction }: ClaimOverlayProps
         {/* Chi picker */}
         {showChiPicker && gameState.lastDiscard && (
           <div style={{
-            display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 8,
-            padding: "8px 0", borderTop: "1px solid rgba(255,255,255,0.1)",
+            borderTop: "1px solid rgba(255,255,255,0.1)",
+            padding: "8px 0",
+            width: "100%",
           }}>
-            <div style={{ width: "100%", textAlign: "center", fontSize: 13, color: "#aaa", marginBottom: 4 }}>
+            <div style={{ textAlign: "center", fontSize: 13, color: "#aaa", marginBottom: 8 }}>
               选择吃牌组合
             </div>
-            {actions.chiOptions.map((combo, i) => (
+            <div className="chi-picker-scroll" style={{
+              display: "flex",
+              overflowX: "auto",
+              gap: 12,
+              padding: "4px 4px",
+              scrollSnapType: "x mandatory",
+              WebkitOverflowScrolling: "touch",
+              justifyContent: actions.chiOptions.length <= 2 ? "center" : undefined,
+            }}>
+              {actions.chiOptions.map((combo, i) => (
+                <button
+                  key={i}
+                  style={{
+                    ...BTN.base,
+                    ...BTN.chi,
+                    display: "flex",
+                    gap: 4,
+                    alignItems: "center",
+                    padding: "10px 16px",
+                    minHeight: 56,
+                    scrollSnapAlign: "start",
+                    flexShrink: 0,
+                    borderRadius: 10,
+                    border: "2px solid rgba(46,139,87,0.6)",
+                  }}
+                  onClick={() => {
+                    onAction({
+                      type: ActionType.Chi,
+                      playerIndex: myIndex,
+                      tiles: combo as [TileInstance, TileInstance],
+                      targetTile: gameState.lastDiscard!.tile,
+                    });
+                    setShowChiPicker(false);
+                  }}
+                >
+                  {combo.map((t) => (
+                    <TileView key={t.id} tile={t} faceUp small />
+                  ))}
+                  <div style={{
+                    border: "2px solid #ffa500",
+                    borderRadius: 4,
+                    padding: 1,
+                    marginLeft: 2,
+                    boxShadow: "0 0 6px rgba(255,165,0,0.4)",
+                  }}>
+                    <TileView tile={gameState.lastDiscard!.tile} faceUp small />
+                  </div>
+                </button>
+              ))}
               <button
-                key={i}
-                style={{ ...BTN.base, ...BTN.chi, display: "flex", gap: 2, alignItems: "center", padding: "8px 12px" }}
-                onClick={() => {
-                  onAction({
-                    type: ActionType.Chi,
-                    playerIndex: myIndex,
-                    tiles: combo as [TileInstance, TileInstance],
-                    targetTile: gameState.lastDiscard!.tile,
-                  });
-                  setShowChiPicker(false);
+                style={{
+                  ...BTN.base,
+                  ...BTN.pass,
+                  fontSize: 14,
+                  padding: "10px 20px",
+                  minHeight: 56,
+                  scrollSnapAlign: "start",
+                  flexShrink: 0,
                 }}
+                onClick={() => setShowChiPicker(false)}
               >
-                {combo.map((t) => (
-                  <TileView key={t.id} tile={t} faceUp small />
-                ))}
+                取消
               </button>
-            ))}
-            <button
-              style={{ ...BTN.base, ...BTN.pass, fontSize: 14, padding: "8px 16px" }}
-              onClick={() => setShowChiPicker(false)}
-            >
-              取消
-            </button>
+            </div>
           </div>
         )}
       </div>
