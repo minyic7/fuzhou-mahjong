@@ -27,6 +27,7 @@ import type {
   ServerEvents,
   Meld,
   WinContext,
+  BotContext,
 } from "@fuzhou-mahjong/shared";
 import { ServerGameState, getGame } from "./gameState.js";
 import { findRoom, findRoomBySocket } from "./room.js";
@@ -865,7 +866,16 @@ function emitOrBotAction(
   if (game.isBot(playerIndex)) {
     setTimeout(() => {
       const player = game.state.players[playerIndex];
-      const botAction = decideBotAction(player.hand, player.melds, actions, playerIndex, game.state.gold, lastDiscardTile);
+      const botContext: BotContext = {
+        wallRemaining: game.state.wall.length + game.state.wallTail.length - game.state.retainCount,
+        opponentMelds: game.state.players
+          .filter((_, i) => i !== playerIndex)
+          .map(p => p.melds),
+        opponentDiscards: game.state.players
+          .filter((_, i) => i !== playerIndex)
+          .map(p => p.discards),
+      };
+      const botAction = decideBotAction(player.hand, player.melds, actions, playerIndex, game.state.gold, lastDiscardTile, botContext);
       handlePlayerAction(io, game.roomId, botAction, playerIndex);
     }, 300 + Math.random() * 500);
   } else {
