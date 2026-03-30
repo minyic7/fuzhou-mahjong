@@ -319,13 +319,14 @@ export function PlayerArea({
               {showBubble && (
                 <div className="discard-bubble" style={{
                   position: "absolute",
-                  bottom: "100%",
+                  ...(isCompactLandscape
+                    ? { top: "100%", marginTop: 4 }
+                    : { bottom: "100%", marginBottom: 4 }),
                   left: "50%",
                   transform: "translateX(-50%)",
                   display: "flex",
                   flexDirection: "column",
                   gap: 4,
-                  marginBottom: 4,
                   zIndex: 20,
                   animation: "bubbleFadeIn 0.15s ease-out",
                 }}>
