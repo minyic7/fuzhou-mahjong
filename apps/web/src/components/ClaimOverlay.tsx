@@ -23,6 +23,7 @@ const BTN = {
 };
 
 export function ClaimOverlay({ actions, gameState, onAction }: ClaimOverlayProps) {
+  const isCompact = window.innerHeight <= 500;
   const [showChiPicker, setShowChiPicker] = useState(false);
   const [exiting, setExiting] = useState(false);
   const [exitingChi, setExitingChi] = useState(false);
@@ -72,14 +73,14 @@ export function ClaimOverlay({ actions, gameState, onAction }: ClaimOverlayProps
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        gap: 12,
+        gap: isCompact ? 6 : 12,
         maxWidth: "90vw",
         maxHeight: "90dvh",
         overflowY: "auto",
         animation: exiting ? "overlayScaleOut 0.18s ease-in forwards" : "overlayScaleIn 0.2s ease-out",
       }}>
         <div style={{ color: "var(--color-accent-orange)", fontWeight: "bold", fontSize: "var(--btn-font)", marginBottom: 4 }}>
-          可以操作！请选择
+          {isCompact ? "选择" : "可以操作！请选择"}
         </div>
 
         <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 10 }}>
@@ -144,7 +145,7 @@ export function ClaimOverlay({ actions, gameState, onAction }: ClaimOverlayProps
         {actions.canPass && (
           <div style={{ borderTop: "1px solid rgba(255,255,255,0.1)", paddingTop: 8, width: "100%" , textAlign: "center" }}>
             <button
-              style={{ ...BTN.base, ...BTN.pass }}
+              style={{ ...BTN.base, ...BTN.pass, ...(isCompact ? { padding: "6px 12px" } : {}) }}
               onClick={() => handleAction({ type: ActionType.Pass, playerIndex: myIndex })}
             >
               过
@@ -181,8 +182,8 @@ export function ClaimOverlay({ actions, gameState, onAction }: ClaimOverlayProps
                     display: "flex",
                     gap: 4,
                     alignItems: "center",
-                    padding: "10px 16px",
-                    minHeight: 56,
+                    padding: isCompact ? "6px 10px" : "10px 16px",
+                    minHeight: isCompact ? 44 : 56,
                     scrollSnapAlign: "start",
                     flexShrink: 0,
                     borderRadius: 10,
@@ -215,7 +216,7 @@ export function ClaimOverlay({ actions, gameState, onAction }: ClaimOverlayProps
                 style={{
                   ...BTN.base,
                   ...BTN.pass,
-                  minHeight: 56,
+                  minHeight: isCompact ? 44 : 56,
                   scrollSnapAlign: "start",
                   flexShrink: 0,
                 }}
