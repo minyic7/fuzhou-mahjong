@@ -3,7 +3,7 @@ import { socket } from "../socket";
 import { GameTable, type DrawAnimationState, type DrawAnimationSeat } from "../components/GameTable";
 import { ClaimOverlay } from "../components/ClaimOverlay";
 import { CenterAction, useCenterAction } from "../components/CenterAction";
-import { sounds, setMuted, isMuted } from "../sounds";
+import { sounds } from "../sounds";
 import { TileCounter } from "../components/TileCounter";
 import { TutorialModal } from "../components/TutorialModal";
 import { TileView } from "../components/Tile";
@@ -11,8 +11,6 @@ import { SessionSummary, type SessionData } from "../components/SessionSummary";
 import { Button } from "../components/Button";
 import { ActionType, MeldType } from "@fuzhou-mahjong/shared";
 import type { ClientGameState, GameOverResult, AvailableActions, GameAction, PlayerDisconnectedEvent, PlayerReconnectedEvent } from "@fuzhou-mahjong/shared";
-
-const MUTE_KEY = "fuzhou-mahjong-muted";
 
 interface GameProps {
   initialGameState?: ClientGameState | null;
@@ -56,11 +54,6 @@ export function Game({ initialGameState, onLeave }: GameProps) {
   const [pendingClaim, setPendingClaim] = useState(false);
   const { display: centerAction, showDiscard, showClaim } = useCenterAction();
   const prevStateRef = useRef<ClientGameState | null>(null);
-  const [soundMuted, setSoundMuted] = useState(() => {
-    const stored = localStorage.getItem(MUTE_KEY);
-    if (stored === "true") { setMuted(true); return true; }
-    return false;
-  });
   const gameStartedRef = useRef(false);
   const [disconnectedPlayers, setDisconnectedPlayers] = useState<Set<number>>(new Set());
   const [toasts, setToasts] = useState<{ id: number; message: string }[]>([]);
@@ -99,13 +92,6 @@ export function Game({ initialGameState, onLeave }: GameProps) {
     window.addEventListener('beforeunload', handler);
     return () => window.removeEventListener('beforeunload', handler);
   }, [gameOver]);
-
-  const toggleMute = () => {
-    const next = !soundMuted;
-    setSoundMuted(next);
-    setMuted(next);
-    localStorage.setItem(MUTE_KEY, String(next));
-  };
 
   useEffect(() => {
     socket.on("gameStateUpdate", (state) => {

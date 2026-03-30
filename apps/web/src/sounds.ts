@@ -1,14 +1,21 @@
 // Web Audio API sound engine — synthesized sounds, no external files
 
+const MUTE_KEY = "fuzhou-mahjong-muted";
+
 let audioCtx: AudioContext | null = null;
-let muted = false;
+let muted = typeof localStorage !== "undefined" && localStorage.getItem(MUTE_KEY) === "true";
 
 function getCtx(): AudioContext {
   if (!audioCtx) audioCtx = new AudioContext();
+  // Resume suspended context (mobile browsers require user-gesture activation)
+  if (audioCtx.state === "suspended") audioCtx.resume();
   return audioCtx;
 }
 
-export function setMuted(m: boolean) { muted = m; }
+export function setMuted(m: boolean) {
+  muted = m;
+  try { localStorage.setItem(MUTE_KEY, String(m)); } catch { /* SSR / private mode */ }
+}
 export function isMuted() { return muted; }
 
 function playTone(freq: number, duration: number, type: OscillatorType = "sine", volume = 0.3) {
