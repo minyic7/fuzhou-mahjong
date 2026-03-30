@@ -67,9 +67,11 @@ export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTile
       display: "grid",
       gridTemplateAreas: isFirstPersonMobile
         ? `"left top right" "left center right" "bottom bottom bottom"`
-        : `". top ." "left center right" ". bottom ."`,
-      gridTemplateColumns: isFirstPersonMobile ? "var(--fp-side-col) 1fr var(--fp-side-col)" : isCompact ? "var(--grid-side-col) 1fr var(--grid-side-col)" : "1fr 2fr 1fr",
-      gridTemplateRows: isFirstPersonMobile ? "var(--fp-top-row) 1fr minmax(55%, 65%)" : isCompact ? "var(--grid-top-row) var(--grid-center-row) 1fr" : "auto 1fr auto",
+        : isCompact
+        ? `". top ." "left center right" ". bottom ."`
+        : `". top top top ." ". wt wt wt ." "wl left center right wr" ". wb wb wb ." ". bottom bottom bottom ."`,
+      gridTemplateColumns: isFirstPersonMobile ? "var(--fp-side-col) 1fr var(--fp-side-col)" : isCompact ? "var(--grid-side-col) 1fr var(--grid-side-col)" : "auto 1fr 2fr 1fr auto",
+      gridTemplateRows: isFirstPersonMobile ? "var(--fp-top-row) 1fr minmax(55%, 65%)" : isCompact ? "var(--grid-top-row) var(--grid-center-row) 1fr" : "auto auto 1fr auto auto",
       flex: 1,
       minHeight: 0,
       gap: "var(--game-gap)",
@@ -139,20 +141,18 @@ export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTile
       {/* Wall segments along table edges (non-compact only) */}
       {!isCompact && (
         <>
-          <div style={{ gridArea: "center", alignSelf: "start", justifySelf: "center", zIndex: 2 }}>
+          <div style={{ gridArea: "wt", justifySelf: "center", zIndex: 2 }}>
             <TileWall segment="top" wallRemaining={wallRemaining} wallDrawCount={state.wallDrawCount} wallSupplementCount={state.wallSupplementCount} gold={gold} canDraw={canDraw} onDraw={onDraw} />
           </div>
-          <div style={{ gridArea: "center", alignSelf: "center", justifySelf: "start", zIndex: 2 }}>
+          <div style={{ gridArea: "wl", alignSelf: "center", zIndex: 2 }}>
             <TileWall segment="left" wallRemaining={wallRemaining} wallDrawCount={state.wallDrawCount} wallSupplementCount={state.wallSupplementCount} gold={gold} canDraw={canDraw} onDraw={onDraw} />
           </div>
-          <div style={{ gridArea: "center", alignSelf: "center", justifySelf: "end", zIndex: 2 }}>
+          <div style={{ gridArea: "wr", alignSelf: "center", zIndex: 2 }}>
             <TileWall segment="right" wallRemaining={wallRemaining} wallDrawCount={state.wallDrawCount} wallSupplementCount={state.wallSupplementCount} gold={gold} canDraw={canDraw} onDraw={onDraw} />
           </div>
-          {!isFirstPersonMobile && (
-            <div style={{ gridArea: "center", alignSelf: "end", justifySelf: "center", zIndex: 2 }}>
-              <TileWall segment="bottom" wallRemaining={wallRemaining} wallDrawCount={state.wallDrawCount} wallSupplementCount={state.wallSupplementCount} gold={gold} canDraw={canDraw} onDraw={onDraw} />
-            </div>
-          )}
+          <div style={{ gridArea: "wb", justifySelf: "center", zIndex: 2 }}>
+            <TileWall segment="bottom" wallRemaining={wallRemaining} wallDrawCount={state.wallDrawCount} wallSupplementCount={state.wallSupplementCount} gold={gold} canDraw={canDraw} onDraw={onDraw} />
+          </div>
         </>
       )}
 
