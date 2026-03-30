@@ -88,6 +88,7 @@ export function ClaimOverlay({ actions, gameState, onAction }: ClaimOverlayProps
         maxWidth: "90vw",
         maxHeight: isUltraCompact ? "70dvh" : isCompact ? "80dvh" : "90dvh",
         overflowY: "auto",
+        WebkitOverflowScrolling: "touch",
         animation: exiting ? "overlayScaleOut 0.18s ease-in forwards" : "overlayScaleIn 0.2s ease-out",
       }}>
         <div style={{ color: "var(--color-accent-orange)", fontWeight: "bold", fontSize: "var(--btn-font)", marginBottom: 4 }}>
