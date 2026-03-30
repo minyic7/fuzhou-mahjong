@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import type { RoomListItem, RoomState } from "@fuzhou-mahjong/shared";
 import { socket } from "../socket";
 import { Button } from "../components/Button";
+import { TutorialModal } from "../components/TutorialModal";
 
 interface LobbyProps {
   onJoined: (roomState: RoomState) => void;
@@ -13,6 +14,7 @@ export function Lobby({ onJoined }: LobbyProps) {
   const [error, setError] = useState("");
   const [rooms, setRooms] = useState<RoomListItem[]>([]);
   const [quickStarting, setQuickStarting] = useState(false);
+  const [showTutorial, setShowTutorial] = useState(false);
 
   useEffect(() => {
     socket.emit("listRooms");
@@ -161,6 +163,23 @@ export function Lobby({ onJoined }: LobbyProps) {
       </div>
 
       {error && <p className="error-msg">{error}</p>}
+
+      <hr />
+      <button
+        onClick={() => setShowTutorial(true)}
+        style={{
+          width: "100%",
+          padding: "10px 12px",
+          fontSize: 14,
+          background: "transparent",
+          border: "1px solid rgba(184,134,11,0.3)",
+          color: "#8fbc8f",
+        }}
+      >
+        游戏规则 / How to Play
+      </button>
+
+      <TutorialModal open={showTutorial} onClose={() => setShowTutorial(false)} />
     </div>
     </div>
   );
