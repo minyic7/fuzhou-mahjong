@@ -7,6 +7,7 @@ import {
   WindType,
   sortHand,
   findTenpaiTiles,
+  checkWin,
 } from "@fuzhou-mahjong/shared";
 import { findRoom } from "./room.js";
 import type {
@@ -68,6 +69,10 @@ export class ServerGameState {
     if (goldResult.dealerFlowers.length > 0) {
       players[dealerIndex].flowers.push(...goldResult.dealerFlowers);
     }
+
+    // Track dealer's last tile before sorting (for Tianhu winning tile identification)
+    const dealerHand = players[dealerIndex].hand;
+    this.lastDrawnTileIds[dealerIndex] = dealerHand[dealerHand.length - 1]?.id ?? null;
 
     // Sort all hands by suit then value
     for (const p of players) {
@@ -155,6 +160,25 @@ export class ServerGameState {
   }
 
   getInitialDealerActions(): import("@fuzhou-mahjong/shared").AvailableActions {
+    const dealer = this.state.players[this.state.dealerIndex];
+    const drawnId = this.lastDrawnTileIds[this.state.dealerIndex];
+    const lastTile = drawnId != null
+      ? dealer.hand.find((t) => t.id === drawnId) ?? dealer.hand[dealer.hand.length - 1]
+      : dealer.hand[dealer.hand.length - 1];
+
+    let canHu = false;
+    if (lastTile) {
+      const winResult = checkWin(dealer, lastTile, this.state.gold, {
+        isSelfDraw: true,
+        isFirstAction: true,
+        isDealer: true,
+        isRobbingKong: false,
+        totalFlowers: dealer.flowers.length,
+        totalGangs: 0,
+      });
+      canHu = winResult.isWin;
+    }
+
     return {
       canDraw: false,
       canDiscard: true,
@@ -163,8 +187,8 @@ export class ServerGameState {
       canMingGang: false,
       anGangOptions: [],
       buGangOptions: [],
-      canHu: false,
-      canPass: false,
+      canHu,
+      canPass: canHu,
     };
   }
 

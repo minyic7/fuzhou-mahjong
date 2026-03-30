@@ -11,7 +11,7 @@ import {
   unregisterPlayerRoom,
 } from "../room.js";
 import { createGame, getGame, deleteGame } from "../gameState.js";
-import { checkWin, GamePhase } from "@fuzhou-mahjong/shared";
+import { checkWin, calculateScore, GamePhase } from "@fuzhou-mahjong/shared";
 import { handlePlayerAction, emitOrBotAction } from "../gameEngine.js";
 
 type GameSocket = Socket<ClientEvents, ServerEvents>;
@@ -217,7 +217,10 @@ export function registerRoomHandlers(io: GameServer, socket: GameSocket): void {
 
     // Check tianhu: dealer wins immediately if hand is complete after gold reveal
     const nextDealer = game.state.players[game.state.dealerIndex];
-    const nextDealerLastTile = nextDealer.hand[nextDealer.hand.length - 1];
+    const drawnId = game.lastDrawnTileIds[game.state.dealerIndex];
+    const nextDealerLastTile = drawnId != null
+      ? nextDealer.hand.find(t => t.id === drawnId) ?? nextDealer.hand[nextDealer.hand.length - 1]
+      : nextDealer.hand[nextDealer.hand.length - 1];
     if (nextDealerLastTile) {
       const tianhuResult = checkWin(nextDealer, nextDealerLastTile, game.state.gold, {
         isSelfDraw: true,
@@ -234,12 +237,21 @@ export function registerRoomHandlers(io: GameServer, socket: GameSocket): void {
             io.to(room.players[i].socketId!).emit("gameStateUpdate", game.getClientGameState(i));
           }
         }
-        const tianhuScores = [0, 0, 0, 0];
-        room.addRoundScores(tianhuScores);
+        const scoreResult = calculateScore(
+          nextDealer,
+          game.state.dealerIndex,
+          tianhuResult.winType,
+          tianhuResult.multiplier,
+          game.state.gold,
+          true,
+          null,
+          game.state.lianZhuangCount,
+        );
+        room.addRoundScores(scoreResult.payments);
         io.to(room.id).emit("gameOver", {
           winnerId: game.state.dealerIndex,
           winType: tianhuResult.winType,
-          scores: tianhuScores,
+          scores: scoreResult.payments,
           cumulative: room.getCumulativeData(),
         });
         return;
