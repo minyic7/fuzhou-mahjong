@@ -296,9 +296,15 @@ button {
 input {
   background: var(--color-bg-medium);
   color: var(--color-text-primary);
-  border: 1px solid var(--color-bg-button);
+  border: 1px solid var(--color-gold-border);
   border-radius: var(--radius-sm);
   min-height: 44px;
+  transition: border-color 0.2s ease;
+}
+
+input:focus {
+  border-color: var(--color-gold-border-hover);
+  outline: none;
 }
 
 input::placeholder {
@@ -318,13 +324,29 @@ hr {
   margin: 20px 0;
 }
 
-/* Lobby/Room pages keep dark theme */
+/* Lobby/Room pages — dark theme with subtle felt-inspired gradient */
 .lobby-page, .room-page {
   width: 100%;
-  background: var(--color-bg-dark);
+  background: radial-gradient(ellipse at center, var(--color-bg-medium) 0%, var(--color-bg-dark) 70%);
   min-height: 100vh;
   min-height: 100dvh;
   overflow-y: auto;
+  position: relative;
+}
+
+/* Subtle vignette for lobby/room */
+.lobby-page::before, .room-page::before {
+  content: "";
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.25) 100%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.lobby-page > *, .room-page > * {
+  position: relative;
+  z-index: 1;
 }
 
 /* Page transition wrapper */
@@ -349,13 +371,13 @@ hr {
   border: 1px solid var(--color-gold-border);
   border-radius: var(--radius-md);
   padding: 14px 16px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.03);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .room-card:hover {
   border-color: var(--color-gold-border-hover);
-  box-shadow: 0 4px 16px rgba(0,0,0,0.4);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05);
 }
 
 button.lobby-create-btn:hover:not(:disabled) {
@@ -387,6 +409,7 @@ button.lobby-create-btn:hover:not(:disabled) {
   justify-content: center;
   padding: 20px 12px;
   min-height: 100px;
+  box-shadow: inset 0 0 15px rgba(0,0,0,0.2), 0 2px 8px rgba(0,0,0,0.3);
 }
 
 .seat-slot {
@@ -396,7 +419,7 @@ button.lobby-create-btn:hover:not(:disabled) {
 }
 
 .seat-card {
-  background: var(--color-bg-medium);
+  background: rgba(13, 51, 32, 0.6);
   border: 1px solid var(--color-gold-border);
   border-radius: var(--radius-md);
   padding: 12px 10px;
@@ -407,6 +430,7 @@ button.lobby-create-btn:hover:not(:disabled) {
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.03);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
