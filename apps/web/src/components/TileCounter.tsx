@@ -8,7 +8,7 @@ interface TileCounterProps {
 
 const SUITS = ["wan", "bing", "tiao"] as const;
 const SUIT_LABELS: Record<string, string> = { wan: "万", bing: "饼", tiao: "条" };
-const SUIT_COLORS: Record<string, string> = { wan: "#e57373", bing: "#64b5f6", tiao: "#81c784" };
+const SUIT_COLORS: Record<string, string> = { wan: "var(--suit-color-wan)", bing: "var(--suit-color-tong)", tiao: "var(--suit-color-tiao)" };
 const CN_NUMS = ["", "一", "二", "三", "四", "五", "六", "七", "八", "九"];
 
 function countVisibleTiles(state: ClientGameState): Map<string, number> {
