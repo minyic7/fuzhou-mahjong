@@ -29,6 +29,7 @@ interface PlayerAreaProps {
   onAnGang?: (tileInstanceId: number) => void;
   onBuGang?: (tileInstanceId: number) => void;
   hasDiscardedGold?: boolean;
+  isDisconnected?: boolean;
 }
 
 const BUBBLE_BTN = {
@@ -43,6 +44,7 @@ export function PlayerArea({
   isCurrentTurn, isDealer, gold, selectedTileId, onTileClick, label,
   claimableTileIds, onTileDoubleClick, lastDrawnTileId, lastDiscardedTileId, tenpaiTiles,
   canDiscard, onDiscard, canHu, onHu, kongTileIds, onAnGang, onBuGang, hasDiscardedGold,
+  isDisconnected,
 }: PlayerAreaProps) {
   const { onTouchStart, onTouchEnd, onMouseEnter, onMouseLeave, Tooltip } = useLongPress(gold);
 
@@ -57,6 +59,8 @@ export function PlayerArea({
         borderRadius: 8,
         border: isCurrentTurn ? "2px solid #ffd700" : "1px solid transparent",
         overflow: "visible",
+        opacity: isDisconnected ? 0.5 : 1,
+        transition: "opacity 0.3s ease",
       }}
     >
       {/* Player info panel */}
@@ -71,6 +75,7 @@ export function PlayerArea({
           {label}
         </span>
         {isDealer && <span style={{ fontSize: 10, background: "#b71c1c", color: "#ffd700", padding: "1px 5px", borderRadius: 3, fontWeight: "bold" }}>庄</span>}
+        {isDisconnected && <span style={{ fontSize: 10, background: "#ff5722", color: "#fff", padding: "1px 5px", borderRadius: 3, fontWeight: "bold", animation: "disconnectPulse 2s ease-in-out infinite" }}>断线</span>}
         {hasDiscardedGold && <span style={{ fontSize: 10, background: "#c41e3a", color: "#fff", padding: "1px 5px", borderRadius: 3, fontWeight: "bold" }}>弃金</span>}
         {isCurrentTurn && <span style={{ fontSize: 10, background: "rgba(255,215,0,0.2)", color: "#ffd700", padding: "1px 5px", borderRadius: 3, border: "1px solid #ffd700" }}>出牌</span>}
         <span style={{ fontSize: 11, color: "#8fbc8f", marginLeft: "auto" }}>
