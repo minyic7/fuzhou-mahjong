@@ -1192,7 +1192,13 @@ export function emitOrBotAction(
             const inFinal = game.state.wall.length <= game.state.retainCount;
             const currentActions = getPostDrawActions(game, playerIndex, inFinal);
             console.warn(`[Bot:FALLBACK] ${tag} Stale safety re-trigger on own turn (roomId=${game.roomId}, playerIndex=${playerIndex}, turn=${turnNumber}, phase=${game.state.phase}, hasActionWindow=false) ts=${Date.now()}`);
-            emitOrBotAction(io, game, playerIndex, currentActions);
+            try {
+              emitOrBotAction(io, game, playerIndex, currentActions);
+            } catch (e) {
+              console.error(`${tag} Stale safety re-trigger failed:`, e);
+              const player = game.state.players[playerIndex];
+              handlePlayerAction(io, game.roomId, emergencyDiscard(player.hand, playerIndex, game.state.gold), playerIndex);
+            }
           } else {
             console.warn(`${tag} Stale safety bail — not this bot's turn (currentTurn=${game.state.currentTurn}), no window. Watchdog will handle.`);
           }
@@ -1246,7 +1252,13 @@ export function emitOrBotAction(
             const inFinal = game.state.wall.length <= game.state.retainCount;
             const currentActions = getPostDrawActions(game, playerIndex, inFinal);
             console.warn(`[Bot:FALLBACK] ${tag} Stale callback re-trigger on own turn (roomId=${game.roomId}, playerIndex=${playerIndex}, turn=${turnNumber}, phase=${game.state.phase}, hasActionWindow=false) ts=${Date.now()}`);
-            emitOrBotAction(io, game, playerIndex, currentActions);
+            try {
+              emitOrBotAction(io, game, playerIndex, currentActions);
+            } catch (e) {
+              console.error(`${tag} Stale callback re-trigger failed:`, e);
+              const player = game.state.players[playerIndex];
+              handlePlayerAction(io, game.roomId, emergencyDiscard(player.hand, playerIndex, game.state.gold), playerIndex);
+            }
           } else {
             console.warn(`${tag} Stale callback bail — not this bot's turn (currentTurn=${game.state.currentTurn}), no window. Watchdog will handle.`);
           }
