@@ -13,7 +13,7 @@ interface SwipeConfig {
  */
 export function useSwipeGesture({
   onSwipeUp,
-  threshold = Math.min(40, window.innerHeight * 0.08),
+  threshold: thresholdProp,
   enabled = true,
 }: SwipeConfig) {
   const [swipingTileId, setSwipingTileId] = useState<number | null>(null);
@@ -66,13 +66,14 @@ export function useSwipeGesture({
 
   const onTouchEnd = useCallback(() => {
     const ref = touchRef.current;
+    const threshold = thresholdProp ?? Math.min(40, window.innerHeight * 0.08);
     if (ref && ref.locked && swipeOffset < -threshold) {
       onSwipeUp(ref.tileId);
     }
     touchRef.current = null;
     setSwipingTileId(null);
     setSwipeOffset(0);
-  }, [swipeOffset, threshold, onSwipeUp]);
+  }, [swipeOffset, thresholdProp, onSwipeUp]);
 
   return { onTouchStart, onTouchMove, onTouchEnd, swipingTileId, swipeOffset };
 }
