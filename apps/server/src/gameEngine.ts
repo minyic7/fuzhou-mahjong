@@ -1282,8 +1282,12 @@ export function emitOrBotAction(
           const window = activeWindows.get(game.roomId);
           if (window) {
             // Action window active: check if this bot has pending actions, otherwise Pass
-            console.warn(`[Bot:FALLBACK] ${tag} Stale safety re-trigger during action window — passing (roomId=${game.roomId}, playerIndex=${playerIndex}, turn=${turnNumber}, phase=${game.state.phase}, hasActionWindow=true) ts=${Date.now()}`);
-            handlePlayerAction(io, game.roomId, { type: ActionType.Pass, playerIndex }, playerIndex);
+            if (!window.isPending(playerIndex)) {
+              console.log(`${tag} Stale safety re-trigger — bot already responded to action window, skipping ts=${Date.now()}`);
+            } else {
+              console.warn(`[Bot:FALLBACK] ${tag} Stale safety re-trigger during action window — passing (roomId=${game.roomId}, playerIndex=${playerIndex}, turn=${turnNumber}, phase=${game.state.phase}, hasActionWindow=true) ts=${Date.now()}`);
+              handlePlayerAction(io, game.roomId, { type: ActionType.Pass, playerIndex }, playerIndex);
+            }
           } else if (game.isBot(game.state.currentTurn) && game.state.currentTurn === playerIndex) {
             const inFinal = isInFinalDraws(game.state.wall.length, game.state.wallTail.length, game.state.retainCount);
             const currentActions = getPostDrawActions(game, playerIndex, inFinal);
@@ -1312,11 +1316,15 @@ export function emitOrBotAction(
       acted = true;
       const safetyWindow = activeWindows.get(game.roomId);
       if (safetyWindow) {
-        console.warn(`[Bot:SAFETY] ${tag} Safety timeout during action window — passing (roomId=${game.roomId}, playerIndex=${playerIndex}, turn=${turnNumber}, phase=${game.state.phase}, version=${version}, hasActionWindow=true) ts=${Date.now()}`);
-        try {
-          handlePlayerAction(io, game.roomId, { type: ActionType.Pass, playerIndex }, playerIndex);
-        } catch (e) {
-          console.error(`${tag} Safety timeout Pass fallback failed:`, e);
+        if (!safetyWindow.isPending(playerIndex)) {
+          console.log(`${tag} Safety timer — bot already responded to action window, skipping ts=${Date.now()}`);
+        } else {
+          console.warn(`[Bot:SAFETY] ${tag} Safety timeout during action window — passing (roomId=${game.roomId}, playerIndex=${playerIndex}, turn=${turnNumber}, phase=${game.state.phase}, version=${version}, hasActionWindow=true) ts=${Date.now()}`);
+          try {
+            handlePlayerAction(io, game.roomId, { type: ActionType.Pass, playerIndex }, playerIndex);
+          } catch (e) {
+            console.error(`${tag} Safety timeout Pass fallback failed:`, e);
+          }
         }
       } else {
         console.warn(`[Bot:SAFETY] ${tag} Safety timeout — forcing emergency discard (roomId=${game.roomId}, playerIndex=${playerIndex}, turn=${turnNumber}, phase=${game.state.phase}, version=${version}, hasActionWindow=false) ts=${Date.now()}`);
@@ -1340,8 +1348,12 @@ export function emitOrBotAction(
         if (game.state.phase === GamePhase.Playing) {
           const window = activeWindows.get(game.roomId);
           if (window) {
-            console.warn(`[Bot:FALLBACK] ${tag} Stale callback re-trigger during action window — passing (roomId=${game.roomId}, playerIndex=${playerIndex}, turn=${turnNumber}, phase=${game.state.phase}, hasActionWindow=true) ts=${Date.now()}`);
-            handlePlayerAction(io, game.roomId, { type: ActionType.Pass, playerIndex }, playerIndex);
+            if (!window.isPending(playerIndex)) {
+              console.log(`${tag} Stale callback — bot already responded to action window, skipping ts=${Date.now()}`);
+            } else {
+              console.warn(`[Bot:FALLBACK] ${tag} Stale callback re-trigger during action window — passing (roomId=${game.roomId}, playerIndex=${playerIndex}, turn=${turnNumber}, phase=${game.state.phase}, hasActionWindow=true) ts=${Date.now()}`);
+              handlePlayerAction(io, game.roomId, { type: ActionType.Pass, playerIndex }, playerIndex);
+            }
           } else if (game.isBot(game.state.currentTurn) && game.state.currentTurn === playerIndex) {
             const inFinal = isInFinalDraws(game.state.wall.length, game.state.wallTail.length, game.state.retainCount);
             const currentActions = getPostDrawActions(game, playerIndex, inFinal);
@@ -1385,7 +1397,12 @@ export function emitOrBotAction(
         // Re-query actions at execution time — the captured `actions` may be stale
         // since 300-800ms have passed since emitOrBotAction was called
         const inFinal = isInFinalDraws(game.state.wall.length, game.state.wallTail.length, game.state.retainCount);
-        const freshActions = activeWindows.has(game.roomId) ? actions : getPostDrawActions(game, playerIndex, inFinal);
+        const activeWindow = activeWindows.get(game.roomId);
+        if (activeWindow && !activeWindow.isPending(playerIndex)) {
+          console.log(`${tag} Bot already responded to action window, skipping ts=${Date.now()}`);
+          return;
+        }
+        const freshActions = activeWindow ? actions : getPostDrawActions(game, playerIndex, inFinal);
         const botAction = decideBotAction(player.hand, player.melds, freshActions, playerIndex, game.state.gold, lastDiscardTile, botContext);
         console.log(`${tag} Decided action=${botAction.type} (version=${version}) ts=${Date.now()}`);
         const success = handlePlayerAction(io, game.roomId, botAction, playerIndex);
