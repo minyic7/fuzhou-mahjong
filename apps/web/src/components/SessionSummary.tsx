@@ -1,3 +1,4 @@
+import { useState } from "react";
 import type { GameOverResult } from "@fuzhou-mahjong/shared";
 import { BREAKPOINTS } from "../hooks/useIsMobile";
 
@@ -25,6 +26,76 @@ const winTypeNames: Record<string, string> = {
   threeGoldDown: "三金倒", goldSparrow: "金雀", goldDragon: "金龙",
   duiDuiHu: "对对胡", qingYiSe: "清一色", draw: "流局",
 };
+
+function RoundHistorySection({ roundHistory, playerNames, isCompact }: {
+  roundHistory: RoundRecord[];
+  playerNames: string[];
+  isCompact: boolean;
+}) {
+  const [expanded, setExpanded] = useState(false);
+  const showToggle = isCompact;
+  const contentMaxHeight = isCompact ? (expanded ? 240 : 0) : 160;
+
+  return (
+    <div style={{ marginBottom: 16 }}>
+      <div
+        style={{
+          fontSize: 13, color: "var(--color-text-secondary)", marginBottom: 6,
+          ...(showToggle ? { cursor: "pointer", userSelect: "none" as const } : {}),
+        }}
+        onClick={showToggle ? () => setExpanded(e => !e) : undefined}
+      >
+        每局记录 / Round History
+        {showToggle && (
+          <span style={{ marginLeft: 6, fontSize: 11 }}>
+            {expanded ? "▲ 收起" : "▼ 展开"}
+          </span>
+        )}
+      </div>
+      {(!showToggle || expanded) && (
+        <div style={{ maxHeight: contentMaxHeight, overflowY: "auto" }}>
+          {/* Player name header */}
+          <div style={{
+            fontSize: 11, padding: "4px 10px", marginBottom: 2,
+            display: "flex", justifyContent: "space-between", alignItems: "center",
+            color: "var(--color-text-secondary)", opacity: 0.7,
+          }}>
+            <span />
+            <span>
+              {playerNames.map((name, i) => (
+                <span key={i} style={{ marginLeft: 8, minWidth: 28, display: "inline-block", textAlign: "right" }}>
+                  {name.length > 4 ? name.slice(0, 3) + "…" : name}
+                </span>
+              ))}
+            </span>
+          </div>
+          {roundHistory.map((round, ri) => (
+            <div key={ri} style={{
+              fontSize: 12, padding: "6px 10px", marginBottom: 2,
+              background: "rgba(255,255,255,0.03)", borderRadius: 4,
+              display: "flex", justifyContent: "space-between", alignItems: "center",
+            }}>
+              <span style={{ color: "var(--color-text-secondary)" }}>
+                第{ri + 1}局: {winTypeNames[round.winType] || round.winType}
+              </span>
+              <span style={{ color: "var(--color-text-primary)" }}>
+                {round.scores.map((s, i) => (
+                  <span key={i} style={{
+                    marginLeft: 8, minWidth: 28, display: "inline-block", textAlign: "right",
+                    color: s > 0 ? "var(--color-success)" : s < 0 ? "var(--color-error)" : "var(--color-text-secondary)",
+                    opacity: s === 0 ? 0.6 : 1,
+                  }}>
+                    {s > 0 ? "+" : ""}{s}
+                  </span>
+                ))}
+              </span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 export function SessionSummary({ data, onClose }: SessionSummaryProps) {
   const { playerNames, cumulativeScores, roundsPlayed, roundHistory } = data;
@@ -122,33 +193,11 @@ export function SessionSummary({ data, onClose }: SessionSummaryProps) {
 
         {/* Per-round history */}
         {roundHistory.length > 0 && (
-          <div style={{ marginBottom: 16 }}>
-            <div style={{ fontSize: 13, color: "var(--color-text-secondary)", marginBottom: 6 }}>每局记录 / Round History</div>
-            <div style={{ maxHeight: isCompact ? 100 : 160, overflowY: "auto" }}>
-              {roundHistory.map((round, ri) => (
-                <div key={ri} style={{
-                  fontSize: 12, padding: "6px 10px", marginBottom: 2,
-                  background: "rgba(255,255,255,0.03)", borderRadius: 4,
-                  display: "flex", justifyContent: "space-between", alignItems: "center",
-                }}>
-                  <span style={{ color: "var(--color-text-secondary)" }}>
-                    第{ri + 1}局: {winTypeNames[round.winType] || round.winType}
-                  </span>
-                  <span style={{ color: "var(--color-text-primary)" }}>
-                    {round.scores.map((s, i) => (
-                      <span key={i} style={{
-                        marginLeft: 8,
-                        color: s > 0 ? "var(--color-success)" : s < 0 ? "var(--color-error)" : "var(--color-text-secondary)",
-                        opacity: s === 0 ? 0.6 : 1,
-                      }}>
-                        {s > 0 ? "+" : ""}{s}
-                      </span>
-                    ))}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
+          <RoundHistorySection
+            roundHistory={roundHistory}
+            playerNames={playerNames}
+            isCompact={isCompact}
+          />
         )}
 
         <button
