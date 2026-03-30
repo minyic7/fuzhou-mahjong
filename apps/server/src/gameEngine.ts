@@ -61,6 +61,7 @@ class ActionWindow {
   private timer: ReturnType<typeof setTimeout> | null = null;
   private onResolve: (winner: PendingAction | null) => void;
   private discarderIndex: number;
+  private resolved = false;
 
   constructor(
     pendingPlayers: number[],
@@ -82,6 +83,7 @@ class ActionWindow {
   }
 
   addResponse(playerIndex: number, action: GameAction): boolean {
+    if (this.resolved) return false;
     if (!this.pendingPlayers.has(playerIndex)) return false;
     this.responses.set(playerIndex, action);
     this.pendingPlayers.delete(playerIndex);
@@ -91,6 +93,7 @@ class ActionWindow {
 
   private tryResolve(): void {
     if (this.pendingPlayers.size > 0) return;
+    this.resolved = true;
     if (this.timer) { clearTimeout(this.timer); this.timer = null; }
 
     // Find highest priority action
@@ -428,8 +431,8 @@ function handleDiscard(
       existingWindow.cancel();
     }
     const window = new ActionWindow(pendingPlayers, playerIndex, (winner) => {
-      activeWindows.delete(game.roomId);
       resolveActionWindow(io, game, winner, playerIndex, tile);
+      activeWindows.delete(game.roomId);
     });
     activeWindows.set(game.roomId, window);
   }
@@ -613,13 +616,13 @@ function handleBuGang(
       existingWindow.cancel();
     }
     const window = new ActionWindow(canRob, playerIndex, (winner) => {
-      activeWindows.delete(game.roomId);
       if (winner && winner.action.type === ActionType.Hu) {
         endGameWin(io, game, winner.playerIndex, tile, false);
       } else {
         // No one robbed, proceed with bu gang
         executeBuGang(io, game, playerIndex, tile, meldIdx);
       }
+      activeWindows.delete(game.roomId);
     });
     activeWindows.set(game.roomId, window);
   } else {
