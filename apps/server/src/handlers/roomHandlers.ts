@@ -65,6 +65,7 @@ export function registerRoomHandlers(io: GameServer, socket: GameSocket): void {
   socket.on("rejoinGame", (playerId: string) => {
     const room = findRoomByPlayerId(playerId);
     if (!room) { socket.emit("error", "No active game found"); return; }
+    if (room.isStartingRound) { socket.emit("error", "Round initializing, retry shortly"); return; }
 
     const player = room.reconnectPlayer(playerId, socket.id);
     if (!player) { socket.emit("error", "Player not found in room"); return; }
@@ -205,7 +206,10 @@ export function registerRoomHandlers(io: GameServer, socket: GameSocket): void {
       socket.emit("error", "Game is still in progress");
       return;
     }
+    if (room.isStartingRound) { socket.emit("error", "Round already starting"); return; }
+    room.isStartingRound = true;
 
+    try {
     game.startNextRound();
     console.log(`Next round in room ${room.id}, dealer: ${game.state.dealerIndex}`);
 
@@ -259,6 +263,9 @@ export function registerRoomHandlers(io: GameServer, socket: GameSocket): void {
     }
 
     triggerDealerAction(io, game, room);
+    } finally {
+      room.isStartingRound = false;
+    }
   });
 
   socket.on("disconnect", () => {
