@@ -10,6 +10,7 @@ interface TileWallProps {
   gold: GoldState | null;
   canDraw?: boolean;
   onDraw?: () => void;
+  compact?: boolean;
 }
 
 const STACKS_PER_SIDE = 18;
@@ -172,7 +173,7 @@ function WallSegment({ side, stacks, drawStack, canDraw, onDraw }: {
   );
 }
 
-export function TileWall({ wallRemaining, wallDrawCount, wallSupplementCount, gold, canDraw, onDraw }: TileWallProps) {
+export function TileWall({ wallRemaining, wallDrawCount, wallSupplementCount, gold, canDraw, onDraw, compact }: TileWallProps) {
   const sides = useMemo(() => computeWallStacks(wallDrawCount, wallSupplementCount), [wallDrawCount, wallSupplementCount]);
   const drawIndex = useMemo(() => findDrawStackIndex(sides), [sides]);
 
@@ -191,6 +192,47 @@ export function TileWall({ wallRemaining, wallDrawCount, wallSupplementCount, go
       setGoldFlip(false);
     }
   }, [gold]);
+
+  if (compact) {
+    return (
+      <div style={{
+        display: "flex", alignItems: "center", justifyContent: "center",
+        gap: 8, padding: "4px 8px", maxHeight: 44,
+        background: "rgba(0,0,0,0.2)", borderRadius: 6,
+      }}>
+        {gold && (
+          <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+            <span style={{ fontSize: 10, color: "#ffd700" }}>金</span>
+            <TileView tile={gold.indicatorTile} faceUp gold={null} small className={goldFlip ? "gold-flip-reveal" : undefined} />
+          </div>
+        )}
+        <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
+          <div style={{ width: 80, height: 6, background: "rgba(255,255,255,0.1)", borderRadius: 3 }}>
+            <div style={{
+              width: `${(wallRemaining / 144) * 100}%`, height: "100%",
+              background: wallRemaining > 20 ? "#4caf50" : wallRemaining > 10 ? "#ff9800" : "#f44336",
+              borderRadius: 3, transition: "width 0.3s ease",
+            }} />
+          </div>
+          <span style={{ fontSize: 11, color: "#8fbc8f" }}>{wallRemaining}</span>
+        </div>
+        {canDraw && (
+          <button
+            className="draw-button-pulse"
+            onClick={onDraw}
+            style={{
+              padding: "4px 12px", fontSize: 12, fontWeight: "bold",
+              background: "#6a5acd", color: "#fff", border: "none",
+              borderRadius: 4, minHeight: 32, minWidth: 44,
+              boxShadow: "0 0 12px rgba(106,90,205,0.6)",
+            }}
+          >
+            摸牌
+          </button>
+        )}
+      </div>
+    );
+  }
 
   return (
     <div className="tile-wall-container" style={{

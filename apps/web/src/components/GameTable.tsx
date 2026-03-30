@@ -55,7 +55,7 @@ export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTile
         ". bottom ."
       `,
       gridTemplateColumns: "1fr 2fr 1fr",
-      gridTemplateRows: "auto 1fr auto",
+      gridTemplateRows: isCompact ? "minmax(0, 50px) minmax(0, 60px) 1fr" : "auto 1fr auto",
       flex: 1,
       minHeight: 0,
       gap: "var(--game-gap)",
@@ -102,16 +102,17 @@ export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTile
       </div>
 
       {/* Center - game info */}
-      <div className="table-center-area" style={{ gridArea: "center", display: "flex", alignItems: "center", justifyContent: "center", position: "relative", zIndex: 1 }}>
-        <TileWall wallRemaining={wallRemaining} wallDrawCount={state.wallDrawCount} wallSupplementCount={state.wallSupplementCount} gold={gold} canDraw={canDraw} onDraw={onDraw} />
+      <div className="table-center-area" style={{ gridArea: "center", display: "flex", flexDirection: isCompact ? "column" : "row", alignItems: "center", justifyContent: "center", position: "relative", zIndex: 1, overflow: "hidden" }}>
+        <TileWall wallRemaining={wallRemaining} wallDrawCount={state.wallDrawCount} wallSupplementCount={state.wallSupplementCount} gold={gold} canDraw={canDraw} onDraw={onDraw} compact={isCompact} />
         <GameInfo
-          gold={null}
+          gold={isCompact ? null : gold}
           wallRemaining={wallRemaining}
           dealerIndex={dealerIndex}
           lianZhuangCount={lianZhuangCount}
           myIndex={myIndex}
           lastDiscard={state.lastDiscard}
           playerNames={[myName || "我", ...otherPlayers.map(p => p.name || "")]}
+          compact={isCompact}
         />
       </div>
 
