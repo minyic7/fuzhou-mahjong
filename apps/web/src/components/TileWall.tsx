@@ -108,7 +108,6 @@ function WallSegment({ side, stacks, drawStack, canDraw, onDraw }: {
       ...(side === "right" && { right: 0, top: "50%", transform: "translateY(-50%)" }),
     }}>
       {ordered.map((s, i) => {
-        const empty = !s.hasUpper && !s.hasLower;
         const isTarget = drawIdx === i;
         return (
           <div key={i} style={{
@@ -117,29 +116,35 @@ function WallSegment({ side, stacks, drawStack, canDraw, onDraw }: {
             height: isH ? "calc(var(--wall-th) + 3px)" : "var(--wall-tw)",
             flexShrink: 0,
           }}>
-            {!empty && (
+            <div style={{
+              position: "absolute",
+              inset: 0,
+              display: "flex",
+              flexDirection: isH ? "column" : "row",
+              justifyContent: "flex-end",
+              ...(!isH && { transform: "rotate(90deg)", transformOrigin: "center" }),
+            }}>
+              {/* Lower tile */}
               <div style={{
-                position: "absolute",
-                inset: 0,
-                display: "flex",
-                flexDirection: isH ? "column" : "row",
-                justifyContent: "flex-end",
-                ...(!isH && { transform: "rotate(90deg)", transformOrigin: "center" }),
+                position: "absolute", bottom: 0, left: 0,
+                opacity: s.hasLower ? 1 : 0,
+                transform: s.hasLower ? "scale(1)" : "scale(0.5)",
+                transition: "opacity 0.15s ease-out, transform 0.15s ease-out",
+                pointerEvents: s.hasLower ? "auto" : "none",
               }}>
-                {/* Lower tile */}
-                {s.hasLower && (
-                  <div style={{ position: "absolute", bottom: 0, left: 0 }}>
-                    <WallTile />
-                  </div>
-                )}
-                {/* Upper tile, offset slightly */}
-                {s.hasUpper && (
-                  <div style={{ position: "absolute", bottom: 3, left: 0 }}>
-                    <WallTile />
-                  </div>
-                )}
+                <WallTile />
               </div>
-            )}
+              {/* Upper tile, offset slightly */}
+              <div style={{
+                position: "absolute", bottom: 3, left: 0,
+                opacity: s.hasUpper ? 1 : 0,
+                transform: s.hasUpper ? "scale(1)" : "scale(0.5)",
+                transition: "opacity 0.15s ease-out, transform 0.15s ease-out",
+                pointerEvents: s.hasUpper ? "auto" : "none",
+              }}>
+                <WallTile />
+              </div>
+            </div>
             {/* Draw button on the draw-target stack */}
             {isTarget && canDraw && (
               <button
