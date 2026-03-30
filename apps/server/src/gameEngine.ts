@@ -179,7 +179,11 @@ function startBotWatchdog(roomId: string, playerIndex: number, io: GameServer): 
       return;
     }
 
-    // Turn-based context: check if currentTurn is a bot
+    // Turn-based context: check if this specific bot is the current turn
+    if (playerIndex !== game.state.currentTurn) {
+      console.log(`[Bot:${roomId}:p${playerIndex}:watchdog] Fired but playerIndex≠currentTurn (currentTurn=${game.state.currentTurn}) ts=${Date.now()}`);
+      return;
+    }
     if (!game.isBot(game.state.currentTurn)) {
       console.log(`[Bot:${roomId}:p${playerIndex}:watchdog] Fired but currentTurn=${game.state.currentTurn} is not a bot ts=${Date.now()}`);
       return;
@@ -831,8 +835,19 @@ function resolveActionWindow(
         state.lastDiscard = null;
         broadcastState(io, game);
         // Player must discard
-        emitOrBotAction(io, game, winner.playerIndex,
-          getPostClaimActions(game, winner.playerIndex));
+        try {
+          emitOrBotAction(io, game, winner.playerIndex,
+            getPostClaimActions(game, winner.playerIndex));
+        } catch (e) {
+          console.error(`[GameEngine] post-Peng emitOrBotAction failed:`, e);
+          const pPlayer = game.state.players[winner.playerIndex];
+          try {
+            handlePlayerAction(io, game.roomId, emergencyDiscard(pPlayer.hand, winner.playerIndex, game.state.gold), winner.playerIndex);
+          } catch (e2) {
+            console.error(`[GameEngine] post-Peng emergency discard failed:`, e2);
+            advanceToNextPlayer(io, game, winner.playerIndex);
+          }
+        }
       } catch (e) {
         console.error(`[GameEngine] resolveActionWindow Peng failed:`, e);
         advanceToNextPlayer(io, game, winner.playerIndex);
@@ -923,8 +938,19 @@ function resolveActionWindow(
         state.currentTurn = winner.playerIndex;
         state.lastDiscard = null;
         broadcastState(io, game);
-        emitOrBotAction(io, game, winner.playerIndex,
-          getPostClaimActions(game, winner.playerIndex));
+        try {
+          emitOrBotAction(io, game, winner.playerIndex,
+            getPostClaimActions(game, winner.playerIndex));
+        } catch (e) {
+          console.error(`[GameEngine] post-Chi emitOrBotAction failed:`, e);
+          const cPlayer = game.state.players[winner.playerIndex];
+          try {
+            handlePlayerAction(io, game.roomId, emergencyDiscard(cPlayer.hand, winner.playerIndex, game.state.gold), winner.playerIndex);
+          } catch (e2) {
+            console.error(`[GameEngine] post-Chi emergency discard failed:`, e2);
+            advanceToNextPlayer(io, game, winner.playerIndex);
+          }
+        }
       } catch (e) {
         console.error(`[GameEngine] resolveActionWindow Chi failed:`, e);
         advanceToNextPlayer(io, game, winner.playerIndex);
@@ -1482,7 +1508,11 @@ export function emitOrBotAction(
         }
         const window = activeWindows.get(game.roomId);
         if (window) {
-          // In action window: pass
+          // In action window: pass only if this player is still pending
+          if (!window.isPending(playerIndex)) {
+            console.log(`[GameEngine] Player ${playerIndex} auto-act skipped — already responded to action window`);
+            return;
+          }
           handlePlayerAction(io, game.roomId, { type: ActionType.Pass, playerIndex }, playerIndex);
         } else if (game.state.currentTurn === playerIndex) {
           // Own turn, no window: emergency discard to keep game moving
