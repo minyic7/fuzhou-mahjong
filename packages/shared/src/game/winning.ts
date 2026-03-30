@@ -141,19 +141,6 @@ export function isValidHand(
   goldCount: number,
   setsNeeded: number = 5,
 ): boolean {
-  // Find unique tile types for pair candidates
-  const seen = new Set<string>();
-  const candidates: { suit: string; value: number; count: number }[] = [];
-  for (const t of handTiles) {
-    const key = `${t.suit}-${t.value}`;
-    if (!seen.has(key)) {
-      seen.add(key);
-      candidates.push({ suit: t.suit, value: t.value, count: 0 });
-    }
-    candidates[candidates.length - 1].count++;
-  }
-
-  // Fix count tracking
   const countMap = new Map<string, number>();
   for (const t of handTiles) {
     const key = `${t.suit}-${t.value}`;
