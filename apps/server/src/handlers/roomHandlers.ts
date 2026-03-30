@@ -18,6 +18,7 @@ type GameSocket = Socket<ClientEvents, ServerEvents>;
 type GameServer = Server<ClientEvents, ServerEvents>;
 
 const RECONNECT_TIMEOUT_MS = 60_000;
+const reconnectingPlayers = new Set<string>();
 
 function broadcastRoomList(io: GameServer): void {
   io.emit("roomList", getAvailableRooms());
@@ -63,25 +64,35 @@ export function registerRoomHandlers(io: GameServer, socket: GameSocket): void {
   });
 
   socket.on("rejoinGame", (playerId: string) => {
+    if (reconnectingPlayers.has(playerId)) {
+      socket.emit("error", "Reconnection already in progress");
+      return;
+    }
+
     const room = findRoomByPlayerId(playerId);
     if (!room) { socket.emit("error", "No active game found"); return; }
     if (room.isStartingRound) { socket.emit("error", "Round initializing, retry shortly"); return; }
 
-    const player = room.reconnectPlayer(playerId, socket.id);
-    if (!player) { socket.emit("error", "Player not found in room"); return; }
+    reconnectingPlayers.add(playerId);
+    try {
+      const player = room.reconnectPlayer(playerId, socket.id);
+      if (!player) { socket.emit("error", "Player not found in room"); return; }
 
-    socket.join(room.id);
+      socket.join(room.id);
 
-    const game = getGame(room.id);
-    if (game) {
-      const playerIndex = room.getPlayerIndexByPlayerId(playerId);
-      game.updateSocketId(playerIndex, socket.id);
-      socket.emit("playerIdAssigned", playerId);
-      socket.emit("gameStarted", game.getClientGameState(playerIndex));
-      io.to(room.id).emit("playerReconnected", { playerIndex, playerName: player.name });
-      console.log(`Player ${player.name} reconnected to room ${room.id}`);
-    } else {
-      socket.emit("roomJoined", room.getState());
+      const game = getGame(room.id);
+      if (game) {
+        const playerIndex = room.getPlayerIndexByPlayerId(playerId);
+        game.updateSocketId(playerIndex, socket.id);
+        socket.emit("playerIdAssigned", playerId);
+        socket.emit("gameStarted", game.getClientGameState(playerIndex));
+        io.to(room.id).emit("playerReconnected", { playerIndex, playerName: player.name });
+        console.log(`Player ${player.name} reconnected to room ${room.id}`);
+      } else {
+        socket.emit("roomJoined", room.getState());
+      }
+    } finally {
+      reconnectingPlayers.delete(playerId);
     }
   });
 
@@ -263,6 +274,9 @@ export function registerRoomHandlers(io: GameServer, socket: GameSocket): void {
     }
 
     triggerDealerAction(io, game, room);
+    } catch (err) {
+      console.error(`[RoomHandlers] nextRound failed in room ${room.id}:`, err);
+      socket.emit("error", "Failed to start next round");
     } finally {
       room.isStartingRound = false;
     }

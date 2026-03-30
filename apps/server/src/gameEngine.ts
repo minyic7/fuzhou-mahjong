@@ -309,6 +309,12 @@ export function handlePlayerAction(
     }
     playerIndex = game.getPlayerIndex(socketIdOrRoomId);
     if (playerIndex === -1) return false;
+
+    // Validate client-supplied playerIndex matches server-computed index
+    if (action.playerIndex !== playerIndex) {
+      console.warn(`[GameEngine] playerIndex mismatch: client sent ${action.playerIndex}, server computed ${playerIndex} for socket=${socketIdOrRoomId}. Using server value.`);
+      action.playerIndex = playerIndex;
+    }
   }
 
   // Clear watchdog on any successful action processing for this player
