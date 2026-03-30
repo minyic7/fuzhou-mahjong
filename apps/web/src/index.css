@@ -49,6 +49,7 @@ body {
 }
 
 /* Tile sizing CSS variables — small sizes derived via calc() */
+/* Game layout spacing variables */
 :root {
   --tile-w: 44px;
   --tile-h: 60px;
@@ -60,6 +61,27 @@ body {
   /* Wall tile sizing — small face-down tiles for the wall display */
   --wall-tw: 11px;
   --wall-th: 15px;
+
+  --game-gap: 8px;
+  --game-padding: 8px;
+  --game-perspective: 1200px;
+  --overlay-padding-y: 20px;
+  --overlay-padding-x: 24px;
+  --btn-font: 18px;
+  --btn-padding: 12px 24px;
+  --btn-min-size: 48px;
+  --label-font: 14px;
+  --discard-cols: 6;
+  --hand-new-tile-margin: 16px;
+  --hand-padding-top: 18px;
+}
+
+@media (max-width: 768px) {
+  :root {
+    --game-gap: 6px;
+    --game-padding: 6px;
+    --game-perspective: 1000px;
+  }
 }
 
 @media (max-width: 480px) {
@@ -70,6 +92,18 @@ body {
     --tile-suit-font: 9px;
     --wall-tw: 9px;
     --wall-th: 12px;
+
+    --game-gap: 4px;
+    --game-padding: 4px;
+    --game-perspective: 800px;
+    --overlay-padding-y: 12px;
+    --overlay-padding-x: 16px;
+    --btn-font: 16px;
+    --btn-padding: 10px 18px;
+    --label-font: 12px;
+    --discard-cols: 7;
+    --hand-new-tile-margin: 8px;
+    --hand-padding-top: 14px;
   }
 }
 
@@ -81,6 +115,15 @@ body {
     --tile-suit-font: 8px;
     --wall-tw: 7px;
     --wall-th: 10px;
+
+    --game-gap: 2px;
+    --game-padding: 2px;
+    --game-perspective: 600px;
+    --btn-font: 14px;
+    --btn-padding: 8px 14px;
+    --discard-cols: 8;
+    --hand-new-tile-margin: 6px;
+    --hand-padding-top: 10px;
   }
 }
 

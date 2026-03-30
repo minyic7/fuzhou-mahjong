@@ -32,7 +32,7 @@ interface PlayerAreaProps {
 }
 
 const BUBBLE_BTN = {
-  padding: "6px 12px", fontSize: 14, fontWeight: "bold" as const,
+  padding: "6px 12px", fontSize: "var(--label-font)", fontWeight: "bold" as const,
   border: "none", borderRadius: 6,
   whiteSpace: "nowrap" as const, minHeight: 44, minWidth: 44,
   cursor: "pointer",
@@ -67,7 +67,7 @@ export function PlayerArea({
         borderRadius: 4,
         borderLeft: isCurrentTurn ? "3px solid #ffd700" : "3px solid transparent",
       }}>
-        <span style={{ fontSize: 14, fontWeight: "bold", color: "#e8d5a3" }}>
+        <span style={{ fontSize: "var(--label-font)", fontWeight: "bold", color: "#e8d5a3" }}>
           {label}
         </span>
         {isDealer && <span style={{ fontSize: 10, background: "#b71c1c", color: "#ffd700", padding: "1px 5px", borderRadius: 3, fontWeight: "bold" }}>庄</span>}
@@ -79,7 +79,7 @@ export function PlayerArea({
       </div>
 
       {/* Hand */}
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 1, marginBottom: 4, alignItems: "flex-end", paddingTop: isMe ? 18 : 0, overflow: "visible", position: "relative" }}>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 1, marginBottom: 4, alignItems: "flex-end", paddingTop: isMe ? "var(--hand-padding-top)" : 0, overflow: "visible", position: "relative" }}>
         {isMe && hand ? (
           hand.map((t, idx) => {
             const isSelected = selectedTileId === t.id;
@@ -91,7 +91,7 @@ export function PlayerArea({
             return (
             <div key={t.id} style={{
               display: "inline-flex",
-              marginLeft: lastDrawnTileId === t.id ? 16 : 0,
+              marginLeft: lastDrawnTileId === t.id ? "var(--hand-new-tile-margin)" : 0,
               position: "relative",
             }}>
               {lastDrawnTileId === t.id && (
@@ -217,9 +217,9 @@ export function PlayerArea({
       {discards.length > 0 && (
         <div style={{
           display: "grid",
-          gridTemplateColumns: "repeat(6, auto)",
+          gridTemplateColumns: `repeat(var(--discard-cols), auto)`,
           gap: 1,
-          padding: 4,
+          padding: "var(--game-padding)",
           background: isMe ? "rgba(0,100,200,0.08)" : "rgba(255,255,255,0.03)",
           borderRadius: 4,
           maxWidth: "min(300px, 90vw)",

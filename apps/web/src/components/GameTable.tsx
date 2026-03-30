@@ -45,9 +45,9 @@ export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTile
       gridTemplateRows: "auto 1fr auto",
       flex: 1,
       minHeight: 0,
-      gap: 8,
-      padding: 8,
-      perspective: "1200px",
+      gap: "var(--game-gap)",
+      padding: "var(--game-padding)",
+      perspective: "var(--game-perspective)",
       perspectiveOrigin: "50% 60%",
     }}>
       {/* Top player (index 2 in otherPlayers = across from me) */}
