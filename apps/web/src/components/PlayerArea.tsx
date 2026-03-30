@@ -31,6 +31,7 @@ interface PlayerAreaProps {
   kongTileIds?: Set<number>;
   onAnGang?: (tileInstanceId: number) => void;
   onBuGang?: (tileInstanceId: number) => void;
+  departingTileId?: number | null;
   hasDiscardedGold?: boolean;
   isDisconnected?: boolean;
   compact?: boolean;
@@ -48,7 +49,7 @@ export function PlayerArea({
   isMe, hand, handCount, melds, flowers, discards,
   isCurrentTurn, isDealer, gold, selectedTileId, onTileClick, label,
   claimableTileIds, onTileDoubleClick, lastDrawnTileId, lastDiscardedTileId, tenpaiTiles,
-  canDiscard, onDiscard, canHu, onHu, kongTileIds, onAnGang, onBuGang, hasDiscardedGold,
+  canDiscard, onDiscard, canHu, onHu, kongTileIds, onAnGang, onBuGang, departingTileId, hasDiscardedGold,
   isDisconnected, compact, cumulativeScore,
 }: PlayerAreaProps) {
   const { onTouchStart: lpTouchStart, onTouchEnd: lpTouchEnd, onMouseEnter, onMouseLeave, Tooltip } = useLongPress(gold);
@@ -312,7 +313,7 @@ export function PlayerArea({
                 gold={gold}
                 selected={selectedTileId === t.id}
                 claimable={claimableTileIds?.has(t.id) || !!isKong}
-                className={lastDrawnTileId === t.id ? "tile-new" : undefined}
+                className={departingTileId === t.id ? "tile-departing" : lastDrawnTileId === t.id ? "tile-new" : undefined}
                 onTouchStart={(e) => lpTouchStart(t, e)}
                 onTouchEnd={lpTouchEnd}
                 onMouseEnter={(e) => onMouseEnter(t, e)}
