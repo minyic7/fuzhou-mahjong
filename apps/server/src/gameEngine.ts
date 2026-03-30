@@ -139,13 +139,9 @@ function addGangSafetyTimeout(roomId: string, timer: NodeJS.Timeout): void {
 const BOT_WATCHDOG_MS = 10_000;
 const botWatchdogs = new Map<string, NodeJS.Timeout>();
 
-/** Last io reference, captured so the watchdog can act without closure. */
-let lastIoRef: GameServer | null = null;
-
 function startBotWatchdog(roomId: string, playerIndex: number, io: GameServer): void {
   const key = roomId + ":" + playerIndex;
   clearBotWatchdog(roomId, playerIndex);
-  lastIoRef = io;
 
   const watchdogVersion = getBotVersion(roomId, playerIndex);
   const watchdog = setTimeout(() => {
@@ -1226,7 +1222,7 @@ export function emitOrBotAction(
             console.warn(`[Bot:FALLBACK] ${tag} Stale safety re-trigger during action window — passing (roomId=${game.roomId}, playerIndex=${playerIndex}, turn=${turnNumber}, phase=${game.state.phase}, hasActionWindow=true) ts=${Date.now()}`);
             handlePlayerAction(io, game.roomId, { type: ActionType.Pass, playerIndex }, playerIndex);
           } else if (game.isBot(game.state.currentTurn) && game.state.currentTurn === playerIndex) {
-            const inFinal = (game.state.wall.length + game.state.wallTail.length) <= game.state.retainCount;
+            const inFinal = isInFinalDraws(game.state.wall.length, game.state.wallTail.length, game.state.retainCount);
             const currentActions = getPostDrawActions(game, playerIndex, inFinal);
             console.warn(`[Bot:FALLBACK] ${tag} Stale safety re-trigger on own turn (roomId=${game.roomId}, playerIndex=${playerIndex}, turn=${turnNumber}, phase=${game.state.phase}, hasActionWindow=false) ts=${Date.now()}`);
             try {
@@ -1237,7 +1233,7 @@ export function emitOrBotAction(
               handlePlayerAction(io, game.roomId, emergencyDiscard(player.hand, playerIndex, game.state.gold), playerIndex);
             }
           } else {
-            console.warn(`${tag} Stale safety bail — not this bot's turn (currentTurn=${game.state.currentTurn}), no window. Watchdog will handle.`);
+            console.log(tag + " Stale bail — bot turn is over, no action needed");
           }
         }
         return;
@@ -1285,7 +1281,7 @@ export function emitOrBotAction(
             console.warn(`[Bot:FALLBACK] ${tag} Stale callback re-trigger during action window — passing (roomId=${game.roomId}, playerIndex=${playerIndex}, turn=${turnNumber}, phase=${game.state.phase}, hasActionWindow=true) ts=${Date.now()}`);
             handlePlayerAction(io, game.roomId, { type: ActionType.Pass, playerIndex }, playerIndex);
           } else if (game.isBot(game.state.currentTurn) && game.state.currentTurn === playerIndex) {
-            const inFinal = (game.state.wall.length + game.state.wallTail.length) <= game.state.retainCount;
+            const inFinal = isInFinalDraws(game.state.wall.length, game.state.wallTail.length, game.state.retainCount);
             const currentActions = getPostDrawActions(game, playerIndex, inFinal);
             console.warn(`[Bot:FALLBACK] ${tag} Stale callback re-trigger on own turn (roomId=${game.roomId}, playerIndex=${playerIndex}, turn=${turnNumber}, phase=${game.state.phase}, hasActionWindow=false) ts=${Date.now()}`);
             try {
@@ -1296,7 +1292,7 @@ export function emitOrBotAction(
               handlePlayerAction(io, game.roomId, emergencyDiscard(player.hand, playerIndex, game.state.gold), playerIndex);
             }
           } else {
-            console.warn(`${tag} Stale callback bail — not this bot's turn (currentTurn=${game.state.currentTurn}), no window. Watchdog will handle.`);
+            console.log(tag + " Stale bail — bot turn is over, no action needed");
           }
         }
         return;
