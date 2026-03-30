@@ -67,7 +67,9 @@ export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTile
       display: "grid",
       gridTemplateAreas: isFirstPersonMobile
         ? `"left top right" "left center right" "bottom bottom bottom"`
-        : `". top ." "left center right" ". bottom ."`,
+        : isCompact
+        ? `". top ." "left center right" ". bottom ."`
+        : `". top ." "left center right" "bottom bottom bottom"`,
       gridTemplateColumns: isFirstPersonMobile ? "var(--fp-side-col) 1fr var(--fp-side-col)" : isCompact ? "var(--grid-side-col) 1fr var(--grid-side-col)" : "1fr 2fr 1fr",
       gridTemplateRows: isFirstPersonMobile ? "var(--fp-top-row) 1fr minmax(55%, 65%)" : isCompact ? "var(--grid-top-row) var(--grid-center-row) 1fr" : "auto 1fr auto",
       flex: 1,
@@ -78,7 +80,7 @@ export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTile
       perspectiveOrigin: "50% 60%",
     }}>
       {/* Top player (index 2 in otherPlayers = across from me) */}
-      <div style={{ gridArea: "top", position: "relative", zIndex: 1 }}>
+      <div style={{ gridArea: "top", position: "relative", zIndex: 1, overflow: "hidden" }}>
         <PlayerArea
           isMe={false}
           handCount={otherPlayers[1]?.handCount ?? 0}
@@ -99,7 +101,7 @@ export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTile
       </div>
 
       {/* Left player — rotated 90° clockwise to face left */}
-      <div style={{ gridArea: "left", position: "relative", zIndex: 1, transform: "rotate(90deg)", transformOrigin: "center center", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <div style={{ gridArea: "left", position: "relative", zIndex: 1, overflow: "hidden", transform: "rotate(90deg)", transformOrigin: "center center", display: "flex", alignItems: "center", justifyContent: "center" }}>
         <PlayerArea
           isMe={false}
           handCount={otherPlayers[2]?.handCount ?? 0}
@@ -157,7 +159,7 @@ export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTile
       )}
 
       {/* Right player — rotated 90° counter-clockwise to face right */}
-      <div style={{ gridArea: "right", position: "relative", zIndex: 1, transform: "rotate(-90deg)", transformOrigin: "center center", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <div style={{ gridArea: "right", position: "relative", zIndex: 1, overflow: "hidden", transform: "rotate(-90deg)", transformOrigin: "center center", display: "flex", alignItems: "center", justifyContent: "center" }}>
         <PlayerArea
           isMe={false}
           handCount={otherPlayers[0]?.handCount ?? 0}
@@ -178,7 +180,7 @@ export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTile
       </div>
 
       {/* Bottom - my area */}
-      <div style={{ gridArea: "bottom", position: "relative", zIndex: 1 }}>
+      <div style={{ gridArea: "bottom", position: "relative", zIndex: 1, overflow: "hidden" }}>
         <PlayerArea
           isMe
           hand={myHand}
