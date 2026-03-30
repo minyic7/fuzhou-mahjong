@@ -4,10 +4,16 @@
   box-sizing: border-box;
 }
 
+html {
+  width: 100%;
+  height: 100%;
+}
+
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   background: var(--color-bg-dark);
   color: var(--color-text-primary);
+  width: 100%;
   min-height: 100vh;
   min-height: 100dvh;
   display: flex;
@@ -43,6 +49,7 @@ body {
 }
 
 #root {
+  width: 100%;
   display: flex;
   flex-direction: column;
   flex: 1;
@@ -169,6 +176,21 @@ body {
   }
 }
 
+/* Landscape compact layout for lobby/room */
+@media (orientation: landscape) and (max-height: 500px) {
+  .lobby-page, .room-page {
+    padding: 16px 20px;
+  }
+  .lobby-page h1 { font-size: 24px; }
+  .lobby-page h2 { font-size: 13px; }
+  .lobby-page input, .lobby-page button,
+  .room-page input, .room-page button {
+    min-height: 36px;
+    padding: 6px 12px;
+  }
+  .lobby-page hr, .room-page hr { margin: 8px 0; }
+}
+
 /* Game area gets felt table background */
 .game-table {
   background: radial-gradient(ellipse at center, var(--color-bg-card) 0%, var(--color-bg-medium) 60%, #082818 100%);
@@ -247,6 +269,7 @@ hr {
 
 /* Lobby/Room pages keep dark theme */
 .lobby-page, .room-page {
+  width: 100%;
   background: var(--color-bg-dark);
   min-height: 100vh;
   min-height: 100dvh;
@@ -362,8 +385,6 @@ button.lobby-create-btn:hover:not(:disabled) {
 
 @media (min-width: 1440px) {
   .lobby-page, .room-page {
-    max-width: 720px;
-    margin: 0 auto;
     padding: 60px 40px;
   }
 
