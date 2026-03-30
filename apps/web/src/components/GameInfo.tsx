@@ -40,7 +40,7 @@ export function GameInfo({ gold, wallRemaining, dealerIndex, lianZhuangCount, my
     return (
       <div style={{
         display: "flex", alignItems: "center", justifyContent: "center",
-        gap: 6, padding: "2px 6px", fontSize: "max(10px, 2.8vh)",
+        gap: 6, padding: "2px 6px", fontSize: "max(10px, 2.8dvh)",
         color: "var(--color-text-secondary)",
         background: "rgba(0,0,0,0.2)", borderRadius: 4,
         maxHeight: 28,

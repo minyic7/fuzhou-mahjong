@@ -355,7 +355,7 @@ export function PlayerArea({
               {idx === 0 && showSwipeHint && (
                 <div className="swipe-hint" style={{
                   position: "absolute", bottom: "100%", left: "50%",
-                  transform: "translateX(-50%)", marginBottom: "clamp(2px, 1.5vh, 6px)",
+                  transform: "translateX(-50%)", marginBottom: "clamp(2px, 1.5dvh, 6px)",
                   fontSize: "var(--font-xs)", color: "var(--color-gold-bright)",
                   whiteSpace: "nowrap", zIndex: "var(--z-swipe-hint)",
                   textShadow: "0 1px 4px rgba(0,0,0,0.8)",
@@ -365,7 +365,7 @@ export function PlayerArea({
               {showBubble && (
                 <div className="discard-bubble" style={{
                   position: "absolute",
-                  bottom: "100%", marginBottom: "clamp(2px, 1vh, 4px)",
+                  bottom: "100%", marginBottom: "clamp(2px, 1dvh, 4px)",
                   left: "50%",
                   transform: "translateX(-50%)",
                   display: "flex",
