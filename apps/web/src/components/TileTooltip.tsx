@@ -76,9 +76,9 @@ export function useLongPress(gold: GoldState | null) {
         boxShadow: "0 4px 20px rgba(0,0,0,0.5)",
         pointerEvents: "none",
       }}>
-        <div style={{ fontSize: 28, marginBottom: 4 }}>{name}</div>
-        {isGold && <div style={{ fontSize: 12, color: "var(--color-gold-bright)" }}>金牌 (百搭)</div>}
-        {!isSuitedTile(tile.tile) && <div style={{ fontSize: 12, color: "#aab4a0" }}>花牌</div>}
+        <div style={{ fontSize: "var(--font-2xl)", marginBottom: 4 }}>{name}</div>
+        {isGold && <div style={{ fontSize: "var(--font-sm)", color: "var(--color-gold-bright)" }}>金牌 (百搭)</div>}
+        {!isSuitedTile(tile.tile) && <div style={{ fontSize: "var(--font-sm)", color: "#aab4a0" }}>花牌</div>}
       </div>
     );
   };

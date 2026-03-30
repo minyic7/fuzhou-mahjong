@@ -77,7 +77,7 @@ export function CenterAction({ display, gold }: { display: ActionDisplay | null;
         ))}
       </div>
       <div style={{
-        fontSize: 20,
+        fontSize: "var(--font-xl)",
         fontWeight: "bold",
         color: display.color,
         textShadow: `0 0 20px ${display.color}, 0 2px 4px rgba(0,0,0,0.5)`,

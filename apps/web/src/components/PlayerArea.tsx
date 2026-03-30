@@ -178,10 +178,10 @@ export function PlayerArea({
         <span style={{ fontSize: "var(--compact-label-font, 12px)", fontWeight: "bold", color: "var(--color-text-warm)", whiteSpace: "nowrap", flexShrink: 0 }}>
           {label}
         </span>
-        {isDealer && <span style={{ fontSize: 9, background: "var(--color-dealer-bg)", color: "var(--color-gold-bright)", padding: "0 4px", borderRadius: 3, fontWeight: "bold", flexShrink: 0 }}>庄</span>}
-        {isDisconnected && <span style={{ fontSize: 9, background: "var(--color-disconnect)", color: "#fff", padding: "0 4px", borderRadius: 3, fontWeight: "bold", flexShrink: 0 }}>断线</span>}
-        {hasDiscardedGold && <span style={{ fontSize: 9, background: "var(--color-action-hu)", color: "#fff", padding: "0 4px", borderRadius: 3, fontWeight: "bold", flexShrink: 0 }}>弃金</span>}
-        {isCurrentTurn && <span className="your-turn-prompt" style={{ fontSize: 9, background: "rgba(255,215,0,0.2)", color: "var(--color-gold-bright)", padding: "0 4px", borderRadius: 3, border: "1px solid var(--color-gold-bright)", flexShrink: 0 }}>出牌</span>}
+        {isDealer && <span style={{ fontSize: "var(--font-xs)", background: "var(--color-dealer-bg)", color: "var(--color-gold-bright)", padding: "0 4px", borderRadius: 3, fontWeight: "bold", flexShrink: 0 }}>庄</span>}
+        {isDisconnected && <span style={{ fontSize: "var(--font-xs)", background: "var(--color-disconnect)", color: "#fff", padding: "0 4px", borderRadius: 3, fontWeight: "bold", flexShrink: 0 }}>断线</span>}
+        {hasDiscardedGold && <span style={{ fontSize: "var(--font-xs)", background: "var(--color-action-hu)", color: "#fff", padding: "0 4px", borderRadius: 3, fontWeight: "bold", flexShrink: 0 }}>弃金</span>}
+        {isCurrentTurn && <span className="your-turn-prompt" style={{ fontSize: "var(--font-xs)", background: "rgba(255,215,0,0.2)", color: "var(--color-gold-bright)", padding: "0 4px", borderRadius: 3, border: "1px solid var(--color-gold-bright)", flexShrink: 0 }}>出牌</span>}
 
         {/* Hand count */}
         <span style={{ fontSize: "var(--compact-info-font, 11px)", color: "var(--color-text-secondary)", flexShrink: 0 }}>{handCount ?? 0}张</span>
@@ -258,16 +258,16 @@ export function PlayerArea({
         <span style={{ fontSize: "var(--label-font)", fontWeight: "bold", color: "var(--color-text-warm)" }}>
           {label}
         </span>
-        {isDealer && <span style={{ fontSize: 10, background: "var(--color-dealer-bg)", color: "var(--color-gold-bright)", padding: "1px 5px", borderRadius: 3, fontWeight: "bold" }}>庄</span>}
-        {isDisconnected && <span style={{ fontSize: 10, background: "var(--color-disconnect)", color: "#fff", padding: "1px 5px", borderRadius: 3, fontWeight: "bold", animation: "disconnectPulse 2s ease-in-out infinite" }}>断线</span>}
-        {hasDiscardedGold && <span style={{ fontSize: 10, background: "var(--color-action-hu)", color: "#fff", padding: "1px 5px", borderRadius: 3, fontWeight: "bold" }}>弃金</span>}
-        {isCurrentTurn && <span className="your-turn-prompt" style={{ fontSize: 10, background: "rgba(255,215,0,0.2)", color: "var(--color-gold-bright)", padding: "1px 5px", borderRadius: 3, border: "1px solid var(--color-gold-bright)" }}>出牌</span>}
-        <span style={{ fontSize: 11, color: "var(--color-text-secondary)", marginLeft: "auto" }}>
+        {isDealer && <span style={{ fontSize: "var(--font-xs)", background: "var(--color-dealer-bg)", color: "var(--color-gold-bright)", padding: "1px 5px", borderRadius: 3, fontWeight: "bold" }}>庄</span>}
+        {isDisconnected && <span style={{ fontSize: "var(--font-xs)", background: "var(--color-disconnect)", color: "#fff", padding: "1px 5px", borderRadius: 3, fontWeight: "bold", animation: "disconnectPulse 2s ease-in-out infinite" }}>断线</span>}
+        {hasDiscardedGold && <span style={{ fontSize: "var(--font-xs)", background: "var(--color-action-hu)", color: "#fff", padding: "1px 5px", borderRadius: 3, fontWeight: "bold" }}>弃金</span>}
+        {isCurrentTurn && <span className="your-turn-prompt" style={{ fontSize: "var(--font-xs)", background: "rgba(255,215,0,0.2)", color: "var(--color-gold-bright)", padding: "1px 5px", borderRadius: 3, border: "1px solid var(--color-gold-bright)" }}>出牌</span>}
+        <span style={{ fontSize: "var(--font-sm)", color: "var(--color-text-secondary)", marginLeft: "auto" }}>
           🌸{flowers.length}
         </span>
         {cumulativeScore != null && (
           <span className="cumulative-score-badge" style={{
-            fontSize: 11, fontWeight: "bold",
+            fontSize: "var(--font-sm)", fontWeight: "bold",
             color: cumulativeScore > 0 ? "var(--color-gold-bright)" : cumulativeScore < 0 ? "var(--color-error)" : "var(--color-text-secondary)",
             padding: "1px 6px", borderRadius: 3, background: "rgba(0,0,0,0.3)",
           }}>
@@ -314,7 +314,7 @@ export function PlayerArea({
               {lastDrawnTileId === t.id && !isCompactLandscape && (
                 <div style={{
                   position: "absolute", top: -14, left: "50%", transform: "translateX(-50%)",
-                  fontSize: 10, color: "#4fc3f7", whiteSpace: "nowrap",
+                  fontSize: "var(--font-xs)", color: "#4fc3f7", whiteSpace: "nowrap",
                 }}>新牌</div>
               )}
               {/* Discard / Kong bubble */}
@@ -330,6 +330,8 @@ export function PlayerArea({
                   flexDirection: "column",
                   gap: 4,
                   zIndex: 20,
+                  maxHeight: "40dvh",
+                  overflowY: "auto",
                   animation: "bubbleFadeIn 0.15s ease-out",
                 }}>
                   {canHu && (
@@ -401,7 +403,7 @@ export function PlayerArea({
 
       {/* Tenpai indicator */}
       {isMe && tenpaiTiles && tenpaiTiles.length > 0 && (
-        <div style={{ fontSize: 12, color: "var(--color-success)", marginBottom: 4 }}>
+        <div style={{ fontSize: "var(--font-sm)", color: "var(--color-success)", marginBottom: 4 }}>
           🀄 听牌！等: {tenpaiTiles.map(t => `${t.value}${{wan:"万",bing:"饼",tiao:"条"}[t.suit]}`).join(" ")}
         </div>
       )}

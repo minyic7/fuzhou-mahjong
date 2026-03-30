@@ -38,11 +38,11 @@ export function ConnectionStatus({ connectionState, reconnectAttempt, timeoutMs,
     }}>
       <div className="spinner" style={{ width: 40, height: 40, borderWidth: 4 }} />
 
-      <div style={{ fontSize: 20, color: "var(--color-text-warm)", fontWeight: "bold" }}>
+      <div style={{ fontSize: "var(--font-xl)", color: "var(--color-text-warm)", fontWeight: "bold" }}>
         {connectionState === "reconnecting" ? "重新连接中... / Reconnecting..." : "连接已断开 / Disconnected"}
       </div>
 
-      <div style={{ fontSize: 16, color: "var(--color-text-secondary)" }}>
+      <div style={{ fontSize: "var(--font-lg)", color: "var(--color-text-secondary)" }}>
         {remaining > 0
           ? `${remaining}s 内重连可恢复游戏 / ${remaining}s to reconnect`
           : "超时 / Timed out"
@@ -50,7 +50,7 @@ export function ConnectionStatus({ connectionState, reconnectAttempt, timeoutMs,
       </div>
 
       {reconnectAttempt > 0 && (
-        <div style={{ fontSize: 13, color: "#6a9a6a" }}>
+        <div style={{ fontSize: "var(--font-md)", color: "#6a9a6a" }}>
           重试 #{reconnectAttempt}
         </div>
       )}
