@@ -143,8 +143,13 @@ function startBotWatchdog(roomId: string, playerIndex: number, io: GameServer): 
   clearBotWatchdog(roomId, playerIndex);
   lastIoRef = io;
 
+  const watchdogVersion = getBotVersion(roomId, playerIndex);
   const watchdog = setTimeout(() => {
     botWatchdogs.delete(key);
+    if (getBotVersion(roomId, playerIndex) !== watchdogVersion) {
+      console.log(`[Bot:${roomId}:p${playerIndex}:watchdog] Fired but bot version changed (had=${watchdogVersion}, now=${getBotVersion(roomId, playerIndex)}) — skipping ts=${Date.now()}`);
+      return;
+    }
     const game = getGame(roomId);
     if (!game || game.state.phase !== GamePhase.Playing) {
       console.log(`[Bot:${roomId}:p${playerIndex}:watchdog] Fired but game ended (phase=${game?.state.phase ?? "deleted"}) ts=${Date.now()}`);
@@ -1184,7 +1189,8 @@ export function emitOrBotAction(
             console.warn(`[Bot:FALLBACK] ${tag} Stale safety re-trigger during action window — passing (roomId=${game.roomId}, playerIndex=${playerIndex}, turn=${turnNumber}, phase=${game.state.phase}, hasActionWindow=true) ts=${Date.now()}`);
             handlePlayerAction(io, game.roomId, { type: ActionType.Pass, playerIndex }, playerIndex);
           } else if (game.isBot(game.state.currentTurn) && game.state.currentTurn === playerIndex) {
-            const currentActions = getPostDrawActions(game, playerIndex, false);
+            const inFinal = game.state.wall.length <= game.state.retainCount;
+            const currentActions = getPostDrawActions(game, playerIndex, inFinal);
             console.warn(`[Bot:FALLBACK] ${tag} Stale safety re-trigger on own turn (roomId=${game.roomId}, playerIndex=${playerIndex}, turn=${turnNumber}, phase=${game.state.phase}, hasActionWindow=false) ts=${Date.now()}`);
             emitOrBotAction(io, game, playerIndex, currentActions);
           } else {
@@ -1237,7 +1243,8 @@ export function emitOrBotAction(
             console.warn(`[Bot:FALLBACK] ${tag} Stale callback re-trigger during action window — passing (roomId=${game.roomId}, playerIndex=${playerIndex}, turn=${turnNumber}, phase=${game.state.phase}, hasActionWindow=true) ts=${Date.now()}`);
             handlePlayerAction(io, game.roomId, { type: ActionType.Pass, playerIndex }, playerIndex);
           } else if (game.isBot(game.state.currentTurn) && game.state.currentTurn === playerIndex) {
-            const currentActions = getPostDrawActions(game, playerIndex, false);
+            const inFinal = game.state.wall.length <= game.state.retainCount;
+            const currentActions = getPostDrawActions(game, playerIndex, inFinal);
             console.warn(`[Bot:FALLBACK] ${tag} Stale callback re-trigger on own turn (roomId=${game.roomId}, playerIndex=${playerIndex}, turn=${turnNumber}, phase=${game.state.phase}, hasActionWindow=false) ts=${Date.now()}`);
             emitOrBotAction(io, game, playerIndex, currentActions);
           } else {
