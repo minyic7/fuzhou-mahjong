@@ -8,7 +8,8 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   background: #0a2e1a;
   color: #eee;
-  height: 100vh;
+  min-height: 100vh;
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
 }
@@ -127,12 +128,31 @@ body {
   }
 }
 
+@media (orientation: landscape) and (max-height: 500px) {
+  :root {
+    --tile-w: 32px;
+    --tile-h: 44px;
+    --tile-font: 11px;
+    --tile-suit-font: 8px;
+    --wall-tw: 9px;
+    --wall-th: 12px;
+    --game-gap: 2px;
+    --game-padding: 2px;
+    --overlay-padding-y: 8px;
+    --overlay-padding-x: 12px;
+    --btn-font: 14px;
+    --btn-padding: 8px 14px;
+    --hand-new-tile-margin: 6px;
+    --hand-padding-top: 8px;
+  }
+}
+
 /* Game area gets felt table background */
 .game-table {
   background: radial-gradient(ellipse at center, #1a4a2e 0%, #0d3320 60%, #082818 100%);
   flex: 1;
   min-height: 0;
-  overflow: hidden;
+  overflow: visible;
   border: 2px solid rgba(184, 134, 11, 0.3);
   transform-style: preserve-3d;
   position: relative;
@@ -206,7 +226,8 @@ hr {
 /* Lobby/Room pages keep dark theme */
 .lobby-page, .room-page {
   background: #0a2e1a;
-  height: 100vh;
+  min-height: 100vh;
+  min-height: 100dvh;
   overflow-y: auto;
 }
 
