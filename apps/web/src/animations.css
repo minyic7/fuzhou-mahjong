@@ -16,6 +16,7 @@
  *   overlayFadeOut          → inline style        (ClaimOverlay: exit backdrop)
  *   overlayScaleOut         → inline style        (ClaimOverlay: exit modal + chi picker)
  *   tileDeparting           → .tile-departing      (PlayerArea: discarded tile exit)
+ *   discardFlyToPool        → inline style         (GameTable: discard fly overlay)
  *   pageFadeIn              → .page-transition    (index: page entrance)
  *   spin                    → .spinner            (index: loading spinner)
  */
@@ -294,6 +295,12 @@
 @keyframes centerActionOut {
   0% { opacity: 1; transform: translate(-50%, -50%) scale(1); }
   100% { opacity: 0; transform: translate(-50%, -50%) scale(0.5) translateY(20px); }
+}
+
+/* Hand-to-pool discard fly animation */
+@keyframes discardFlyToPool {
+  0% { transform: translate(0, 0) scale(1); opacity: 1; }
+  100% { transform: translate(0, -80px) scale(0.7); opacity: 0; }
 }
 
 /* Wall-to-hand draw fly animations */

@@ -301,7 +301,7 @@ export function PlayerArea({
                 position: "relative",
                 transform: tileSwipeOffset < 0 ? `translateY(${tileSwipeOffset}px)` : undefined,
                 opacity: isSwiping ? 1 - Math.min(0.5, Math.abs(tileSwipeOffset) / 100) : 1,
-                transition: isSwiping ? "none" : "transform 0.2s ease, opacity 0.2s ease",
+                transition: isSwiping ? "none" : "transform 0.2s ease, opacity 0.2s ease, margin 0.15s ease",
                 boxShadow: swipeReady ? "0 0 12px rgba(0,184,148,0.6)" : undefined,
               }}
             >
