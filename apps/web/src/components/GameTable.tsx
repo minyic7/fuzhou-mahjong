@@ -72,7 +72,7 @@ export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTile
         ? `". top ." "left center right" ". bottom ."`
         : `". top ." "left center right" "bottom bottom bottom"`,
       gridTemplateColumns: isFirstPersonMobile ? "var(--fp-side-col) 1fr var(--fp-side-col)" : isCompact ? "var(--grid-side-col) 1fr var(--grid-side-col)" : "1fr 2fr 1fr",
-      gridTemplateRows: isFirstPersonMobile ? "var(--fp-top-row) 1fr minmax(55%, 65%)" : isCompact ? "var(--grid-top-row) var(--grid-center-row) 1fr" : "auto 1fr auto",
+      gridTemplateRows: isFirstPersonMobile ? "var(--fp-top-row) 1fr minmax(min(55%, 200px), 65%)" : isCompact ? "var(--grid-top-row) var(--grid-center-row) 1fr" : "auto 1fr auto",
       flex: 1,
       minHeight: 0,
       gap: "var(--game-gap)",
