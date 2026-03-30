@@ -25,6 +25,9 @@ function countGoldInHand(hand: TileInstance[], gold: GoldState): number {
 /**
  * Calculate flower score for the winner.
  * = individual flowers + flower gang bonus (+2 per gang) + meld gang points + gold in hand
+ *
+ * Note: gold tile scoring is included here, so no separate gold addition is needed in the
+ * total score formula.
  */
 function calculateFlowerScore(winner: PlayerState, gold: GoldState | null): number {
   let score = winner.flowers.length;
@@ -56,7 +59,7 @@ function calculateFlowerScore(winner: PlayerState, gold: GoldState | null): numb
 /**
  * Calculate score using QQ version formula.
  *
- * Discard win: (flowerScore + goldScore + lianZhuang + 5) × 2 + specialMultiplier
+ * Discard win: (flowerScore + lianZhuang + 5) × 2 + specialMultiplier
  * Self-draw:   above × 3
  *
  * Payment (modern rules):
@@ -74,7 +77,6 @@ export function calculateScore(
   lianZhuangCount: number,
 ): ScoreResult {
   const flowerScore = calculateFlowerScore(winner, gold);
-  const goldScore = gold ? countGoldInHand(winner.hand, gold) : 0;
 
   const baseCalc = (flowerScore + lianZhuangCount + 5) * 2 + multiplier;
   const totalScore = isSelfDraw ? baseCalc * 3 : baseCalc;
@@ -99,7 +101,7 @@ export function calculateScore(
 
   return {
     flowerScore,
-    goldScore,
+    goldScore: gold ? countGoldInHand(winner.hand, gold) : 0, // for display breakdown only
     specialMultiplier: multiplier,
     totalScore,
     payments,
