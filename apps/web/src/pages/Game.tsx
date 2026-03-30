@@ -3,7 +3,7 @@ import { socket } from "../socket";
 import { GameTable, type DrawAnimationState, type DrawAnimationSeat } from "../components/GameTable";
 import { ClaimOverlay } from "../components/ClaimOverlay";
 import { CenterAction, useCenterAction } from "../components/CenterAction";
-import { sounds } from "../sounds";
+import { sounds, setMuted, isMuted } from "../sounds";
 import { TileCounter } from "../components/TileCounter";
 import { TutorialModal } from "../components/TutorialModal";
 import { BREAKPOINTS } from "../hooks/useIsMobile";
@@ -73,6 +73,21 @@ export function Game({ initialGameState, onLeave }: GameProps) {
   const drawAnimKeyRef = useRef(0);
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
   const [departingTileId, setDepartingTileId] = useState<number | null>(null);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [muted, setMutedState] = useState(isMuted);
+  const settingsRef = useRef<HTMLDivElement>(null);
+
+  // Close settings dropdown on click outside
+  useEffect(() => {
+    if (!settingsOpen) return;
+    const handler = (e: MouseEvent) => {
+      if (settingsRef.current && !settingsRef.current.contains(e.target as Node)) {
+        setSettingsOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [settingsOpen]);
 
   // First-game auto-show tutorial
   useEffect(() => {
@@ -628,64 +643,54 @@ export function Game({ initialGameState, onLeave }: GameProps) {
         <ClaimOverlay actions={actions} gameState={gameState} onAction={handleAction} />
       )}
       <TileCounter gameState={gameState} />
-      {/* Help & Leave buttons — compact: top-right row; normal: bottom-right stacked */}
-      {isCompactMain ? (
-        <div style={{ position: 'fixed', top: 'calc(8px + env(safe-area-inset-top, 0px))', right: 'calc(8px + env(safe-area-inset-right, 0px))', display: 'flex', gap: 4, zIndex: 20 }}>
-          <button
-            onClick={() => { setTutorialCondensed(false); setShowTutorial(true); }}
-            aria-label="How to play"
-            style={{
-              width: 44, height: 44, minHeight: 44, borderRadius: "50%",
-              background: "var(--overlay-bg)", border: "1px solid var(--color-gold-border-hover)",
-              color: "var(--color-text-secondary)", fontSize: 18, fontWeight: 700,
-              display: "flex", alignItems: "center", justifyContent: "center",
-              cursor: "pointer", padding: 0,
-            }}
-          >?</button>
-          {onLeave && (
-            <button
-              onClick={() => setShowLeaveConfirm(true)}
-              aria-label="Leave game"
-              style={{
-                width: 44, height: 44, minHeight: 44, borderRadius: "50%",
-                background: "var(--overlay-bg)", border: "1px solid var(--color-gold-border-hover)",
-                color: "var(--color-error)", fontSize: 18, fontWeight: 700,
-                display: "flex", alignItems: "center", justifyContent: "center",
-                cursor: "pointer", padding: 0,
-              }}
-            >✕</button>
-          )}
-        </div>
-      ) : (
-        <>
-          {onLeave && (
-            <button
-              onClick={() => setShowLeaveConfirm(true)}
-              aria-label="Leave game"
-              style={{
-                position: "fixed", bottom: "calc(56px + env(safe-area-inset-bottom, 0px))", right: "calc(12px + env(safe-area-inset-right, 0px))",
-                width: 44, height: 44, minHeight: 44, borderRadius: "50%",
-                background: "var(--overlay-bg)", border: "1px solid var(--color-gold-border-hover)",
-                color: "var(--color-error)", fontSize: 18, fontWeight: 700,
-                display: "flex", alignItems: "center", justifyContent: "center",
-                cursor: "pointer", zIndex: 20, padding: 0,
-              }}
-            >✕</button>
-          )}
-          <button
-            onClick={() => { setTutorialCondensed(false); setShowTutorial(true); }}
-            aria-label="How to play"
-            style={{
-              position: "fixed", bottom: "calc(12px + env(safe-area-inset-bottom, 0px))", right: "calc(12px + env(safe-area-inset-right, 0px))",
-              width: 44, height: 44, minHeight: 44, borderRadius: "50%",
-              background: "var(--overlay-bg)", border: "1px solid var(--color-gold-border-hover)",
-              color: "var(--color-text-secondary)", fontSize: 18, fontWeight: 700,
-              display: "flex", alignItems: "center", justifyContent: "center",
-              cursor: "pointer", zIndex: 20, padding: 0,
-            }}
-          >?</button>
-        </>
-      )}
+      {/* Settings gear button + dropdown */}
+      <div ref={settingsRef} style={{
+        position: 'fixed',
+        top: 'calc(8px + env(safe-area-inset-top, 0px))',
+        right: 'calc(8px + env(safe-area-inset-right, 0px))',
+        zIndex: 20,
+      }}>
+        <button
+          onClick={() => setSettingsOpen((v) => !v)}
+          aria-label="Settings"
+          style={{
+            width: 44, height: 44, minHeight: 44, borderRadius: "50%",
+            background: "var(--overlay-bg)", border: "1px solid var(--color-gold-border-hover)",
+            color: "var(--color-text-secondary)", fontSize: 20, fontWeight: 700,
+            display: "flex", alignItems: "center", justifyContent: "center",
+            cursor: "pointer", padding: 0,
+          }}
+        >⚙</button>
+        {settingsOpen && (
+          <div style={{
+            position: 'absolute', top: 48, right: 0,
+            background: 'var(--overlay-bg)', border: '1px solid var(--color-gold-border-hover)',
+            borderRadius: 'var(--radius-md)', padding: 4, minWidth: 160,
+            display: 'flex', flexDirection: 'column', gap: 2,
+          }}>
+            <Button
+              variant="secondary"
+              size="sm"
+              style={{ justifyContent: 'flex-start', width: '100%', border: 'none' }}
+              onClick={() => { setTutorialCondensed(false); setShowTutorial(true); setSettingsOpen(false); }}
+            >📖 规则说明</Button>
+            <Button
+              variant="secondary"
+              size="sm"
+              style={{ justifyContent: 'flex-start', width: '100%', border: 'none' }}
+              onClick={() => { const next = !muted; setMuted(next); setMutedState(next); }}
+            >{muted ? '🔇' : '🔊'} 音效{muted ? '开启' : '关闭'}</Button>
+            {onLeave && (
+              <Button
+                variant="danger"
+                size="sm"
+                style={{ justifyContent: 'flex-start', width: '100%', border: 'none' }}
+                onClick={() => { setShowLeaveConfirm(true); setSettingsOpen(false); }}
+              >🚪 退出游戏</Button>
+            )}
+          </div>
+        )}
+      </div>
       {/* Leave confirmation modal */}
       {showLeaveConfirm && (
         <div className="confirm-modal-backdrop">
