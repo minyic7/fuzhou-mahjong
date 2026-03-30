@@ -33,7 +33,7 @@ const variantStyles: Record<
 
 const sizeStyles: Record<NonNullable<ButtonProps["size"]>, React.CSSProperties> =
   {
-    sm: { padding: "8px 14px", fontSize: 13, minHeight: 36 },
+    sm: { padding: "8px 14px", fontSize: 13, minHeight: 44 },
     md: { padding: "12px 20px", fontSize: 15, minHeight: 44 },
     lg: { padding: "14px 24px", fontSize: 18, fontWeight: 600, minHeight: 48 },
   };
