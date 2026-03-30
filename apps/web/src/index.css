@@ -775,6 +775,8 @@ button.lobby-create-btn:hover:not(:disabled) {
 .compact-discards {
   scrollbar-width: none; /* Firefox */
   -ms-overflow-style: none; /* IE/Edge */
+  mask-image: linear-gradient(to right, transparent 0%, black 8px, black calc(100% - 16px), transparent 100%);
+  -webkit-mask-image: linear-gradient(to right, transparent 0%, black 8px, black calc(100% - 16px), transparent 100%);
 }
 .compact-discards::-webkit-scrollbar {
   display: none; /* Chrome/Safari */
