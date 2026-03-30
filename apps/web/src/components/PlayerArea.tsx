@@ -330,6 +330,8 @@ export function PlayerArea({
                   flexDirection: "column",
                   gap: 4,
                   zIndex: 20,
+                  maxHeight: "40dvh",
+                  overflowY: "auto",
                   animation: "bubbleFadeIn 0.15s ease-out",
                 }}>
                   {canHu && (
