@@ -600,6 +600,7 @@ hr {
   display: flex;
   flex-direction: column;
   gap: 20px;
+  animation: pageFadeIn 0.3s ease-out;
 }
 
 /* Lobby left/right wrappers — stack by default */
@@ -786,12 +787,13 @@ hr {
   border-radius: var(--radius-md);
   padding: 14px 16px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.03);
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .room-card:hover {
+  transform: translateY(-2px);
   border-color: var(--color-gold-border-hover);
-  box-shadow: 0 4px 16px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05);
+  box-shadow: 0 4px 12px rgba(255,215,0,0.15), 0 4px 16px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05);
 }
 
 /* Quick Start gradient button */
@@ -804,6 +806,10 @@ hr {
 button.lobby-create-btn:hover:not(:disabled) {
   border-color: rgba(184, 134, 11, 0.7);
   box-shadow: 0 0 12px rgba(184, 134, 11, 0.2);
+}
+
+button.lobby-create-btn:active:not(:disabled) {
+  transform: scale(0.97);
 }
 
 /* ─── Room: seat layout (mahjong table view) ─── */
