@@ -483,8 +483,8 @@ function handleDraw(
 
   const actions = getPostDrawActions(game, playerIndex, inFinalDraws);
 
-  // During final draws, if human can't hu, auto-pass immediately instead of waiting for input
-  if (inFinalDraws && !actions.canHu && !game.isBot(playerIndex)) {
+  // During final draws, if player can't hu, auto-pass immediately instead of waiting for input
+  if (inFinalDraws && !actions.canHu) {
     handlePlayerAction(io, game.roomId, { type: ActionType.Pass, playerIndex }, playerIndex);
     return;
   }
