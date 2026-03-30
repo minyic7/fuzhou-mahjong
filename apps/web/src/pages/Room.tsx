@@ -1,15 +1,16 @@
 import { useEffect, useState } from "react";
 import { socket } from "../socket";
-import type { RoomState } from "@fuzhou-mahjong/shared";
+import type { RoomState, CumulativeData } from "@fuzhou-mahjong/shared";
 import { Button } from "../components/Button";
 
 interface RoomProps {
   initialRoomState: RoomState | null;
+  sessionScores?: CumulativeData | null;
 }
 
 const WIND_LABELS = ["东 East", "南 South", "西 West", "北 North"];
 
-export function Room({ initialRoomState }: RoomProps) {
+export function Room({ initialRoomState, sessionScores }: RoomProps) {
   const [room, setRoom] = useState<RoomState | null>(initialRoomState);
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
 
@@ -55,11 +56,11 @@ export function Room({ initialRoomState }: RoomProps) {
       <div className="seat-layout">
         {/* Top seat */}
         <div className="seat-slot" style={{ gridArea: "top" }}>
-          <SeatCard seat={seats[2]} />
+          <SeatCard seat={seats[2]} score={sessionScores?.scores[2]} />
         </div>
         {/* Left seat */}
         <div className="seat-slot" style={{ gridArea: "left" }}>
-          <SeatCard seat={seats[3]} />
+          <SeatCard seat={seats[3]} score={sessionScores?.scores[3]} />
         </div>
         {/* Center: room ID */}
         <div className="table-center" style={{ gridArea: "center" }}>
@@ -70,14 +71,19 @@ export function Room({ initialRoomState }: RoomProps) {
           <div style={{ fontSize: 12, color: "var(--color-text-secondary)", marginTop: 6 }}>
             {room.players.length}/4 玩家
           </div>
+          {sessionScores && sessionScores.roundsPlayed > 0 && (
+            <div style={{ fontSize: 11, color: "var(--color-text-gold)", marginTop: 4 }}>
+              已完成 {sessionScores.roundsPlayed} 局
+            </div>
+          )}
         </div>
         {/* Right seat */}
         <div className="seat-slot" style={{ gridArea: "right" }}>
-          <SeatCard seat={seats[1]} />
+          <SeatCard seat={seats[1]} score={sessionScores?.scores[1]} />
         </div>
         {/* Bottom seat */}
         <div className="seat-slot" style={{ gridArea: "bottom" }}>
-          <SeatCard seat={seats[0]} />
+          <SeatCard seat={seats[0]} score={sessionScores?.scores[0]} />
         </div>
       </div>
 
@@ -132,7 +138,7 @@ export function Room({ initialRoomState }: RoomProps) {
   );
 }
 
-function SeatCard({ seat }: { seat: { index: number; player: { name: string; isBot?: boolean } | null; wind: string } }) {
+function SeatCard({ seat, score }: { seat: { index: number; player: { name: string; isBot?: boolean } | null; wind: string }; score?: number }) {
   const { player, wind } = seat;
   const isEmpty = !player;
 
@@ -145,6 +151,14 @@ function SeatCard({ seat }: { seat: { index: number; player: { name: string; isB
             {player.name}
           </div>
           {player.isBot && <div style={{ fontSize: 11, color: "var(--color-text-secondary)", marginTop: 2 }}>🤖 Bot</div>}
+          {score != null && (
+            <div style={{
+              fontSize: 12, fontWeight: "bold", marginTop: 2,
+              color: score > 0 ? "#ffd700" : score < 0 ? "#f44336" : "#8fbc8f",
+            }}>
+              {score > 0 ? "+" : ""}{score}
+            </div>
+          )}
         </>
       ) : (
         <div style={{ fontSize: 13, color: "rgba(143,188,143,0.5)" }}>空位 / Empty</div>

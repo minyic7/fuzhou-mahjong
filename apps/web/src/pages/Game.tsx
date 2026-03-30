@@ -7,6 +7,7 @@ import { sounds, setMuted, isMuted } from "../sounds";
 import { TileCounter } from "../components/TileCounter";
 import { TutorialModal } from "../components/TutorialModal";
 import { TileView } from "../components/Tile";
+import { SessionSummary, type SessionData } from "../components/SessionSummary";
 import { Button } from "../components/Button";
 import { ActionType, MeldType } from "@fuzhou-mahjong/shared";
 import type { ClientGameState, GameOverResult, AvailableActions, GameAction, PlayerDisconnectedEvent, PlayerReconnectedEvent } from "@fuzhou-mahjong/shared";
@@ -70,6 +71,8 @@ export function Game({ initialGameState, onLeave }: GameProps) {
     setToasts((prev) => [...prev, { id, message }]);
     setTimeout(() => setToasts((prev) => prev.filter((t) => t.id !== id)), 4000);
   };
+  const [roundHistory, setRoundHistory] = useState<{ scores: number[]; winnerId: number | null; winType: string }[]>([]);
+  const [sessionSummary, setSessionSummary] = useState<SessionData | null>(null);
   const [showTutorial, setShowTutorial] = useState(false);
   const [tutorialCondensed, setTutorialCondensed] = useState(false);
   const [drawAnimation, setDrawAnimation] = useState<DrawAnimationState | null>(null);
@@ -215,6 +218,11 @@ export function Game({ initialGameState, onLeave }: GameProps) {
     });
     socket.on("gameOver", (result) => {
       setGameOver(result);
+      setRoundHistory((prev) => [...prev, {
+        scores: result.scores,
+        winnerId: result.winnerId,
+        winType: result.winType,
+      }]);
       if (result.winnerId !== null) sounds.hu();
       else sounds.gameDraw();
     });
@@ -476,11 +484,34 @@ export function Game({ initialGameState, onLeave }: GameProps) {
           下一局 / Next Round
         </Button>
         {onLeave && (
-          <Button variant="secondary" onClick={() => { socket.emit("leaveRoom"); onLeave(); }} style={{ marginLeft: 10 }}>
+          <Button variant="secondary" onClick={() => {
+              const cum = gameOver.cumulative;
+              if (cum && cum.roundsPlayed > 0) {
+                setSessionSummary({
+                  playerNames: gameOver.playerNames ?? [],
+                  cumulativeScores: cum.scores,
+                  roundsPlayed: cum.roundsPlayed,
+                  roundHistory,
+                });
+              } else {
+                socket.emit("leaveRoom");
+                onLeave();
+              }
+            }} style={{ marginLeft: 10 }}>
             离开 / Leave
           </Button>
         )}
       </div>
+      {sessionSummary && (
+        <SessionSummary
+          data={sessionSummary}
+          onClose={() => {
+            setSessionSummary(null);
+            socket.emit("leaveRoom");
+            onLeave?.();
+          }}
+        />
+      )}
       </div>
     );
   }

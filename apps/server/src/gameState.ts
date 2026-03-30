@@ -8,6 +8,7 @@ import {
   sortHand,
   findTenpaiTiles,
 } from "@fuzhou-mahjong/shared";
+import { findRoom } from "./room.js";
 import type {
   GameState,
   PlayerState,
@@ -126,6 +127,8 @@ export class ServerGameState {
       });
     }
 
+    const cumulative = findRoom(this.roomId)?.getCumulativeData();
+
     return {
       phase: state.phase,
       myHand: myPlayer.hand,
@@ -146,6 +149,8 @@ export class ServerGameState {
       tenpaiTiles: findTenpaiTiles(myPlayer.hand, myPlayer.melds, state.gold),
       lastDrawnTileId: this.lastDrawnTileIds[playerIndex],
       myHasDiscardedGold: myPlayer.hasDiscardedGold,
+      cumulativeScores: cumulative?.scores ?? [0, 0, 0, 0],
+      roundsPlayed: cumulative?.roundsPlayed ?? 0,
     };
   }
 
