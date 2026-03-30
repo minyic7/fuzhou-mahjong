@@ -535,39 +535,39 @@ export function Game({ initialGameState, onLeave }: GameProps) {
             background: "var(--overlay-bg)",
             border: "2px solid var(--color-gold-border-hover)",
             borderRadius: "var(--radius-lg)",
-            padding: "16px 20px",
+            padding: "clamp(8px, 2.5vh, 16px) clamp(12px, 3vh, 20px)",
             maxWidth: 360, width: "90vw",
             maxHeight: "90dvh", overflowY: "auto",
             textAlign: "center",
             animation: "overlayScaleIn 0.3s ease-out",
           }}>
-            <h2 style={{ fontSize: 24, marginBottom: 8 }}>
+            <h2 style={{ fontSize: "clamp(16px, 5vh, 24px)", marginBottom: "clamp(4px, 1.2vh, 8px)" }}>
               {go.winnerId !== null
                 ? `🎉 ${(go.playerNames ?? [])[go.winnerId] || "玩家"} 胡了!`
                 : "流局 / Draw"}
             </h2>
-            <p style={{ fontSize: 16, color: "var(--color-text-gold)", marginBottom: 12 }}>
+            <p style={{ fontSize: "clamp(12px, 3.5vh, 16px)", color: "var(--color-text-gold)", marginBottom: "clamp(6px, 2vh, 12px)" }}>
               {winTypeNames[go.winType] || go.winType}
             </p>
 
             {/* Score breakdown */}
             {go.breakdown && go.winnerId !== null && (
               <div className="score-breakdown">
-                <div style={{ fontSize: 12, color: "var(--color-text-secondary)", marginBottom: 4 }}>得分明细</div>
-                <div style={{ display: "flex", flexWrap: "wrap", gap: "4px 12px", justifyContent: "center", fontSize: 13, color: "var(--color-text-primary)" }}>
+                <div style={{ fontSize: "clamp(10px, 2.8vh, 12px)", color: "var(--color-text-secondary)", marginBottom: "clamp(2px, 0.8vh, 4px)" }}>得分明细</div>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "clamp(2px, 0.8vh, 4px) clamp(6px, 2vh, 12px)", justifyContent: "center", fontSize: "clamp(11px, 3vh, 13px)", color: "var(--color-text-primary)" }}>
                   <span>花分: {go.breakdown.flowerScore}</span>
                   <span>金: {go.breakdown.goldScore}</span>
                   <span>连庄: {go.breakdown.lianZhuangCount}</span>
                   <span>特殊: {go.breakdown.specialMultiplier}x</span>
                 </div>
-                <div style={{ fontSize: 14, color: "var(--color-text-gold)", marginTop: 4 }}>
+                <div style={{ fontSize: "clamp(12px, 3.2vh, 14px)", color: "var(--color-text-gold)", marginTop: "clamp(2px, 0.8vh, 4px)" }}>
                   总分: {go.breakdown.totalScore}
                 </div>
               </div>
             )}
 
             {/* Round scores */}
-            <div style={{ marginBottom: 12 }}>
+            <div style={{ marginBottom: "clamp(6px, 2vh, 12px)" }}>
               {go.scores
                 .map((score, i) => ({ name: (go.playerNames ?? [])[i] || `玩家${i}`, score, i }))
                 .sort((a, b) => b.score - a.score)
@@ -583,8 +583,8 @@ export function Game({ initialGameState, onLeave }: GameProps) {
             </div>
 
             {/* Actions */}
-            <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
-              <Button variant="gold" size="lg" onClick={handleNextRound} style={{ minHeight: 48 }}>
+            <div style={{ display: "flex", gap: "clamp(6px, 2vh, 12px)", justifyContent: "center", flexWrap: "wrap" }}>
+              <Button variant="gold" size="lg" onClick={handleNextRound} style={{ minHeight: "clamp(36px, 10vh, 48px)" }}>
                 下一局 / Next Round
               </Button>
               {onLeave && (
@@ -601,7 +601,7 @@ export function Game({ initialGameState, onLeave }: GameProps) {
                     socket.emit("leaveRoom");
                     onLeave();
                   }
-                }} style={{ minHeight: 48 }}>
+                }} style={{ minHeight: "clamp(36px, 10vh, 48px)" }}>
                   离开 / Leave
                 </Button>
               )}

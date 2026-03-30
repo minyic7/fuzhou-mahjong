@@ -37,17 +37,17 @@ function RoundHistorySection({ roundHistory, playerNames, isCompact }: {
   const contentMaxHeight = isCompact ? (expanded ? 240 : 0) : 160;
 
   return (
-    <div style={{ marginBottom: 16 }}>
+    <div style={{ marginBottom: "clamp(8px, 2.5vh, 16px)" }}>
       <div
         style={{
-          fontSize: 13, color: "var(--color-text-secondary)", marginBottom: 6,
+          fontSize: "clamp(11px, 3vh, 13px)", color: "var(--color-text-secondary)", marginBottom: "clamp(3px, 1vh, 6px)",
           ...(showToggle ? { cursor: "pointer", userSelect: "none" as const } : {}),
         }}
         onClick={showToggle ? () => setExpanded(e => !e) : undefined}
       >
         每局记录 / Round History
         {showToggle && (
-          <span style={{ marginLeft: 6, fontSize: 11 }}>
+          <span style={{ marginLeft: 6, fontSize: "clamp(9px, 2.5vh, 11px)" }}>
             {expanded ? "▲ 收起" : "▼ 展开"}
           </span>
         )}
@@ -56,14 +56,14 @@ function RoundHistorySection({ roundHistory, playerNames, isCompact }: {
         <div style={{ maxHeight: contentMaxHeight, overflowY: "auto" }}>
           {/* Player name header */}
           <div style={{
-            fontSize: 11, padding: "4px 10px", marginBottom: 2,
+            fontSize: "clamp(9px, 2.5vh, 11px)", padding: "clamp(2px, 0.8vh, 4px) clamp(6px, 1.8vh, 10px)", marginBottom: 2,
             display: "flex", justifyContent: "space-between", alignItems: "center",
             color: "var(--color-text-secondary)", opacity: 0.7,
           }}>
             <span />
             <span>
               {playerNames.map((name, i) => (
-                <span key={i} style={{ marginLeft: 8, minWidth: 28, display: "inline-block", textAlign: "right" }}>
+                <span key={i} style={{ marginLeft: "clamp(4px, 1.2vh, 8px)", minWidth: "clamp(20px, 6vh, 28px)", display: "inline-block", textAlign: "right" }}>
                   {name.length > 4 ? name.slice(0, 3) + "…" : name}
                 </span>
               ))}
@@ -71,7 +71,7 @@ function RoundHistorySection({ roundHistory, playerNames, isCompact }: {
           </div>
           {roundHistory.map((round, ri) => (
             <div key={ri} style={{
-              fontSize: 12, padding: "6px 10px", marginBottom: 2,
+              fontSize: "clamp(10px, 2.8vh, 12px)", padding: "clamp(3px, 1vh, 6px) clamp(6px, 1.8vh, 10px)", marginBottom: 2,
               background: "rgba(255,255,255,0.03)", borderRadius: 4,
               display: "flex", justifyContent: "space-between", alignItems: "center",
             }}>
@@ -81,7 +81,7 @@ function RoundHistorySection({ roundHistory, playerNames, isCompact }: {
               <span style={{ color: "var(--color-text-primary)" }}>
                 {round.scores.map((s, i) => (
                   <span key={i} style={{
-                    marginLeft: 8, minWidth: 28, display: "inline-block", textAlign: "right",
+                    marginLeft: "clamp(4px, 1.2vh, 8px)", minWidth: "clamp(20px, 6vh, 28px)", display: "inline-block", textAlign: "right",
                     color: s > 0 ? "var(--color-success)" : s < 0 ? "var(--color-error)" : "var(--color-text-secondary)",
                     opacity: s === 0 ? 0.6 : 1,
                   }}>
@@ -133,36 +133,36 @@ export function SessionSummary({ data, onClose }: SessionSummaryProps) {
         background: "linear-gradient(135deg, var(--color-bg-dark) 0%, var(--color-bg-medium) 100%)",
         border: "1px solid rgba(255,215,0,0.3)",
         borderRadius: 12,
-        padding: isCompact ? "16px 20px" : "24px 28px",
+        padding: isCompact ? "clamp(8px, 2.5vh, 16px) clamp(12px, 3vh, 20px)" : "24px 28px",
         maxWidth: 440,
         width: "90vw",
         maxHeight: "90dvh",
         overflowY: "auto",
         color: "var(--color-text-primary)",
       }}>
-        <h2 style={{ textAlign: "center", fontSize: isCompact ? 18 : 22, marginBottom: 4, color: "var(--color-gold-bright)" }}>
+        <h2 style={{ textAlign: "center", fontSize: isCompact ? "clamp(14px, 4.5vh, 18px)" : 22, marginBottom: "clamp(2px, 0.8vh, 4px)", color: "var(--color-gold-bright)" }}>
           本场总结 / Session Summary
         </h2>
-        <div style={{ textAlign: "center", fontSize: 13, color: "var(--color-text-secondary)", marginBottom: 16 }}>
+        <div style={{ textAlign: "center", fontSize: "clamp(11px, 3vh, 13px)", color: "var(--color-text-secondary)", marginBottom: "clamp(8px, 2.5vh, 16px)" }}>
           共 {roundsPlayed} 局
         </div>
 
         {/* Final Rankings */}
-        <div style={{ marginBottom: 16 }}>
-          <div style={{ fontSize: 13, color: "var(--color-text-secondary)", marginBottom: 6 }}>最终排名 / Final Rankings</div>
+        <div style={{ marginBottom: "clamp(8px, 2.5vh, 16px)" }}>
+          <div style={{ fontSize: "clamp(11px, 3vh, 13px)", color: "var(--color-text-secondary)", marginBottom: "clamp(3px, 1vh, 6px)" }}>最终排名 / Final Rankings</div>
           {rankings.map((p, rank) => (
             <div key={p.i} className="session-rank-row" style={{
               display: "flex", justifyContent: "space-between", alignItems: "center",
-              padding: "8px 14px", marginBottom: 4, borderRadius: 6,
+              padding: "clamp(4px, 1.5vh, 8px) clamp(8px, 2.5vh, 14px)", marginBottom: "clamp(2px, 0.6vh, 4px)", borderRadius: 6,
               background: rank === 0 ? "rgba(255,215,0,0.12)" : "rgba(255,255,255,0.04)",
               border: rank === 0 ? "1px solid rgba(255,215,0,0.4)" : "1px solid transparent",
             }}>
-              <span style={{ fontSize: rank === 0 ? 16 : 14 }}>
+              <span style={{ fontSize: rank === 0 ? "clamp(13px, 3.8vh, 16px)" : "clamp(11px, 3.2vh, 14px)" }}>
                 {rank === 0 ? "👑 " : `${rank + 1}. `}
                 {p.name}
               </span>
               <span style={{
-                fontWeight: "bold", fontSize: rank === 0 ? 18 : 14,
+                fontWeight: "bold", fontSize: rank === 0 ? "clamp(14px, 4vh, 18px)" : "clamp(11px, 3.2vh, 14px)",
                 color: p.score > 0 ? "var(--color-gold-bright)" : p.score < 0 ? "var(--color-error)" : "var(--color-text-secondary)",
               }}>
                 {p.score > 0 ? "+" : ""}{p.score}
@@ -174,17 +174,17 @@ export function SessionSummary({ data, onClose }: SessionSummaryProps) {
         {/* MVP Stats */}
         {roundHistory.length > 0 && (
           <div style={{
-            marginBottom: 16, padding: 10,
+            marginBottom: "clamp(8px, 2.5vh, 16px)", padding: "clamp(6px, 1.8vh, 10px)",
             background: "rgba(255,255,255,0.04)", borderRadius: 6,
           }}>
-            <div style={{ fontSize: 13, color: "var(--color-text-secondary)", marginBottom: 6 }}>数据亮点 / Highlights</div>
+            <div style={{ fontSize: "clamp(11px, 3vh, 13px)", color: "var(--color-text-secondary)", marginBottom: "clamp(3px, 1vh, 6px)" }}>数据亮点 / Highlights</div>
             {mostWins > 0 && (
-              <div style={{ fontSize: 13, color: "var(--color-text-warm)", marginBottom: 4 }}>
+              <div style={{ fontSize: "clamp(11px, 3vh, 13px)", color: "var(--color-text-warm)", marginBottom: "clamp(2px, 0.6vh, 4px)" }}>
                 🏆 最多胜场: {playerNames[mostWinsIdx]} ({mostWins}胡)
               </div>
             )}
             {highestRoundScore > 0 && (
-              <div style={{ fontSize: 13, color: "var(--color-text-warm)" }}>
+              <div style={{ fontSize: "clamp(11px, 3vh, 13px)", color: "var(--color-text-warm)" }}>
                 🎯 单局最高: {playerNames[highestRoundPlayer]} (+{highestRoundScore})
               </div>
             )}
@@ -204,10 +204,11 @@ export function SessionSummary({ data, onClose }: SessionSummaryProps) {
           onClick={onClose}
           style={{
             position: "sticky", bottom: 0,
-            width: "100%", padding: "12px 0", fontSize: 16,
+            width: "100%", padding: "clamp(8px, 2.5vh, 12px) 0", fontSize: "clamp(13px, 3.5vh, 16px)",
             background: "var(--color-bg-button)", color: "var(--color-text-primary)",
             border: "1px solid rgba(255,215,0,0.3)",
             borderRadius: 6, cursor: "pointer",
+            minHeight: "max(36px, 9vh)",
           }}
         >
           返回大厅 / Back to Lobby
