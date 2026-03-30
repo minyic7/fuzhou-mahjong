@@ -11,7 +11,7 @@ import { TileView } from "../components/Tile";
 import { SessionSummary, type SessionData } from "../components/SessionSummary";
 import { Button } from "../components/Button";
 import { ActionType, MeldType } from "@fuzhou-mahjong/shared";
-import type { ClientGameState, GameOverResult, AvailableActions, GameAction, PlayerDisconnectedEvent, PlayerReconnectedEvent } from "@fuzhou-mahjong/shared";
+import type { ClientGameState, GameOverResult, AvailableActions, GameAction, PlayerDisconnectedEvent, PlayerReconnectedEvent, TileInstance } from "@fuzhou-mahjong/shared";
 
 interface GameProps {
   initialGameState?: ClientGameState | null;
@@ -74,7 +74,7 @@ export function Game({ initialGameState, onLeave }: GameProps) {
   const [claimAnimation, setClaimAnimation] = useState<{ seat: DrawAnimationSeat; key: number } | null>(null);
   const claimAnimKeyRef = useRef(0);
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
-  const [departingTileId, setDepartingTileId] = useState<number | null>(null);
+  const [departingTile, setDepartingTile] = useState<TileInstance | null>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [muted, setMutedState] = useState(isMuted);
   const [isPortrait, setIsPortrait] = useState(() => window.matchMedia("(orientation: portrait)").matches && window.innerWidth <= 768);
@@ -236,7 +236,7 @@ export function Game({ initialGameState, onLeave }: GameProps) {
         }
       }
 
-      setDepartingTileId(null);
+      setDepartingTile(null);
       prevStateRef.current = state;
       setGameState(state);
     });
@@ -638,7 +638,7 @@ export function Game({ initialGameState, onLeave }: GameProps) {
         onTileSelect={(tile) => setSelectedTileId(tile?.id ?? null)}
         onTileDoubleClick={(tile) => {
           if (effectiveCanDiscard) {
-            setDepartingTileId(tile.id);
+            setDepartingTile(tile);
             handleAction({ type: ActionType.Discard, playerIndex: gameState.myIndex, tile });
           }
         }}
@@ -648,7 +648,7 @@ export function Game({ initialGameState, onLeave }: GameProps) {
         onDiscard={(tileInstanceId) => {
           const tile = gameState.myHand.find(t => t.id === tileInstanceId);
           if (tile) {
-            setDepartingTileId(tileInstanceId);
+            setDepartingTile(tile);
             handleAction({ type: ActionType.Discard, playerIndex: gameState.myIndex, tile });
           }
         }}
@@ -669,7 +669,7 @@ export function Game({ initialGameState, onLeave }: GameProps) {
         disconnectedPlayers={disconnectedPlayers}
         drawAnimation={drawAnimation}
         claimAnimation={claimAnimation}
-        departingTileId={departingTileId}
+        departingTile={departingTile}
       />
       {isClaimWindow && actions && (
         <ClaimOverlay actions={actions} gameState={gameState} onAction={handleAction} />
