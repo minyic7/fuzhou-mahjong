@@ -20,7 +20,12 @@ export function Game({ initialGameState, onLeave }: GameProps) {
   useEffect(() => {
     const lockOrientation = async () => {
       try {
-        await screen.orientation?.lock?.('landscape');
+        // screen.orientation.lock() is not in all TS DOM libs yet
+        const orientation = screen.orientation as ScreenOrientation & {
+          lock?: (type: string) => Promise<void>;
+          unlock?: () => void;
+        };
+        await orientation.lock?.('landscape');
       } catch {
         // Not supported or not allowed — CSS fallback handles it
       }
@@ -29,7 +34,10 @@ export function Game({ initialGameState, onLeave }: GameProps) {
 
     return () => {
       try {
-        screen.orientation?.unlock?.();
+        const orientation = screen.orientation as ScreenOrientation & {
+          unlock?: () => void;
+        };
+        orientation.unlock?.();
       } catch {
         // ignore
       }
