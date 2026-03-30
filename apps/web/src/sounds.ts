@@ -100,4 +100,29 @@ export const sounds = {
     playTone(660, 0.1, "triangle", 0.2);
     setTimeout(() => playTone(880, 0.12, "triangle", 0.2), 80);
   },
+
+  goldFlip() {
+    // Shimmering reveal — ascending sparkle
+    playTone(1200, 0.12, "sine", 0.15);
+    setTimeout(() => playTone(1500, 0.1, "sine", 0.18), 80);
+    setTimeout(() => playTone(1800, 0.15, "sine", 0.12), 160);
+  },
+
+  gameDraw() {
+    // Flat, deflating tone — descending notes
+    playTone(500, 0.2, "triangle", 0.15);
+    setTimeout(() => playTone(400, 0.2, "triangle", 0.12), 150);
+    setTimeout(() => playTone(300, 0.3, "triangle", 0.1), 300);
+  },
+
+  error() {
+    // Low buzz — something went wrong
+    playTone(150, 0.2, "sawtooth", 0.15);
+  },
+
+  warning() {
+    // Gentle two-tone alert — low wall count
+    playTone(880, 0.1, "sine", 0.12);
+    setTimeout(() => playTone(660, 0.12, "sine", 0.1), 120);
+  },
 };
