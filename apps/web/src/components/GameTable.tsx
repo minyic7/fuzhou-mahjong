@@ -36,9 +36,10 @@ interface GameTableProps {
   claimAnimation?: { seat: DrawAnimationSeat; key: number } | null;
   departingTile?: TileInstance | null;
   revealedHands?: { hand: TileInstance[]; melds: import("@fuzhou-mahjong/shared").Meld[]; flowers: TileInstance[] }[] | null;
+  claimActive?: boolean;
 }
 
-export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTileId, claimableTileIds, canDiscard, onDiscard, canHu, onHu, canDraw, onDraw, kongTileIds, onAnGang, onBuGang, onBackgroundClick, disconnectedPlayers, drawAnimation, claimAnimation, departingTile, revealedHands }: GameTableProps) {
+export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTileId, claimableTileIds, canDiscard, onDiscard, canHu, onHu, canDraw, onDraw, kongTileIds, onAnGang, onBuGang, onBackgroundClick, disconnectedPlayers, drawAnimation, claimAnimation, departingTile, revealedHands, claimActive }: GameTableProps) {
   const isCompact = useIsCompactLandscape();
   const isFirstPersonMobile = useIsFirstPersonMobile();
 
@@ -213,6 +214,7 @@ export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTile
           tenpaiTiles={state.tenpaiTiles}
           firstPerson={isFirstPersonMobile}
           cumulativeScore={roundsPlayed > 0 ? cumulativeScores[myIndex] : undefined}
+          claimActive={claimActive}
         />
       </div>
 

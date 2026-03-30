@@ -449,6 +449,7 @@ export function Game({ initialGameState, onLeave }: GameProps) {
         claimAnimation={claimAnimation}
         departingTile={departingTile}
         revealedHands={gameOver?.allHands ?? null}
+        claimActive={isClaimWindow}
       />
       {isClaimWindow && actions && (
         <ClaimOverlay actions={actions} gameState={gameState} onAction={handleAction} />
