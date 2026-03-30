@@ -44,7 +44,8 @@ export function useSwipeGesture({
     // If not yet locked into a direction, check which axis dominates
     if (!ref.locked) {
       // Need minimum movement before deciding direction
-      if (Math.abs(deltaX) < 10 && Math.abs(deltaY) < 10) return;
+      const deadzone = Math.max(6, window.innerHeight * 0.02);
+      if (Math.abs(deltaX) < deadzone && Math.abs(deltaY) < deadzone) return;
       // Horizontal scroll — abort swipe tracking
       if (Math.abs(deltaX) > Math.abs(deltaY)) {
         touchRef.current = null;
@@ -69,7 +70,7 @@ export function useSwipeGesture({
 
   const onTouchEnd = useCallback(() => {
     const ref = touchRef.current;
-    const threshold = thresholdProp ?? Math.min(40, window.innerHeight * 0.08);
+    const threshold = thresholdProp ?? Math.max(25, window.innerHeight * 0.08);
     if (ref && ref.locked && swipeOffset < -threshold) {
       onSwipeUp(ref.tileId);
     }
