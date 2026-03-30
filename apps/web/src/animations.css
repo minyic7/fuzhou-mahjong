@@ -13,7 +13,24 @@
  *   goldWarningPulse        → .gold-warning-pulse (PlayerArea: gold suit warning)
  *   yourTurnBounce          → .your-turn-prompt   (PlayerArea: turn prompt)
  *   scoreReveal + meldEntrance → score/meld anim  (PlayerArea: round-end reveal)
+ *   pageFadeIn              → .page-transition    (index: page entrance)
+ *   spin                    → .spinner            (index: loading spinner)
  */
+
+/* Page transition fade-in */
+@keyframes pageFadeIn {
+  0% { opacity: 0; transform: translateY(8px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
+/* Loading spinner rotation */
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* Disconnect pulse animation */
+@keyframes disconnectPulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
 
 /* Portrait rotate phone animation */
 @keyframes rotatePhone {
