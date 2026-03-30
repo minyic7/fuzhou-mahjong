@@ -210,7 +210,7 @@ export function SessionSummary({ data, onClose }: SessionSummaryProps) {
             background: "var(--color-bg-button)", color: "var(--color-text-primary)",
             border: "1px solid rgba(255,215,0,0.3)",
             borderRadius: 6, cursor: "pointer",
-            minHeight: "max(36px, 9vh)",
+            minHeight: "max(44px, 9vh)",
           }}
         >
           返回大厅 / Back to Lobby

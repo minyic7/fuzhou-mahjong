@@ -436,7 +436,7 @@ body {
     grid-column: 1 / -1;
   }
   .lobby-left { gap: 12px; }
-  .lobby-right { gap: 12px; overflow-y: auto; max-height: 70vh; }
+  .lobby-right { gap: 12px; overflow-y: auto; max-height: 70dvh; }
 
   /* Room page compact: reduce spacing to fit above fold */
   .room-page h2 { margin-bottom: 6px !important; }
