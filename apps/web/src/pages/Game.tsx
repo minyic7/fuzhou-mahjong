@@ -71,6 +71,8 @@ export function Game({ initialGameState, onLeave }: GameProps) {
   const [tutorialCondensed, setTutorialCondensed] = useState(false);
   const [drawAnimation, setDrawAnimation] = useState<DrawAnimationState | null>(null);
   const drawAnimKeyRef = useRef(0);
+  const [claimAnimation, setClaimAnimation] = useState<{ seat: DrawAnimationSeat; key: number } | null>(null);
+  const claimAnimKeyRef = useRef(0);
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
   const [departingTileId, setDepartingTileId] = useState<number | null>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -181,12 +183,17 @@ export function Game({ initialGameState, onLeave }: GameProps) {
         const newMelds = state.myMelds.length + state.otherPlayers.reduce((s, p) => s + p.melds.length, 0);
         if (newMelds > prevMelds) {
           // Find which player got a new meld
+          const seatMap: DrawAnimationSeat[] = ["bottom", "right", "top", "left"];
           if (state.myMelds.length > prev.myMelds.length) {
             const meld = state.myMelds[state.myMelds.length - 1];
             showClaim(meld.tiles, meld.type, state.myName || "我");
             if (meld.type === "chi") sounds.chi();
             else if (meld.type === "peng") sounds.peng();
             else sounds.gang();
+            // Claim fly toward bottom (self)
+            const ck = ++claimAnimKeyRef.current;
+            setClaimAnimation({ seat: "bottom", key: ck });
+            setTimeout(() => setClaimAnimation((cur) => cur?.key === ck ? null : cur), 300);
           } else {
             for (let i = 0; i < state.otherPlayers.length; i++) {
               if (state.otherPlayers[i].melds.length > (prev.otherPlayers[i]?.melds.length || 0)) {
@@ -195,6 +202,11 @@ export function Game({ initialGameState, onLeave }: GameProps) {
                 if (meld.type === "chi") sounds.chi();
                 else if (meld.type === "peng") sounds.peng();
                 else sounds.gang();
+                // Claim fly toward the claiming player's seat
+                const seat = seatMap[i + 1]; // otherPlayers[0]=right, [1]=top, [2]=left
+                const ck = ++claimAnimKeyRef.current;
+                setClaimAnimation({ seat, key: ck });
+                setTimeout(() => setClaimAnimation((cur) => cur?.key === ck ? null : cur), 300);
                 break;
               }
             }
@@ -642,6 +654,7 @@ export function Game({ initialGameState, onLeave }: GameProps) {
         onBackgroundClick={() => setSelectedTileId(null)}
         disconnectedPlayers={disconnectedPlayers}
         drawAnimation={drawAnimation}
+        claimAnimation={claimAnimation}
         departingTileId={departingTileId}
       />
       {isClaimWindow && actions && (
