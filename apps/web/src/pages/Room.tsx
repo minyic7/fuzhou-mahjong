@@ -49,9 +49,9 @@ export function Room({ initialRoomState, sessionScores }: RoomProps) {
   });
 
   return (
-    <div className="room-page" style={{ display: "flex", justifyContent: "center", padding: "max(16px, 3vh) max(12px, 3vw)" }}>
-    <div style={{ maxWidth: 480, width: "100%" }}>
-      <h2 style={{ textAlign: "center", color: "var(--color-text-secondary)", fontSize: "var(--label-font)", fontWeight: 400, marginBottom: 20 }}>房间 / Room</h2>
+    <div className="room-page">
+    <div className="room-content">
+      <h2 className="room-heading">房间 / Room</h2>
 
       {/* Mahjong table seat layout */}
       <div className="seat-layout">
@@ -89,7 +89,7 @@ export function Room({ initialRoomState, sessionScores }: RoomProps) {
       </div>
 
       {/* Action buttons */}
-      <div style={{ marginTop: 24, display: "flex", gap: 10, flexWrap: "wrap", justifyContent: "center" }}>
+      <div className="room-actions">
         <Button
           onClick={() => socket.emit("addBot")}
           disabled={room.players.length >= 4}
@@ -105,7 +105,7 @@ export function Room({ initialRoomState, sessionScores }: RoomProps) {
           -机器人
         </Button>
       </div>
-      <div style={{ marginTop: 10, display: "flex", gap: 10 }}>
+      <div className="room-start-row">
         <Button
           variant="gold"
           size="lg"
@@ -127,7 +127,7 @@ export function Room({ initialRoomState, sessionScores }: RoomProps) {
         <div className="confirm-modal-backdrop">
           <div className="confirm-modal">
             <p style={{ fontSize: "var(--lobby-subtitle-font)", marginBottom: 16 }}>确定要离开房间吗？</p>
-            <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
+            <div className="confirm-actions">
               <Button variant='secondary' onClick={() => setShowLeaveConfirm(false)}>取消</Button>
               <Button variant='danger' onClick={() => { sounds.confirm(); handleLeave(); }}>离开</Button>
             </div>
