@@ -164,6 +164,7 @@ body {
   --hand-new-tile-margin: 16px;
   --hand-padding-top: 18px;
   --tile-margin: 1px;
+  --tile-select-lift: -10px;
 
   /* Grid layout sizing */
   --grid-side-col: 60px;
@@ -277,6 +278,7 @@ body {
     --hand-new-tile-margin: 6px;
     --hand-padding-top: 8px;
     --tile-margin: 2px;
+    --tile-select-lift: -8px;
     --compact-gap: 6px;
     --compact-padding: 2px 8px;
     --compact-label-font: 12px;
@@ -337,11 +339,12 @@ body {
     --hand-padding-top: max(2px, 0.5vh);
     --hand-new-tile-margin: max(4px, 1vh);
     --tile-margin: 2px;
+    --tile-select-lift: -6px;
     --compact-gap: max(2px, 0.5vh);
     --compact-padding: max(2px, 0.5vh) max(4px, 1vh);
     --compact-label-font: max(10px, 2.6vh);
     --compact-info-font: max(9px, 2.3vh);
-    --fp-tile-w: clamp(28px, 8.5vh, 38px);
+    --fp-tile-w: clamp(40px, 8.5vh, 44px);
     --fp-tile-h: clamp(40px, 12vh, 56px);
     --fp-opponent-tile-w: clamp(16px, 5.3vh, 24px);
     --fp-opponent-tile-h: clamp(22px, 7.2vh, 32px);

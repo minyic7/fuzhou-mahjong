@@ -122,7 +122,7 @@ export function TileView({ tile, faceUp = true, selected, claimable, onClick, on
           ? "0 0 8px rgba(255,215,0,0.6), 0 3px 6px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.8)"
           : "0 3px 6px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.8)",
         transform: selected
-          ? "translateY(-10px) translateZ(20px) scale(1.12)"
+          ? "translateY(var(--tile-select-lift, -10px)) translateZ(20px) scale(1.12)"
           : "translateZ(0)",
         transformStyle: "preserve-3d" as any,
         transition: "all 0.2s cubic-bezier(0.4, 0, 0.2, 1)",
