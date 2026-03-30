@@ -372,7 +372,7 @@ export function PlayerArea({
                   flexDirection: ultraCompact ? "row" : "column",
                   flexWrap: ultraCompact ? "wrap" : "nowrap",
                   gap: 4,
-                  zIndex: 20,
+                  zIndex: "var(--z-tile-anim)" as any,
                   maxHeight: ultraCompact ? undefined : "40dvh",
                   overflowY: ultraCompact ? undefined : "auto",
                   animation: "bubbleFadeIn 0.15s ease-out",

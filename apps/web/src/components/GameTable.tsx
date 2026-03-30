@@ -228,7 +228,7 @@ export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTile
             left: "50%",
             marginLeft: "calc(var(--wall-tw) / -2)",
             pointerEvents: "none",
-            zIndex: 20,
+            zIndex: "var(--z-tile-anim)" as any,
             animation: "discardFlyToPool 0.3s ease-in forwards",
           }}
         >
@@ -247,7 +247,7 @@ export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTile
             marginTop: "calc(var(--wall-th) / -2)",
             marginLeft: "calc(var(--wall-tw) / -2)",
             pointerEvents: "none",
-            zIndex: 20,
+            zIndex: "var(--z-tile-anim)" as any,
             animation: `${drawAnimation.isSupplement ? "supplementFly" : "drawFly"}${drawAnimation.seat.charAt(0).toUpperCase() + drawAnimation.seat.slice(1)} ${drawAnimation.seat === "bottom" ? "0.3s" : "0.2s"} ease-out forwards`,
           }}
         >
@@ -279,7 +279,7 @@ export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTile
             marginTop: "calc(var(--wall-th) / -2)",
             marginLeft: "calc(var(--wall-tw) / -2)",
             pointerEvents: "none",
-            zIndex: 20,
+            zIndex: "var(--z-tile-anim)" as any,
             animation: `claimFly${claimAnimation.seat.charAt(0).toUpperCase() + claimAnimation.seat.slice(1)} 0.3s ease-out forwards`,
           }}
         >

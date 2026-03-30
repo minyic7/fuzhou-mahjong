@@ -91,7 +91,7 @@ export function App() {
 
   if (!connected && !reconnecting) {
     return (
-      <div className="loading-state" style={{ minHeight: "80vh" }}>
+      <div className="loading-state" style={{ minHeight: "80dvh" }}>
         <div className="spinner" />
         连接服务器中... / Connecting...
       </div>

@@ -71,7 +71,7 @@ export function useLongPress(gold: GoldState | null) {
         border: isGold ? "2px solid var(--color-gold-bright)" : "1px solid var(--color-text-secondary)",
         borderRadius: 8,
         padding: 12,
-        zIndex: 34,
+        zIndex: "var(--z-tooltip)" as any,
         textAlign: "center",
         boxShadow: "0 4px 20px rgba(0,0,0,0.5)",
         pointerEvents: "none",

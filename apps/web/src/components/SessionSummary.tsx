@@ -126,7 +126,7 @@ export function SessionSummary({ data, onClose }: SessionSummaryProps) {
 
   return (
     <div style={{
-      position: "fixed", inset: 0, zIndex: 9999,
+      position: "fixed", inset: 0, zIndex: "var(--z-portrait-overlay)" as any,
       background: "rgba(0,0,0,0.85)",
       display: "flex", alignItems: "center", justifyContent: "center",
       animation: "pageFadeIn 0.3s ease-out",

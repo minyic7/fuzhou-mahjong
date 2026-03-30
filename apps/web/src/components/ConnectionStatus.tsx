@@ -28,7 +28,7 @@ export function ConnectionStatus({ connectionState, reconnectAttempt, timeoutMs,
     <div style={{
       position: "fixed",
       inset: 0,
-      zIndex: 10000,
+      zIndex: "var(--z-connection-status)" as any,
       background: "var(--overlay-bg)",
       display: "flex",
       flexDirection: "column",
