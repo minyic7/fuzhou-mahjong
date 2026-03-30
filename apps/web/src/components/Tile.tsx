@@ -57,7 +57,7 @@ export function TileView({ tile, faceUp = true, selected, claimable, onClick, on
   if (!faceUp) {
     return (
       <div style={{
-        width: w, height: h, flexShrink: 1, minWidth: 0,
+        flex: `0 1 ${w}`, height: h, minWidth: 0,
         borderRadius: "var(--radius-sm)",
         borderBottom: "3px solid var(--color-tile-back-border)",
         borderRight: "2px solid var(--color-tile-back-border-right)",
@@ -94,7 +94,7 @@ export function TileView({ tile, faceUp = true, selected, claimable, onClick, on
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
       style={{
-        width: w, height: h, flexShrink: 1, minWidth: 0,
+        flex: `0 1 ${w}`, height: h, minWidth: 0,
         background: selected
           ? "linear-gradient(180deg, #fff8e1 0%, #ffe082 100%)"
           : claimable
