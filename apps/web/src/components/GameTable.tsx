@@ -54,8 +54,8 @@ export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTile
         "left center right"
         ". bottom ."
       `,
-      gridTemplateColumns: "1fr 2fr 1fr",
-      gridTemplateRows: isCompact ? "minmax(0, 50px) minmax(0, 60px) 1fr" : "auto 1fr auto",
+      gridTemplateColumns: isCompact ? "80px 1fr 80px" : "1fr 2fr 1fr",
+      gridTemplateRows: isCompact ? "36px 40px 1fr" : "auto 1fr auto",
       flex: 1,
       minHeight: 0,
       gap: "var(--game-gap)",
