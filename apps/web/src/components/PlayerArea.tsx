@@ -310,7 +310,7 @@ export function PlayerArea({
       </div>
 
       {/* Hand */}
-      <div style={{
+      <div ref={(el) => { swipe.containerRef.current = el; }} style={{
         display: "flex", flexWrap: "nowrap", gap: firstPerson ? "var(--fp-hand-gap)" : 1, marginBottom: 4, alignItems: "flex-end",
         justifyContent: isMe ? "center" : undefined,
         paddingTop: isMe ? "var(--hand-padding-top)" : 0, overflow: "visible", clipPath: "inset(-9999px 0px -9999px 0px)", position: "relative",
@@ -332,7 +332,6 @@ export function PlayerArea({
             <div
               key={t.id}
               onTouchStart={(e) => swipe.onTouchStart(t.id, e)}
-              onTouchMove={swipe.onTouchMove}
               onTouchEnd={() => { swipe.onTouchEnd(); }}
               onTouchCancel={() => { swipe.onTouchCancel(); }}
               style={{
