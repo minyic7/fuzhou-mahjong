@@ -235,6 +235,16 @@
   100% { opacity: 1; transform: scale(1); }
 }
 
+/* Gold indicator shimmer */
+@keyframes goldShimmer {
+  0%, 100% { box-shadow: 0 0 8px rgba(255,215,0,0.4); }
+  50% { box-shadow: 0 0 16px rgba(255,215,0,0.7), 0 0 24px rgba(255,215,0,0.3); }
+}
+
+.gold-indicator-glow {
+  animation: goldShimmer 2s ease-in-out infinite;
+}
+
 /* Center action animations (discard fly / claim reveal) */
 @keyframes centerActionIn {
   0% { opacity: 0; transform: translate(-50%, -50%) scale(0.3); }
