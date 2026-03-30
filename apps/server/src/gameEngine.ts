@@ -240,10 +240,20 @@ export function handlePlayerAction(
   if (botPlayerIndex !== undefined) {
     // Bot action: resolve by room ID directly
     game = getGame(socketIdOrRoomId);
-    if (!game || game.state.phase !== GamePhase.Playing) return;
+    if (!game) {
+      console.error(`[GameEngine] handlePlayerAction rejected: game not found for roomId=${socketIdOrRoomId}, playerIndex=${botPlayerIndex}, actionType=${action.type}`);
+      return;
+    }
+    if (game.state.phase !== GamePhase.Playing) {
+      console.warn(`[GameEngine] handlePlayerAction rejected: phase=${game.state.phase}, playerIndex=${botPlayerIndex}, actionType=${action.type}`);
+      return;
+    }
     playerIndex = botPlayerIndex;
     room = findRoom(game.roomId);
-    if (!room) return;
+    if (!room) {
+      console.error(`[GameEngine] handlePlayerAction rejected: room not found for roomId=${game.roomId}, playerIndex=${botPlayerIndex}, actionType=${action.type}`);
+      return;
+    }
     // Bots don't need error feedback
   } else {
     // Human action: resolve by socket ID
@@ -1152,6 +1162,10 @@ export function emitOrBotAction(
       }
       acted = true;
       const safetyWindow = activeWindows.get(game.roomId);
+      if (game.state.phase !== GamePhase.Playing) {
+        console.warn(`[Bot:SAFETY] ${tag} Safety timeout skipped — game ended (phase=${game.state.phase})`);
+        return;
+      }
       if (safetyWindow) {
         console.warn(`[Bot:SAFETY] ${tag} Safety timeout during action window — passing (roomId=${game.roomId}, playerIndex=${playerIndex}, turn=${turnNumber}, phase=${game.state.phase}, version=${version}, hasActionWindow=true) ts=${Date.now()}`);
         try {
@@ -1223,6 +1237,10 @@ export function emitOrBotAction(
         console.error(`${tag} Action error:`, err);
         // Fallback: try pass first, then discard if pass not allowed
         console.warn(`${tag} Entering fallback chain (canPass=${actions.canPass}) ts=${Date.now()}`);
+        if (game.state.phase !== GamePhase.Playing) {
+          console.warn(`${tag} Fallback skipped — game ended (phase=${game.state.phase})`);
+          return;
+        }
         try {
           if (actions.canPass) {
             handlePlayerAction(io, game.roomId, { type: ActionType.Pass, playerIndex }, playerIndex);
@@ -1234,6 +1252,10 @@ export function emitOrBotAction(
         } catch (fallbackErr) {
           console.error(`${tag} Fallback also failed:`, fallbackErr);
           // Last resort: force Pass to prevent permanent hang
+          if (game.state.phase !== GamePhase.Playing) {
+            console.warn(`${tag} Last-resort skipped — game ended (phase=${game.state.phase})`);
+            return;
+          }
           try {
             console.warn(`${tag} Last-resort Pass ts=${Date.now()}`);
             handlePlayerAction(io, game.roomId, { type: ActionType.Pass, playerIndex }, playerIndex);
