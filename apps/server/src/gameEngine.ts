@@ -990,7 +990,15 @@ export function emitOrBotAction(
             handlePlayerAction(io, game.roomId, emergencyDiscard(player.hand, playerIndex, game.state.gold), playerIndex);
           }
         } catch (fallbackErr) {
-          console.error(`Bot ${playerIndex} fallback also failed:`, fallbackErr);
+          console.error(`[GameEngine] Bot ${playerIndex} fallback also failed:`, fallbackErr);
+          // Last resort: force Pass to prevent permanent hang
+          try {
+            handlePlayerAction(io, game.roomId, { type: ActionType.Pass, playerIndex }, playerIndex);
+          } catch (lastResortErr) {
+            console.error(`[GameEngine] Bot ${playerIndex} last-resort Pass also failed:`, lastResortErr);
+            // Force advance turn as absolute last resort
+            advanceToNextPlayer(io, game, playerIndex);
+          }
         }
       }
     }, 300 + Math.random() * 500);
@@ -1002,8 +1010,20 @@ export function emitOrBotAction(
     } else {
       // Disconnected human player — auto-pass to prevent game freeze
       console.warn(`[GameEngine] Player ${playerIndex} has no valid socket, auto-passing`);
+      const savedTurn = game.state.currentTurn;
       setTimeout(() => {
         if (game.state.phase !== GamePhase.Playing) return;
+        // Skip if turn has advanced since timeout was set (stale)
+        if (game.state.currentTurn !== savedTurn) {
+          console.warn(`[GameEngine] Player ${playerIndex} auto-pass skipped: turn has advanced`);
+          return;
+        }
+        // Skip if no action window is expecting this player
+        const window = activeWindows.get(game.roomId);
+        if (!window) {
+          console.warn(`[GameEngine] Player ${playerIndex} auto-pass skipped: no active window`);
+          return;
+        }
         handlePlayerAction(io, game.roomId, { type: ActionType.Pass, playerIndex }, playerIndex);
       }, 100);
     }
