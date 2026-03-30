@@ -1,4 +1,5 @@
 import type { ButtonHTMLAttributes } from "react";
+import { sounds } from "../sounds";
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: "primary" | "secondary" | "danger" | "gold";
@@ -42,6 +43,7 @@ export function Button({
   variant = "primary",
   size = "md",
   style,
+  onClick,
   ...rest
 }: ButtonProps) {
   return (
@@ -51,6 +53,10 @@ export function Button({
         ...variantStyles[variant],
         ...sizeStyles[size],
         ...style,
+      }}
+      onClick={(e) => {
+        sounds.buttonTap();
+        onClick?.(e);
       }}
       {...rest}
     />
