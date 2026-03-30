@@ -44,7 +44,7 @@ interface PlayerAreaProps {
 const BUBBLE_BTN = {
   padding: "6px 12px", fontSize: "var(--label-font)", fontWeight: "bold" as const,
   border: "none", borderRadius: 6,
-  whiteSpace: "nowrap" as const, minHeight: 44, minWidth: 44,
+  whiteSpace: "nowrap" as const, minHeight: "var(--btn-min-size, 44px)", minWidth: "var(--btn-min-size, 44px)",
   cursor: "pointer",
 };
 
