@@ -1,4 +1,5 @@
 import type { GameOverResult } from "@fuzhou-mahjong/shared";
+import { BREAKPOINTS } from "../hooks/useIsMobile";
 
 interface RoundRecord {
   scores: number[];
@@ -27,6 +28,7 @@ const winTypeNames: Record<string, string> = {
 
 export function SessionSummary({ data, onClose }: SessionSummaryProps) {
   const { playerNames, cumulativeScores, roundsPlayed, roundHistory } = data;
+  const isCompact = window.innerHeight <= BREAKPOINTS.COMPACT_HEIGHT;
 
   // Rankings sorted by cumulative score
   const rankings = cumulativeScores
@@ -60,14 +62,14 @@ export function SessionSummary({ data, onClose }: SessionSummaryProps) {
         background: "linear-gradient(135deg, var(--color-bg-dark) 0%, var(--color-bg-medium) 100%)",
         border: "1px solid rgba(255,215,0,0.3)",
         borderRadius: 12,
-        padding: "24px 28px",
+        padding: isCompact ? "16px 20px" : "24px 28px",
         maxWidth: 440,
         width: "90vw",
         maxHeight: "90dvh",
         overflowY: "auto",
         color: "var(--color-text-primary)",
       }}>
-        <h2 style={{ textAlign: "center", fontSize: 22, marginBottom: 4, color: "var(--color-gold-bright)" }}>
+        <h2 style={{ textAlign: "center", fontSize: isCompact ? 18 : 22, marginBottom: 4, color: "var(--color-gold-bright)" }}>
           本场总结 / Session Summary
         </h2>
         <div style={{ textAlign: "center", fontSize: 13, color: "var(--color-text-secondary)", marginBottom: 16 }}>
@@ -122,7 +124,7 @@ export function SessionSummary({ data, onClose }: SessionSummaryProps) {
         {roundHistory.length > 0 && (
           <div style={{ marginBottom: 16 }}>
             <div style={{ fontSize: 13, color: "var(--color-text-secondary)", marginBottom: 6 }}>每局记录 / Round History</div>
-            <div style={{ maxHeight: 160, overflowY: "auto" }}>
+            <div style={{ maxHeight: isCompact ? 100 : 160, overflowY: "auto" }}>
               {roundHistory.map((round, ri) => (
                 <div key={ri} style={{
                   fontSize: 12, padding: "6px 10px", marginBottom: 2,
@@ -152,6 +154,7 @@ export function SessionSummary({ data, onClose }: SessionSummaryProps) {
         <button
           onClick={onClose}
           style={{
+            position: "sticky", bottom: 0,
             width: "100%", padding: "12px 0", fontSize: 16,
             background: "var(--color-bg-button)", color: "var(--color-text-primary)",
             border: "1px solid rgba(255,215,0,0.3)",
