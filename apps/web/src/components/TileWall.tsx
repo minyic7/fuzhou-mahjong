@@ -119,8 +119,8 @@ function WallSegment({ side, stacks, drawStack, canDraw, onDraw, standalone }: {
         return (
           <div key={i} style={{
             position: "relative",
-            width: isH ? "var(--wall-tw)" : "calc(var(--wall-th) + 3px)",
-            height: isH ? "calc(var(--wall-th) + 3px)" : "var(--wall-tw)",
+            width: isH ? "var(--wall-tw)" : "calc(var(--wall-th) + var(--wall-tw) * 0.4)",
+            height: isH ? "calc(var(--wall-th) + var(--wall-tw) * 0.4)" : "var(--wall-tw)",
             flexShrink: 0,
           }}>
             <div style={{
