@@ -6,8 +6,8 @@
 
 body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-  background: #0a2e1a;
-  color: #eee;
+  background: var(--color-bg-dark);
+  color: var(--color-text-primary);
   min-height: 100vh;
   min-height: 100dvh;
   display: flex;
@@ -29,7 +29,7 @@ body {
   position: fixed;
   inset: 0;
   z-index: 9999;
-  background: #0a2e1a;
+  background: var(--color-bg-dark);
   flex-direction: column;
   align-items: center;
   justify-content: center;
@@ -52,6 +52,28 @@ body {
 /* Tile sizing CSS variables — small sizes derived via calc() */
 /* Game layout spacing variables */
 :root {
+  /* Theme colors */
+  --color-bg-dark: #0a2e1a;
+  --color-bg-medium: #0d3320;
+  --color-bg-card: #1a4a2e;
+  --color-bg-button: #1a5c3a;
+  --color-bg-button-hover: #2e7d50;
+  --color-gold: #d4a017;
+  --color-gold-border: rgba(184, 134, 11, 0.2);
+  --color-gold-border-hover: rgba(184, 134, 11, 0.4);
+  --color-text-primary: #eee;
+  --color-text-secondary: #8fbc8f;
+  --color-text-gold: #d4a017;
+  --color-error: #ff8a80;
+  --color-error-bg: rgba(255, 82, 82, 0.15);
+  --color-focus: #4fc3f7;
+  --color-separator: rgba(184, 134, 11, 0.2);
+
+  /* Consistent border-radius */
+  --radius-sm: 4px;
+  --radius-md: 8px;
+  --radius-lg: 12px;
+
   --tile-w: 44px;
   --tile-h: 60px;
   --tile-font: 18px;
@@ -149,7 +171,7 @@ body {
 
 /* Game area gets felt table background */
 .game-table {
-  background: radial-gradient(ellipse at center, #1a4a2e 0%, #0d3320 60%, #082818 100%);
+  background: radial-gradient(ellipse at center, var(--color-bg-card) 0%, var(--color-bg-medium) 60%, #082818 100%);
   flex: 1;
   min-height: 0;
   overflow: visible;
@@ -168,15 +190,15 @@ body {
 
 button {
   cursor: pointer;
-  background: #1a5c3a;
-  color: #eee;
-  border: 1px solid #2e7d50;
-  border-radius: 4px;
+  background: var(--color-bg-button);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-bg-button-hover);
+  border-radius: var(--radius-sm);
   min-height: 44px;
 }
 
 button:hover:not(:disabled) {
-  background: #2e7d50;
+  background: var(--color-bg-button-hover);
 }
 
 button:disabled {
@@ -199,33 +221,33 @@ button {
 }
 
 input {
-  background: #0d3320;
-  color: #eee;
-  border: 1px solid #1a5c3a;
-  border-radius: 4px;
+  background: var(--color-bg-medium);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-bg-button);
+  border-radius: var(--radius-sm);
   min-height: 44px;
 }
 
 input::placeholder {
-  color: #8fbc8f;
+  color: var(--color-text-secondary);
 }
 
 /* Keyboard focus outline for tiles and buttons */
 [role="button"]:focus-visible,
 button:focus-visible {
-  outline: 2px solid #4fc3f7;
+  outline: 2px solid var(--color-focus);
   outline-offset: 2px;
 }
 
 hr {
   border: none;
-  border-top: 1px solid rgba(184, 134, 11, 0.2);
+  border-top: 1px solid var(--color-separator);
   margin: 20px 0;
 }
 
 /* Lobby/Room pages keep dark theme */
 .lobby-page, .room-page {
-  background: #0a2e1a;
+  background: var(--color-bg-dark);
   min-height: 100vh;
   min-height: 100dvh;
   overflow-y: auto;
@@ -249,16 +271,16 @@ hr {
 }
 
 .room-card {
-  background: #1a4a2e;
-  border: 1px solid rgba(184, 134, 11, 0.2);
-  border-radius: 8px;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-gold-border);
+  border-radius: var(--radius-md);
   padding: 14px 16px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.3);
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .room-card:hover {
-  border-color: rgba(184, 134, 11, 0.4);
+  border-color: var(--color-gold-border-hover);
   box-shadow: 0 4px 16px rgba(0,0,0,0.4);
 }
 
@@ -282,9 +304,9 @@ button.lobby-create-btn:hover:not(:disabled) {
 }
 
 .table-center {
-  background: radial-gradient(ellipse at center, #1a4a2e 0%, #0d3320 100%);
+  background: radial-gradient(ellipse at center, var(--color-bg-card) 0%, var(--color-bg-medium) 100%);
   border: 2px solid rgba(184, 134, 11, 0.3);
-  border-radius: 10px;
+  border-radius: var(--radius-lg);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -300,9 +322,9 @@ button.lobby-create-btn:hover:not(:disabled) {
 }
 
 .seat-card {
-  background: #0d3320;
-  border: 1px solid rgba(184, 134, 11, 0.2);
-  border-radius: 8px;
+  background: var(--color-bg-medium);
+  border: 1px solid var(--color-gold-border);
+  border-radius: var(--radius-md);
   padding: 12px 10px;
   text-align: center;
   width: 100%;
@@ -376,7 +398,7 @@ button.lobby-create-btn:hover:not(:disabled) {
 .spinner {
   width: 28px; height: 28px;
   border: 3px solid rgba(255,255,255,0.15);
-  border-top-color: #8fbc8f;
+  border-top-color: var(--color-text-secondary);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
   margin: 0 auto 12px;
@@ -389,16 +411,16 @@ button.lobby-create-btn:hover:not(:disabled) {
   align-items: center;
   justify-content: center;
   min-height: 200px;
-  color: #8fbc8f;
+  color: var(--color-text-secondary);
   font-size: 14px;
 }
 
 /* Error message */
 .error-msg {
-  color: #ff8a80;
+  color: var(--color-error);
   background: rgba(255,82,82,0.1);
   border: 1px solid rgba(255,82,82,0.3);
-  border-radius: 6px;
+  border-radius: var(--radius-md);
   padding: 8px 12px;
   margin-top: 10px;
   font-size: 13px;
