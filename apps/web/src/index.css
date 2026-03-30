@@ -98,6 +98,9 @@ body {
   --color-action-chi: #2e8b57;
   --color-action-pass-bg: #444;
   --color-action-pass-text: #ccc;
+  --color-draw-action: #6a5acd;
+  --color-tile-back-border: #1a3c2a;
+  --color-tile-back-border-right: #1e4530;
 
   /* Consistent border-radius */
   --radius-sm: 4px;
