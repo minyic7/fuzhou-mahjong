@@ -101,7 +101,8 @@ export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTile
       </div>
 
       {/* Left player — rotated 90° clockwise to face left */}
-      <div style={{ gridArea: "left", position: "relative", zIndex: 1, overflow: "hidden", transform: "rotate(90deg)", transformOrigin: "center center", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <div style={{ gridArea: "left", position: "relative", zIndex: 1, overflow: "hidden" }}>
+      <div style={{ transform: "rotate(90deg)", transformOrigin: "center center", width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>
         <PlayerArea
           isMe={false}
           handCount={otherPlayers[2]?.handCount ?? 0}
@@ -119,6 +120,7 @@ export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTile
           ultraCompact={isFirstPersonMobile}
           cumulativeScore={roundsPlayed > 0 ? cumulativeScores[(myIndex + 3) % 4] : undefined}
         />
+      </div>
       </div>
 
       {/* Center - game info */}
@@ -159,7 +161,8 @@ export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTile
       )}
 
       {/* Right player — rotated 90° counter-clockwise to face right */}
-      <div style={{ gridArea: "right", position: "relative", zIndex: 1, overflow: "hidden", transform: "rotate(-90deg)", transformOrigin: "center center", display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <div style={{ gridArea: "right", position: "relative", zIndex: 1, overflow: "hidden" }}>
+      <div style={{ transform: "rotate(-90deg)", transformOrigin: "center center", width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>
         <PlayerArea
           isMe={false}
           handCount={otherPlayers[0]?.handCount ?? 0}
@@ -177,6 +180,7 @@ export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTile
           ultraCompact={isFirstPersonMobile}
           cumulativeScore={roundsPlayed > 0 ? cumulativeScores[(myIndex + 1) % 4] : undefined}
         />
+      </div>
       </div>
 
       {/* Bottom - my area */}
