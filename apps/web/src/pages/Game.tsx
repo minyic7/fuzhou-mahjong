@@ -77,6 +77,14 @@ export function Game({ initialGameState, onLeave }: GameProps) {
   const [departingTileId, setDepartingTileId] = useState<number | null>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [muted, setMutedState] = useState(isMuted);
+  const [isPortrait, setIsPortrait] = useState(() => window.matchMedia("(orientation: portrait)").matches && window.innerWidth <= 768);
+
+  useEffect(() => {
+    const mq = window.matchMedia("(orientation: portrait) and (max-width: 768px)");
+    const handler = (e: MediaQueryListEvent) => setIsPortrait(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
   const settingsRef = useRef<HTMLDivElement>(null);
 
   // Close settings dropdown on click outside
@@ -381,10 +389,13 @@ export function Game({ initialGameState, onLeave }: GameProps) {
 
     return (
       <div>
-        <div className="portrait-rotate-overlay">
-          <div style={{ fontSize: 48, animation: 'rotatePhone 2s ease-in-out infinite' }}>📱</div>
-          <div style={{ fontSize: 18, color: '#eee' }}>请旋转手机</div>
-        </div>
+        {isPortrait && (
+          <div className="portrait-rotate-overlay">
+            <div style={{ fontSize: 48, animation: 'rotatePhone 2s ease-in-out infinite' }}>📱</div>
+            <div style={{ fontSize: 18, color: '#eee' }}>请旋转手机</div>
+            <div style={{ fontSize: 14, color: 'var(--color-text-secondary)' }}>Please rotate your phone</div>
+          </div>
+        )}
         {isWin && (
           <div className="confetti-container">
             {Array.from({ length: isCompact ? 10 : 30 }).map((_, i) => (
@@ -588,11 +599,13 @@ export function Game({ initialGameState, onLeave }: GameProps) {
 
   return (
     <div className="game-wrapper">
-      <div className="portrait-rotate-overlay">
-        <div style={{ fontSize: 48, animation: 'rotatePhone 2s ease-in-out infinite' }}>📱</div>
-        <div style={{ fontSize: 18, color: '#eee' }}>请旋转手机</div>
-        <div style={{ fontSize: 14, color: 'var(--color-text-secondary)' }}>Please rotate your phone</div>
-      </div>
+      {isPortrait && (
+        <div className="portrait-rotate-overlay">
+          <div style={{ fontSize: 48, animation: 'rotatePhone 2s ease-in-out infinite' }}>📱</div>
+          <div style={{ fontSize: 18, color: '#eee' }}>请旋转手机</div>
+          <div style={{ fontSize: 14, color: 'var(--color-text-secondary)' }}>Please rotate your phone</div>
+        </div>
+      )}
       {showFlash && (
         <>
           <div className="screen-flash" />
