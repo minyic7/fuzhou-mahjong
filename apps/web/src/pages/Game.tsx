@@ -383,9 +383,15 @@ export function Game({ initialGameState, onLeave }: GameProps) {
     <div className="game-wrapper">
       {isPortrait && (
         <div className="portrait-rotate-overlay">
-          <div style={{ fontSize: 48, animation: 'rotatePhone 2s ease-in-out infinite' }}>📱</div>
-          <div style={{ fontSize: 18, color: '#eee' }}>请旋转手机</div>
-          <div style={{ fontSize: 14, color: 'var(--color-text-secondary)' }}>Please rotate your phone</div>
+          <div className="portrait-title">福州麻将</div>
+          <div className="portrait-phone-icon phone-rotate-icon">📱</div>
+          <div className="portrait-msg">
+            请将手机横屏以获得最佳体验
+          </div>
+          <div className="portrait-hint">
+            Please rotate your device to landscape mode.
+            The game table requires a wider screen to display properly.
+          </div>
         </div>
       )}
       {showFlash && (
