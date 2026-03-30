@@ -312,6 +312,7 @@ function handleDiscard(
   game: ServerGameState,
   playerIndex: number,
   tile: TileInstance,
+  depth = 0,
 ): void {
   const state = game.state;
   const player = state.players[playerIndex];
@@ -321,9 +322,14 @@ function handleDiscard(
   if (tileIdx === -1) {
     if (game.isBot(playerIndex)) {
       console.warn(`[GameEngine] Bot ${playerIndex} discard failed: tile ${tile.id} not in hand — forcing emergency discard`);
+      if (depth > 1) {
+        console.error(`[GameEngine] Bot ${playerIndex} emergency discard recursion limit reached (depth=${depth}) — advancing turn`);
+        advanceToNextPlayer(io, game, playerIndex);
+        return;
+      }
       const fallback = emergencyDiscard(player.hand, playerIndex, state.gold);
       if (fallback.type === ActionType.Discard) {
-        handleDiscard(io, game, playerIndex, fallback.tile!);
+        handleDiscard(io, game, playerIndex, fallback.tile!, depth + 1);
       } else {
         advanceToNextPlayer(io, game, playerIndex);
       }
@@ -1051,6 +1057,9 @@ export function emitOrBotAction(
     const delay = 300 + Math.random() * 500;
     startBotWatchdog(game.roomId, playerIndex, io);
     let acted = false;
+    // Snapshot the drawn tile ID at schedule time to avoid race conditions
+    // where another player's action clears/changes it before the callback fires
+    const snapshotDrawnTileId = game.lastDrawnTileIds[playerIndex];
 
     console.log(`${tag} Scheduling action (version=${version}, delay=${Math.round(delay)}ms, phase=${game.state.phase}) ts=${Date.now()}`);
 
@@ -1108,6 +1117,9 @@ export function emitOrBotAction(
       try {
         acted = true;
         clearTimeout(safetyTimer);
+        // Restore the snapshotted drawn tile ID so downstream handlers
+        // (e.g. handleSelfDrawHu, getPostDrawActions) see the correct value
+        game.lastDrawnTileIds[playerIndex] = snapshotDrawnTileId;
         // Check if game state is still valid for this bot action
         if (game.state.phase !== GamePhase.Playing) {
           console.warn(`${tag} Action skipped: phase=${game.state.phase}, attempting Pass fallback ts=${Date.now()}`);
