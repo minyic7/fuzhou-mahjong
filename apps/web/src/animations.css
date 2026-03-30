@@ -326,17 +326,17 @@
 /* Hand-to-pool discard fly animation */
 @keyframes discardFlyToPool {
   0% { transform: translate(0, 0) scale(1); opacity: 1; }
-  100% { transform: translate(0, max(-80px, -10vh)) scale(0.7); opacity: 0; }
+  100% { transform: translate(0, max(-80px, -10dvh)) scale(0.7); opacity: 0; }
 }
 
 /* Wall-to-hand draw fly animations */
 @keyframes drawFlyBottom {
   0% { transform: translate(0, 0) scale(1); opacity: 1; }
-  100% { transform: translate(0, min(120px, 15vh)) scale(1.2); opacity: 0; }
+  100% { transform: translate(0, min(120px, 15dvh)) scale(1.2); opacity: 0; }
 }
 @keyframes drawFlyTop {
   0% { transform: translate(0, 0) scale(1); opacity: 1; }
-  100% { transform: translate(0, max(-120px, -15vh)) scale(0.8); opacity: 0; }
+  100% { transform: translate(0, max(-120px, -15dvh)) scale(0.8); opacity: 0; }
 }
 @keyframes drawFlyLeft {
   0% { transform: translate(0, 0) scale(1); opacity: 1; }
@@ -351,12 +351,12 @@
 @keyframes supplementFlyBottom {
   0% { transform: translate(0, 0) scale(1); opacity: 1; box-shadow: 0 0 4px rgba(255,215,0,0.4); }
   50% { box-shadow: 0 0 10px rgba(255,215,0,0.8); }
-  100% { transform: translate(0, min(120px, 15vh)) scale(1.2); opacity: 0; box-shadow: 0 0 4px rgba(255,215,0,0.4); }
+  100% { transform: translate(0, min(120px, 15dvh)) scale(1.2); opacity: 0; box-shadow: 0 0 4px rgba(255,215,0,0.4); }
 }
 @keyframes supplementFlyTop {
   0% { transform: translate(0, 0) scale(1); opacity: 1; box-shadow: 0 0 4px rgba(255,215,0,0.4); }
   50% { box-shadow: 0 0 10px rgba(255,215,0,0.8); }
-  100% { transform: translate(0, max(-120px, -15vh)) scale(0.8); opacity: 0; box-shadow: 0 0 4px rgba(255,215,0,0.4); }
+  100% { transform: translate(0, max(-120px, -15dvh)) scale(0.8); opacity: 0; box-shadow: 0 0 4px rgba(255,215,0,0.4); }
 }
 @keyframes supplementFlyLeft {
   0% { transform: translate(0, 0) scale(1); opacity: 1; box-shadow: 0 0 4px rgba(255,215,0,0.4); }
@@ -376,11 +376,11 @@
  * so the 60px translations are never clipped.  meld-new (.meldEntrance) is
  * applied in all three PlayerArea layout paths (ultraCompact / compact / normal). */
 @keyframes claimFlyBottom {
-  0% { transform: translate(0, max(-60px, -7.5vh)) scale(0.8); opacity: 1; }
+  0% { transform: translate(0, max(-60px, -7.5dvh)) scale(0.8); opacity: 1; }
   100% { transform: translate(0, 0) scale(1); opacity: 0; }
 }
 @keyframes claimFlyTop {
-  0% { transform: translate(0, min(60px, 7.5vh)) scale(0.8); opacity: 1; }
+  0% { transform: translate(0, min(60px, 7.5dvh)) scale(0.8); opacity: 1; }
   100% { transform: translate(0, 0) scale(1); opacity: 0; }
 }
 @keyframes claimFlyLeft {

@@ -317,19 +317,19 @@ body {
     --seat-card-min-height: 48px;
     --table-center-padding: 10px 8px;
     --table-center-min-height: 70px;
-    --font-badge: max(10px, 1.8vh);
-    --font-uc-label: max(10px, 1.8vh);
-    --font-uc-badge: max(10px, 1.5vh);
-    --font-uc-tile: max(9px, 1.4vh);
-    --font-dot: max(9px, 1.3vh);
-    --font-overflow: max(9px, 1.4vh);
+    --font-badge: max(10px, 1.8dvh);
+    --font-uc-label: max(10px, 1.8dvh);
+    --font-uc-badge: max(10px, 1.5dvh);
+    --font-uc-tile: max(9px, 1.4dvh);
+    --font-dot: max(9px, 1.3dvh);
+    --font-overflow: max(9px, 1.4dvh);
 
-    --font-xs: max(9px, 1.3vh);
-    --font-sm: max(11px, 1.8vh);
-    --font-md: max(13px, 2.2vh);
-    --font-lg: max(16px, 2.8vh);
-    --font-xl: max(20px, 3.6vh);
-    --font-2xl: max(28px, 5vh);
+    --font-xs: max(9px, 1.3dvh);
+    --font-sm: max(11px, 1.8dvh);
+    --font-md: max(13px, 2.2dvh);
+    --font-lg: max(16px, 2.8dvh);
+    --font-xl: max(20px, 3.6dvh);
+    --font-2xl: max(28px, 5dvh);
   }
 }
 
@@ -352,63 +352,63 @@ body {
 /* BREAKPOINTS.SMALL_PHONE_HEIGHT */
 @media (orientation: landscape) and (max-height: 390px) {
   :root {
-    --game-gap: max(1px, 0.25vh);
-    --game-padding: max(1px, 0.25vh);
-    --tile-w: clamp(30px, 9vh, 40px);
-    --tile-h: clamp(40px, 11.5vh, 54px);
-    --tile-font: max(10px, 2.6vh);
-    --tile-suit-font: max(7px, 1.8vh);
-    --tile-suit-font-sm: max(5px, 1.3vh);
-    --wall-tw: max(7px, 1.8vh);
-    --wall-th: max(10px, 2.6vh);
-    --overlay-padding-y: max(4px, 1vh);
-    --overlay-padding-x: max(6px, 1.5vh);
-    --btn-font: max(12px, 3.2vh);
-    --btn-padding: max(6px, 1.5vh) max(10px, 2.6vh);
-    --hand-padding-top: max(2px, 0.5vh);
-    --hand-new-tile-margin: max(4px, 1vh);
+    --game-gap: max(1px, 0.25dvh);
+    --game-padding: max(1px, 0.25dvh);
+    --tile-w: clamp(30px, 9dvh, 40px);
+    --tile-h: clamp(40px, 11.5dvh, 54px);
+    --tile-font: max(10px, 2.6dvh);
+    --tile-suit-font: max(7px, 1.8dvh);
+    --tile-suit-font-sm: max(5px, 1.3dvh);
+    --wall-tw: max(7px, 1.8dvh);
+    --wall-th: max(10px, 2.6dvh);
+    --overlay-padding-y: max(4px, 1dvh);
+    --overlay-padding-x: max(6px, 1.5dvh);
+    --btn-font: max(12px, 3.2dvh);
+    --btn-padding: max(6px, 1.5dvh) max(10px, 2.6dvh);
+    --hand-padding-top: max(2px, 0.5dvh);
+    --hand-new-tile-margin: max(4px, 1dvh);
     --tile-margin: 2px;
     --tile-select-lift: -6px;
-    --compact-gap: max(2px, 0.5vh);
-    --compact-padding: max(2px, 0.5vh) max(4px, 1vh);
-    --compact-label-font: max(10px, 2.6vh);
-    --compact-info-font: max(9px, 2.3vh);
-    --fp-tile-w: clamp(40px, 8.5vh, 44px);
-    --fp-tile-h: clamp(40px, 12vh, 56px);
-    --fp-opponent-tile-w: clamp(16px, 5.3vh, 24px);
-    --fp-opponent-tile-h: clamp(22px, 7.2vh, 32px);
+    --compact-gap: max(2px, 0.5dvh);
+    --compact-padding: max(2px, 0.5dvh) max(4px, 1dvh);
+    --compact-label-font: max(10px, 2.6dvh);
+    --compact-info-font: max(9px, 2.3dvh);
+    --fp-tile-w: clamp(40px, 8.5dvh, 44px);
+    --fp-tile-h: clamp(40px, 12dvh, 56px);
+    --fp-opponent-tile-w: clamp(16px, 5.3dvh, 24px);
+    --fp-opponent-tile-h: clamp(22px, 7.2dvh, 32px);
     --fp-hand-gap: 1px;
-    --grid-side-col: clamp(40px, 13vh, 60px);
-    --wall-progress-w: clamp(50px, 16vh, 80px);
-    --fp-side-col: clamp(40px, 9.5vh, 44px);
-    --fp-top-row: clamp(16px, 5.3vh, 24px);
-    --font-badge: max(10px, 2.6vh);
-    --font-uc-label: max(10px, 2.6vh);
-    --font-uc-badge: max(10px, 2.6vh);
-    --font-uc-tile: max(9px, 2.3vh);
-    --font-dot: max(9px, 2.3vh);
-    --font-overflow: max(9px, 2.3vh);
+    --grid-side-col: clamp(40px, 13dvh, 60px);
+    --wall-progress-w: clamp(50px, 16dvh, 80px);
+    --fp-side-col: clamp(40px, 9.5dvh, 44px);
+    --fp-top-row: clamp(16px, 5.3dvh, 24px);
+    --font-badge: max(10px, 2.6dvh);
+    --font-uc-label: max(10px, 2.6dvh);
+    --font-uc-badge: max(10px, 2.6dvh);
+    --font-uc-tile: max(9px, 2.3dvh);
+    --font-dot: max(9px, 2.3dvh);
+    --font-overflow: max(9px, 2.3dvh);
 
-    --font-xs: max(9px, 2.3vh);
-    --font-sm: max(11px, 2.8vh);
-    --font-md: max(13px, 3.3vh);
-    --font-lg: max(16px, 4.1vh);
-    --font-xl: max(20px, 5.1vh);
-    --font-2xl: max(28px, 7.2vh);
+    --font-xs: max(9px, 2.3dvh);
+    --font-sm: max(11px, 2.8dvh);
+    --font-md: max(13px, 3.3dvh);
+    --font-lg: max(16px, 4.1dvh);
+    --font-xl: max(20px, 5.1dvh);
+    --font-2xl: max(28px, 7.2dvh);
   }
 }
 
 /* iPhone SE landscape (667×375) — reclaim space from gaps/padding, not tile size */
 @media (orientation: landscape) and (max-height: 340px) {
   :root {
-    --game-gap: max(0px, 0.15vh);
-    --game-padding: max(0px, 0.15vh);
-    --overlay-padding-y: max(3px, 0.8vh);
-    --overlay-padding-x: max(5px, 1.2vh);
-    --compact-gap: max(1px, 0.3vh);
-    --compact-padding: max(1px, 0.3vh) max(2px, 0.6vh);
-    --hand-padding-top: max(1px, 0.3vh);
-    --hand-new-tile-margin: max(2px, 0.6vh);
+    --game-gap: max(0px, 0.15dvh);
+    --game-padding: max(0px, 0.15dvh);
+    --overlay-padding-y: max(3px, 0.8dvh);
+    --overlay-padding-x: max(5px, 1.2dvh);
+    --compact-gap: max(1px, 0.3dvh);
+    --compact-padding: max(1px, 0.3dvh) max(2px, 0.6dvh);
+    --hand-padding-top: max(1px, 0.3dvh);
+    --hand-new-tile-margin: max(2px, 0.6dvh);
   }
 }
 
@@ -590,7 +590,7 @@ hr {
   position: relative;
   display: flex;
   justify-content: center;
-  padding: max(16px, 3vh, env(safe-area-inset-top, 0px)) max(12px, 3vw, env(safe-area-inset-right, 0px)) max(16px, 3vh, env(safe-area-inset-bottom, 0px)) max(12px, 3vw, env(safe-area-inset-left, 0px));
+  padding: max(16px, 3dvh, env(safe-area-inset-top, 0px)) max(12px, 3vw, env(safe-area-inset-right, 0px)) max(16px, 3dvh, env(safe-area-inset-bottom, 0px)) max(12px, 3vw, env(safe-area-inset-left, 0px));
 }
 
 /* Lobby content column */
@@ -994,13 +994,13 @@ button.lobby-create-btn:active:not(:disabled) {
 
 /* Toast notifications */
 .game-toast-container { position: fixed; top: 16px; left: 50%; transform: translateX(-50%); z-index: var(--z-toast); display: flex; flex-direction: column; gap: 8px; align-items: center; pointer-events: none; }
-.game-toast-container.compact { top: auto; bottom: calc(clamp(40px, 18vh, 70px) + env(safe-area-inset-bottom, 0px)); }
+.game-toast-container.compact { top: auto; bottom: calc(clamp(40px, 18dvh, 70px) + env(safe-area-inset-bottom, 0px)); }
 .game-toast { background: var(--toast-bg); color: var(--color-text-warm); padding: 8px 20px; border-radius: 8px; font-size: var(--label-font); font-weight: bold; border: 1px solid var(--color-gold-border); animation: pageFadeIn 0.3s ease-out; white-space: nowrap; }
 
 /* ── Game-over overlay ── */
 .game-over-wrapper {
   text-align: center;
-  padding: clamp(var(--spacing-md), 3vh, 40px);
+  padding: clamp(var(--spacing-md), 3dvh, 40px);
   max-height: 100dvh;
   overflow-y: auto;
   background: var(--color-bg-dark);
@@ -1087,12 +1087,12 @@ button.lobby-create-btn:active:not(:disabled) {
 /* Compact score rows for landscape mobile */
 @media (orientation: landscape) and (max-height: 550px) {
   .score-row {
-    padding: clamp(3px, 1vh, 6px) clamp(8px, 2.5vh, 16px);
-    font-size: clamp(11px, 3vh, 14px);
-    margin-bottom: max(1px, 0.3vh);
+    padding: clamp(3px, 1dvh, 6px) clamp(8px, 2.5dvh, 16px);
+    font-size: clamp(11px, 3dvh, 14px);
+    margin-bottom: max(1px, 0.3dvh);
   }
   .score-breakdown {
-    margin-bottom: clamp(4px, 1.2vh, 8px);
-    padding: clamp(6px, 1.8vh, 10px);
+    margin-bottom: clamp(4px, 1.2dvh, 8px);
+    padding: clamp(6px, 1.8dvh, 10px);
   }
 }
