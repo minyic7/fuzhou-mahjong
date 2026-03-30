@@ -122,6 +122,64 @@ class ActionWindow {
 
 const activeWindows = new Map<string, ActionWindow>();
 
+// ─── Bot Watchdog Timer ──────────────────────────────────────────
+const BOT_WATCHDOG_MS = 10_000;
+const botWatchdogs = new Map<string, NodeJS.Timeout>();
+
+/** Last io reference, captured so the watchdog can act without closure. */
+let lastIoRef: GameServer | null = null;
+
+function startBotWatchdog(roomId: string, playerIndex: number, io: GameServer): void {
+  clearBotWatchdog(roomId);
+  lastIoRef = io;
+
+  const watchdog = setTimeout(() => {
+    botWatchdogs.delete(roomId);
+    const game = getGame(roomId);
+    if (!game || game.state.phase !== GamePhase.Playing) return;
+    if (!game.isBot(game.state.currentTurn)) return;
+
+    const turn = game.state.currentTurn;
+    const player = game.state.players[turn];
+    console.warn(
+      `[Watchdog] Bot ${turn} in room ${roomId} exceeded ${BOT_WATCHDOG_MS}ms — forcing default action. ` +
+      `phase=${game.state.phase}, handSize=${player.hand.length}, ` +
+      `wallRemaining=${game.state.wall.length + game.state.wallTail.length}, ` +
+      `currentTurn=${turn}, pendingWindow=${activeWindows.has(roomId)}`,
+    );
+
+    try {
+      // If there's a stale action window, force-resolve it
+      const window = activeWindows.get(roomId);
+      if (window) {
+        console.warn(`[Watchdog] Cancelling stale action window for room ${roomId}`);
+        window.cancel();
+        activeWindows.delete(roomId);
+      }
+
+      const fallback = emergencyDiscard(player.hand, playerIndex, game.state.gold);
+      handlePlayerAction(io, roomId, fallback, turn);
+    } catch (e) {
+      console.error(`[Watchdog] Fallback for bot ${turn} in room ${roomId} failed:`, e);
+      try {
+        advanceToNextPlayer(io, game, turn);
+      } catch (e2) {
+        console.error(`[Watchdog] advanceToNextPlayer also failed for room ${roomId}:`, e2);
+      }
+    }
+  }, BOT_WATCHDOG_MS);
+
+  botWatchdogs.set(roomId, watchdog);
+}
+
+function clearBotWatchdog(roomId: string): void {
+  const existing = botWatchdogs.get(roomId);
+  if (existing) {
+    clearTimeout(existing);
+    botWatchdogs.delete(roomId);
+  }
+}
+
 /** Monotonic counter per room to invalidate stale bot callbacks. */
 const botActionVersion = new Map<string, number>();
 
@@ -138,6 +196,7 @@ function getBotVersion(roomId: string): number {
 // Clean up per-room state when a game is deleted
 setOnGameDeleted((roomId) => {
   botActionVersion.delete(roomId);
+  clearBotWatchdog(roomId);
   const window = activeWindows.get(roomId);
   if (window) {
     window.cancel();
@@ -190,6 +249,9 @@ export function handlePlayerAction(
     playerIndex = game.getPlayerIndex(socketIdOrRoomId);
     if (playerIndex === -1) return;
   }
+
+  // Clear watchdog on any successful action processing for this room
+  clearBotWatchdog(room.id);
 
   // Check if there's an active action window
   const window = activeWindows.get(room.id);
@@ -248,6 +310,16 @@ function handleDiscard(
   // Remove tile from hand
   const tileIdx = player.hand.findIndex((t) => t.id === tile.id);
   if (tileIdx === -1) {
+    if (game.isBot(playerIndex)) {
+      console.warn(`[GameEngine] Bot ${playerIndex} discard failed: tile ${tile.id} not in hand — forcing emergency discard`);
+      const fallback = emergencyDiscard(player.hand, playerIndex, state.gold);
+      if (fallback.type === ActionType.Discard) {
+        handleDiscard(io, game, playerIndex, fallback.tile!);
+      } else {
+        advanceToNextPlayer(io, game, playerIndex);
+      }
+      return;
+    }
     const socketId = game.getSocketId(playerIndex);
     const socket = io.sockets.sockets.get(socketId);
     socket?.emit('actionError', { message: 'Tile not found in hand', code: 'TILE_NOT_FOUND' });
@@ -359,7 +431,14 @@ function handleAnGang(
     (t) => isSuitedTile(t.tile) && isSuitedTile(tile.tile) &&
            t.tile.suit === tile.tile.suit && t.tile.value === tile.tile.value,
   );
-  if (matching.length < 4) return;
+  if (matching.length < 4) {
+    if (game.isBot(playerIndex)) {
+      console.warn(`[GameEngine] Bot ${playerIndex} AnGang failed: only ${matching.length} matching tiles — forcing emergency discard`);
+      const fallback = emergencyDiscard(player.hand, playerIndex, state.gold);
+      handlePlayerAction(io, game.roomId, fallback, playerIndex);
+    }
+    return;
+  }
 
   // Remove from hand
   const anGangIds = matching.map(m => m.id);
@@ -401,7 +480,14 @@ function handleBuGang(
            isSuitedTile(m.tiles[0].tile) && isSuitedTile(tile.tile) &&
            m.tiles[0].tile.suit === tile.tile.suit && m.tiles[0].tile.value === tile.tile.value,
   );
-  if (meldIdx === -1) return;
+  if (meldIdx === -1) {
+    if (game.isBot(playerIndex)) {
+      console.warn(`[GameEngine] Bot ${playerIndex} BuGang failed: no matching Peng meld — forcing emergency discard`);
+      const fallback = emergencyDiscard(player.hand, playerIndex, state.gold);
+      handlePlayerAction(io, game.roomId, fallback, playerIndex);
+    }
+    return;
+  }
 
   // Check for robbing kong (抢杠胡)
   // Other players can hu on this tile
@@ -483,7 +569,13 @@ function handleSelfDrawHu(
   playerIndex: number,
 ): void {
   const player = game.state.players[playerIndex];
-  if (player.hand.length === 0) return;
+  if (player.hand.length === 0) {
+    if (game.isBot(playerIndex)) {
+      console.warn(`[GameEngine] Bot ${playerIndex} Hu failed: empty hand — forcing pass`);
+      handlePlayerAction(io, game.roomId, { type: ActionType.Pass, playerIndex }, playerIndex);
+    }
+    return;
+  }
 
   // Find the drawn tile by tracked ID (hand is sorted, so it may not be last)
   const drawnId = game.lastDrawnTileIds[playerIndex];
@@ -504,6 +596,10 @@ function handleSelfDrawHu(
 
   if (winResult.isWin) {
     endGameWin(io, game, playerIndex, winningTile, true);
+  } else if (game.isBot(playerIndex)) {
+    console.warn(`[GameEngine] Bot ${playerIndex} Hu failed: win check returned false — forcing emergency discard`);
+    const fallback = emergencyDiscard(player.hand, playerIndex, game.state.gold);
+    handlePlayerAction(io, game.roomId, fallback, playerIndex);
   }
 }
 
@@ -930,6 +1026,7 @@ export function emitOrBotAction(
   const version = nextBotVersion(game.roomId);
 
   if (game.isBot(playerIndex)) {
+    startBotWatchdog(game.roomId, playerIndex, io);
     let acted = false;
 
     const safetyTimer = setTimeout(() => {
