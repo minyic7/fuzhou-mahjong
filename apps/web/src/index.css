@@ -195,6 +195,20 @@ body {
   :root {
     --game-gap: 1px;
     --game-padding: 1px;
+    --tile-w: 30px;
+    --tile-h: 44px;
+    --tile-font: 10px;
+    --tile-suit-font: 7px;
+    --tile-suit-font-sm: 5px;
+    --wall-tw: 7px;
+    --wall-th: 10px;
+    --overlay-padding-y: 6px;
+    --overlay-padding-x: 8px;
+    --btn-font: 12px;
+    --btn-padding: 6px 10px;
+    --hand-padding-top: 4px;
+    --hand-new-tile-margin: 4px;
+    --tile-margin: 2px;
   }
   .game-table {
     grid-template-columns: 50px 1fr 50px;
