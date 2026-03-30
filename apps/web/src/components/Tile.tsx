@@ -39,7 +39,7 @@ function getTileDisplay(tile: Tile): { value: string; suit: string; color: strin
   switch (tile.kind) {
     case "wind": return { value: FLOWER_CHARS.wind[tile.windType], suit: "", color: "#1a237e" };
     case "dragon": {
-      const colors: Record<string, string> = { red: "#b71c1c", green: "#1b5e20", white: "#37474f" };
+      const colors: Record<string, string> = { red: "var(--suit-color-wan)", green: "#1b5e20", white: "#37474f" };
       return { value: FLOWER_CHARS.dragon[tile.dragonType], suit: "", color: colors[tile.dragonType] };
     }
     case "season": return { value: FLOWER_CHARS.season[tile.seasonType], suit: "", color: "#e65100" };
