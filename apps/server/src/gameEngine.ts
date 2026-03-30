@@ -478,6 +478,19 @@ function handleAnGang(
 
   // Draw replacement from tail
   gangDraw(io, game, playerIndex);
+  // Safety timeout: if gangDraw leaves game stuck, force advance
+  setTimeout(() => {
+    if (game.state.currentTurn === playerIndex && game.state.phase === GamePhase.Playing) {
+      const player = game.state.players[playerIndex];
+      console.warn(`[GameEngine] gangDraw safety timeout fired for AnGang (roomId=${game.roomId}, playerIndex=${playerIndex}, turn=${game.state.currentTurn}, phase=${game.state.phase})`);
+      try {
+        handlePlayerAction(io, game.roomId, emergencyDiscard(player.hand, playerIndex, game.state.gold), playerIndex);
+      } catch (err) {
+        console.error(`[GameEngine] gangDraw safety timeout fallback failed:`, err);
+        advanceToNextPlayer(io, game, playerIndex);
+      }
+    }
+  }, 3000);
 }
 
 function handleBuGang(
@@ -576,6 +589,19 @@ function executeBuGang(
   game.state.retainCount = calculateRetainCount(game.state.players);
 
   gangDraw(io, game, playerIndex);
+  // Safety timeout: if gangDraw leaves game stuck, force advance
+  setTimeout(() => {
+    if (game.state.currentTurn === playerIndex && game.state.phase === GamePhase.Playing) {
+      const player = game.state.players[playerIndex];
+      console.warn(`[GameEngine] gangDraw safety timeout fired for BuGang (roomId=${game.roomId}, playerIndex=${playerIndex}, turn=${game.state.currentTurn}, phase=${game.state.phase})`);
+      try {
+        handlePlayerAction(io, game.roomId, emergencyDiscard(player.hand, playerIndex, game.state.gold), playerIndex);
+      } catch (err) {
+        console.error(`[GameEngine] gangDraw safety timeout fallback failed:`, err);
+        advanceToNextPlayer(io, game, playerIndex);
+      }
+    }
+  }, 3000);
 }
 
 function handleSelfDrawHu(
@@ -676,100 +702,134 @@ function resolveActionWindow(
 
   switch (winner.action.type) {
     case ActionType.Hu:
-      endGameWin(io, game, winner.playerIndex, discardTile, false);
+      try {
+        endGameWin(io, game, winner.playerIndex, discardTile, false);
+      } catch (e) {
+        console.error(`[GameEngine] resolveActionWindow Hu failed:`, e);
+        advanceToNextPlayer(io, game, winner.playerIndex);
+      }
       break;
 
     case ActionType.Peng: {
-      const player = state.players[winner.playerIndex];
-      // Remove 2 matching tiles from hand
-      const matching = player.hand.filter(
-        (t) => isSuitedTile(t.tile) && isSuitedTile(discardTile.tile) &&
-               t.tile.suit === discardTile.tile.suit && t.tile.value === discardTile.tile.value,
-      );
-      const pengIds = matching.map(m => m.id);
-      if (new Set(pengIds).size !== pengIds.length) {
-        console.warn(`[GameEngine] Duplicate tile IDs in matching: ${pengIds}`);
-      }
-      for (let i = 0; i < 2 && i < matching.length; i++) {
-        const idx = player.hand.findIndex((t) => t.id === matching[i].id);
-        if (idx < 0) {
-          console.warn(`[GameEngine] Tile ${matching[i].id} not found in hand during Peng`);
-          continue;
+      try {
+        const player = state.players[winner.playerIndex];
+        // Remove 2 matching tiles from hand
+        const matching = player.hand.filter(
+          (t) => isSuitedTile(t.tile) && isSuitedTile(discardTile.tile) &&
+                 t.tile.suit === discardTile.tile.suit && t.tile.value === discardTile.tile.value,
+        );
+        const pengIds = matching.map(m => m.id);
+        if (new Set(pengIds).size !== pengIds.length) {
+          console.warn(`[GameEngine] Duplicate tile IDs in matching: ${pengIds}`);
         }
-        player.hand.splice(idx, 1);
+        for (let i = 0; i < 2 && i < matching.length; i++) {
+          const idx = player.hand.findIndex((t) => t.id === matching[i].id);
+          if (idx < 0) {
+            console.warn(`[GameEngine] Tile ${matching[i].id} not found in hand during Peng`);
+            continue;
+          }
+          player.hand.splice(idx, 1);
+        }
+        // Remove from discarder's discards
+        const discardIdx = state.players[discarderIndex].discards.findIndex((t) => t.id === discardTile.id);
+        if (discardIdx >= 0) state.players[discarderIndex].discards.splice(discardIdx, 1);
+        // Create meld
+        player.melds.push({
+          type: MeldType.Peng,
+          tiles: [matching[0], matching[1], discardTile],
+          sourceTile: discardTile,
+          sourcePlayer: discarderIndex,
+        });
+        state.currentTurn = winner.playerIndex;
+        state.lastDiscard = null;
+        broadcastState(io, game);
+        // Player must discard
+        emitOrBotAction(io, game, winner.playerIndex,
+          getPostClaimActions(game, winner.playerIndex));
+      } catch (e) {
+        console.error(`[GameEngine] resolveActionWindow Peng failed:`, e);
+        advanceToNextPlayer(io, game, winner.playerIndex);
       }
-      // Remove from discarder's discards
-      const discardIdx = state.players[discarderIndex].discards.findIndex((t) => t.id === discardTile.id);
-      if (discardIdx >= 0) state.players[discarderIndex].discards.splice(discardIdx, 1);
-      // Create meld
-      player.melds.push({
-        type: MeldType.Peng,
-        tiles: [matching[0], matching[1], discardTile],
-        sourceTile: discardTile,
-        sourcePlayer: discarderIndex,
-      });
-      state.currentTurn = winner.playerIndex;
-      state.lastDiscard = null;
-      broadcastState(io, game);
-      // Player must discard
-      emitOrBotAction(io, game, winner.playerIndex,
-        getPostClaimActions(game, winner.playerIndex));
       break;
     }
 
     case ActionType.MingGang: {
-      const player = state.players[winner.playerIndex];
-      const matching = player.hand.filter(
-        (t) => isSuitedTile(t.tile) && isSuitedTile(discardTile.tile) &&
-               t.tile.suit === discardTile.tile.suit && t.tile.value === discardTile.tile.value,
-      );
-      const mingGangIds = matching.map(m => m.id);
-      if (new Set(mingGangIds).size !== mingGangIds.length) {
-        console.warn(`[GameEngine] Duplicate tile IDs in matching: ${mingGangIds}`);
-      }
-      for (let i = 0; i < 3 && i < matching.length; i++) {
-        const idx = player.hand.findIndex((t) => t.id === matching[i].id);
-        if (idx < 0) {
-          console.warn(`[GameEngine] Tile ${matching[i].id} not found in hand during MingGang`);
-          continue;
+      try {
+        const player = state.players[winner.playerIndex];
+        const matching = player.hand.filter(
+          (t) => isSuitedTile(t.tile) && isSuitedTile(discardTile.tile) &&
+                 t.tile.suit === discardTile.tile.suit && t.tile.value === discardTile.tile.value,
+        );
+        const mingGangIds = matching.map(m => m.id);
+        if (new Set(mingGangIds).size !== mingGangIds.length) {
+          console.warn(`[GameEngine] Duplicate tile IDs in matching: ${mingGangIds}`);
         }
-        player.hand.splice(idx, 1);
+        for (let i = 0; i < 3 && i < matching.length; i++) {
+          const idx = player.hand.findIndex((t) => t.id === matching[i].id);
+          if (idx < 0) {
+            console.warn(`[GameEngine] Tile ${matching[i].id} not found in hand during MingGang`);
+            continue;
+          }
+          player.hand.splice(idx, 1);
+        }
+        const discardIdx = state.players[discarderIndex].discards.findIndex((t) => t.id === discardTile.id);
+        if (discardIdx >= 0) state.players[discarderIndex].discards.splice(discardIdx, 1);
+        player.melds.push({
+          type: MeldType.MingGang,
+          tiles: [...matching.slice(0, 3), discardTile],
+          sourceTile: discardTile,
+          sourcePlayer: discarderIndex,
+        });
+        state.currentTurn = winner.playerIndex;
+        state.retainCount = calculateRetainCount(state.players);
+        const gangPlayerIdx = winner.playerIndex;
+        gangDraw(io, game, gangPlayerIdx);
+        // Safety timeout: if gangDraw leaves game stuck, force advance
+        setTimeout(() => {
+          if (game.state.currentTurn === gangPlayerIdx && game.state.phase === GamePhase.Playing) {
+            const player = game.state.players[gangPlayerIdx];
+            console.warn(`[GameEngine] gangDraw safety timeout fired for MingGang (roomId=${game.roomId}, playerIndex=${gangPlayerIdx}, turn=${game.state.currentTurn}, phase=${game.state.phase})`);
+            try {
+              handlePlayerAction(io, game.roomId, emergencyDiscard(player.hand, gangPlayerIdx, game.state.gold), gangPlayerIdx);
+            } catch (err) {
+              console.error(`[GameEngine] gangDraw safety timeout fallback failed:`, err);
+              advanceToNextPlayer(io, game, gangPlayerIdx);
+            }
+          }
+        }, 3000);
+      } catch (e) {
+        console.error(`[GameEngine] resolveActionWindow MingGang failed:`, e);
+        advanceToNextPlayer(io, game, winner.playerIndex);
       }
-      const discardIdx = state.players[discarderIndex].discards.findIndex((t) => t.id === discardTile.id);
-      if (discardIdx >= 0) state.players[discarderIndex].discards.splice(discardIdx, 1);
-      player.melds.push({
-        type: MeldType.MingGang,
-        tiles: [...matching.slice(0, 3), discardTile],
-        sourceTile: discardTile,
-        sourcePlayer: discarderIndex,
-      });
-      state.currentTurn = winner.playerIndex;
-      state.retainCount = calculateRetainCount(state.players);
-      gangDraw(io, game, winner.playerIndex);
       break;
     }
 
     case ActionType.Chi: {
-      const chiAction = winner.action as import("@fuzhou-mahjong/shared").ChiAction;
-      const player = state.players[winner.playerIndex];
-      // Remove the 2 chi tiles from hand
-      for (const ct of chiAction.tiles) {
-        const idx = player.hand.findIndex((t) => t.id === ct.id);
-        if (idx >= 0) player.hand.splice(idx, 1);
+      try {
+        const chiAction = winner.action as import("@fuzhou-mahjong/shared").ChiAction;
+        const player = state.players[winner.playerIndex];
+        // Remove the 2 chi tiles from hand
+        for (const ct of chiAction.tiles) {
+          const idx = player.hand.findIndex((t) => t.id === ct.id);
+          if (idx >= 0) player.hand.splice(idx, 1);
+        }
+        const discardIdx = state.players[discarderIndex].discards.findIndex((t) => t.id === discardTile.id);
+        if (discardIdx >= 0) state.players[discarderIndex].discards.splice(discardIdx, 1);
+        player.melds.push({
+          type: MeldType.Chi,
+          tiles: [...chiAction.tiles, discardTile],
+          sourceTile: discardTile,
+          sourcePlayer: discarderIndex,
+        });
+        state.currentTurn = winner.playerIndex;
+        state.lastDiscard = null;
+        broadcastState(io, game);
+        emitOrBotAction(io, game, winner.playerIndex,
+          getPostClaimActions(game, winner.playerIndex));
+      } catch (e) {
+        console.error(`[GameEngine] resolveActionWindow Chi failed:`, e);
+        advanceToNextPlayer(io, game, winner.playerIndex);
       }
-      const discardIdx = state.players[discarderIndex].discards.findIndex((t) => t.id === discardTile.id);
-      if (discardIdx >= 0) state.players[discarderIndex].discards.splice(discardIdx, 1);
-      player.melds.push({
-        type: MeldType.Chi,
-        tiles: [...chiAction.tiles, discardTile],
-        sourceTile: discardTile,
-        sourcePlayer: discarderIndex,
-      });
-      state.currentTurn = winner.playerIndex;
-      state.lastDiscard = null;
-      broadcastState(io, game);
-      emitOrBotAction(io, game, winner.playerIndex,
-        getPostClaimActions(game, winner.playerIndex));
       break;
     }
 
@@ -1093,14 +1153,14 @@ export function emitOrBotAction(
       acted = true;
       const safetyWindow = activeWindows.get(game.roomId);
       if (safetyWindow) {
-        console.warn(`[Bot:FALLBACK] ${tag} Safety timeout during action window — passing (roomId=${game.roomId}, playerIndex=${playerIndex}, turn=${turnNumber}, phase=${game.state.phase}, hasActionWindow=true) ts=${Date.now()}`);
+        console.warn(`[Bot:SAFETY] ${tag} Safety timeout during action window — passing (roomId=${game.roomId}, playerIndex=${playerIndex}, turn=${turnNumber}, phase=${game.state.phase}, version=${version}, hasActionWindow=true) ts=${Date.now()}`);
         try {
           handlePlayerAction(io, game.roomId, { type: ActionType.Pass, playerIndex }, playerIndex);
         } catch (e) {
           console.error(`${tag} Safety timeout Pass fallback failed:`, e);
         }
       } else {
-        console.warn(`[Bot:FALLBACK] ${tag} Safety timeout — forcing emergency discard (roomId=${game.roomId}, playerIndex=${playerIndex}, turn=${turnNumber}, phase=${game.state.phase}, hasActionWindow=false, version=${version}) ts=${Date.now()}`);
+        console.warn(`[Bot:SAFETY] ${tag} Safety timeout — forcing emergency discard (roomId=${game.roomId}, playerIndex=${playerIndex}, turn=${turnNumber}, phase=${game.state.phase}, version=${version}, hasActionWindow=false) ts=${Date.now()}`);
         try {
           const player = game.state.players[playerIndex];
           handlePlayerAction(io, game.roomId, emergencyDiscard(player.hand, playerIndex, game.state.gold), playerIndex);
