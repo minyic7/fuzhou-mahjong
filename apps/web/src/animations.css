@@ -1,3 +1,20 @@
+/*
+ * Animation inventory (verified 2026-03-30, ticket #133):
+ *   tileDrawIn + tileGlow  → .tile-new          (PlayerArea: drawn tile)
+ *   discardArrive           → .discard-arrive     (PlayerArea: newest discard)
+ *   meldEntrance            → .meld-new           (PlayerArea: newest meld)
+ *   turnGlow                → .current-turn       (PlayerArea: active player)
+ *   huGlow + huScale        → .hu-celebration     (Game: win overlay)
+ *   confettiFall            → .confetti           (Game: win confetti)
+ *   goldFlipReveal          → .gold-flip-reveal   (TileWall + GameInfo: gold indicator)
+ *   wallLowPulse            → .wall-low-pulse     (TileWall: low tile warning)
+ *   disconnectPulse         → inline style        (PlayerArea: disconnected badge)
+ *   drawBtnPulse            → .draw-button-pulse  (TileWall: draw prompt)
+ *   goldWarningPulse        → .gold-warning-pulse (PlayerArea: gold suit warning)
+ *   yourTurnBounce          → .your-turn-prompt   (PlayerArea: turn prompt)
+ *   scoreReveal + meldEntrance → score/meld anim  (PlayerArea: round-end reveal)
+ */
+
 /* Portrait rotate phone animation */
 @keyframes rotatePhone {
   0%, 100% { transform: rotate(0deg); }
