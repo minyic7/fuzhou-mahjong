@@ -11,9 +11,10 @@ interface GameInfoProps {
   myIndex: number;
   lastDiscard: { tile: TileInstance; playerIndex: number } | null;
   playerNames: string[];
+  compact?: boolean;
 }
 
-export function GameInfo({ gold, dealerIndex, lianZhuangCount, myIndex, lastDiscard, playerNames }: GameInfoProps) {
+export function GameInfo({ gold, dealerIndex, lianZhuangCount, myIndex, lastDiscard, playerNames, compact }: GameInfoProps) {
   const [goldFlip, setGoldFlip] = useState(false);
   const prevGoldRef = useRef<number | null>(null);
 
@@ -34,6 +35,24 @@ export function GameInfo({ gold, dealerIndex, lianZhuangCount, myIndex, lastDisc
     const rel = (idx - myIndex + 4) % 4;
     return rel === 0 ? "我" : (playerNames[rel] || ["我", "右", "上", "左"][rel]);
   };
+
+  if (compact) {
+    return (
+      <div style={{
+        display: "flex", alignItems: "center", gap: 8,
+        padding: "2px 8px", fontSize: 11, color: "#8fbc8f",
+      }}>
+        <span>庄:{posLabel(dealerIndex)}</span>
+        {lianZhuangCount > 0 && <span>连庄:{lianZhuangCount}</span>}
+        {lastDiscard && (
+          <span style={{ color: "#ffa500" }}>
+            {posLabel(lastDiscard.playerIndex)}打: <TileView tile={lastDiscard.tile} faceUp gold={gold} small />
+          </span>
+        )}
+        <MuteButton />
+      </div>
+    );
+  }
 
   return (
     <div style={{
