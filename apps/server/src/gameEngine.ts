@@ -122,6 +122,15 @@ class ActionWindow {
 
 const activeWindows = new Map<string, ActionWindow>();
 
+// ─── Gang Safety Timeouts ────────────────────────────────────────
+const gangSafetyTimeouts = new Map<string, NodeJS.Timeout[]>();
+
+function addGangSafetyTimeout(roomId: string, timer: NodeJS.Timeout): void {
+  let timers = gangSafetyTimeouts.get(roomId);
+  if (!timers) { timers = []; gangSafetyTimeouts.set(roomId, timers); }
+  timers.push(timer);
+}
+
 // ─── Bot Watchdog Timer ──────────────────────────────────────────
 const BOT_WATCHDOG_MS = 10_000;
 const botWatchdogs = new Map<string, NodeJS.Timeout>();
@@ -213,6 +222,12 @@ setOnGameDeleted((roomId) => {
     window.cancel();
     activeWindows.delete(roomId);
   }
+  // Clear gang safety timeouts
+  const gangTimers = gangSafetyTimeouts.get(roomId);
+  if (gangTimers) {
+    for (const t of gangTimers) clearTimeout(t);
+    gangSafetyTimeouts.delete(roomId);
+  }
 });
 
 /** Pick first non-gold tile to discard as emergency fallback. Returns Pass if hand is empty. */
@@ -234,7 +249,7 @@ export function handlePlayerAction(
   socketIdOrRoomId: string,
   action: GameAction,
   botPlayerIndex?: number,
-): void {
+): boolean {
   let room: ReturnType<typeof findRoomBySocket>;
   let game: ReturnType<typeof getGame>;
   let playerIndex: number;
@@ -244,31 +259,31 @@ export function handlePlayerAction(
     game = getGame(socketIdOrRoomId);
     if (!game) {
       console.error(`[GameEngine] handlePlayerAction rejected: game not found for roomId=${socketIdOrRoomId}, playerIndex=${botPlayerIndex}, actionType=${action.type}`);
-      return;
+      return false;
     }
     if (game.state.phase !== GamePhase.Playing) {
       console.warn(`[GameEngine] handlePlayerAction rejected: phase=${game.state.phase}, playerIndex=${botPlayerIndex}, actionType=${action.type}`);
-      return;
+      return false;
     }
     playerIndex = botPlayerIndex;
     room = findRoom(game.roomId);
     if (!room) {
       console.error(`[GameEngine] handlePlayerAction rejected: room not found for roomId=${game.roomId}, playerIndex=${botPlayerIndex}, actionType=${action.type}`);
-      return;
+      return false;
     }
     // Bots don't need error feedback
   } else {
     // Human action: resolve by socket ID
     room = findRoomBySocket(socketIdOrRoomId);
-    if (!room) return;
+    if (!room) return false;
     game = getGame(room.id);
     if (!game || game.state.phase !== GamePhase.Playing) {
       const socket = io.sockets.sockets.get(socketIdOrRoomId);
       socket?.emit('actionError', { message: 'Invalid game phase', code: 'WRONG_PHASE' });
-      return;
+      return false;
     }
     playerIndex = game.getPlayerIndex(socketIdOrRoomId);
-    if (playerIndex === -1) return;
+    if (playerIndex === -1) return false;
   }
 
   // Clear watchdog on any successful action processing for this player
@@ -278,7 +293,7 @@ export function handlePlayerAction(
   const window = activeWindows.get(room.id);
   if (window) {
     window.addResponse(playerIndex, action);
-    return;
+    return true;
   }
 
   // Direct actions (during player's own turn)
@@ -290,7 +305,7 @@ export function handlePlayerAction(
       const socket = io.sockets.sockets.get(socketIdOrRoomId);
       socket?.emit('actionError', { message: 'Not your turn', code: 'WRONG_TURN' });
     }
-    return;
+    return false;
   }
 
   switch (action.type) {
@@ -315,8 +330,9 @@ export function handlePlayerAction(
       break;
     default:
       console.warn(`[GameEngine] Unhandled action type in handlePlayerAction: ${action.type}`);
-      break;
+      return false;
   }
+  return true;
 }
 
 function handleDiscard(
@@ -491,7 +507,7 @@ function handleAnGang(
   // Draw replacement from tail
   gangDraw(io, game, playerIndex);
   // Safety timeout: if gangDraw leaves game stuck, force advance
-  setTimeout(() => {
+  const anGangSafetyTimer = setTimeout(() => {
     if (game.state.currentTurn === playerIndex && game.state.phase === GamePhase.Playing) {
       const player = game.state.players[playerIndex];
       console.warn(`[GameEngine] gangDraw safety timeout fired for AnGang (roomId=${game.roomId}, playerIndex=${playerIndex}, turn=${game.state.currentTurn}, phase=${game.state.phase})`);
@@ -503,6 +519,7 @@ function handleAnGang(
       }
     }
   }, 3000);
+  addGangSafetyTimeout(game.roomId, anGangSafetyTimer);
 }
 
 function handleBuGang(
@@ -602,7 +619,7 @@ function executeBuGang(
 
   gangDraw(io, game, playerIndex);
   // Safety timeout: if gangDraw leaves game stuck, force advance
-  setTimeout(() => {
+  const buGangSafetyTimer = setTimeout(() => {
     if (game.state.currentTurn === playerIndex && game.state.phase === GamePhase.Playing) {
       const player = game.state.players[playerIndex];
       console.warn(`[GameEngine] gangDraw safety timeout fired for BuGang (roomId=${game.roomId}, playerIndex=${playerIndex}, turn=${game.state.currentTurn}, phase=${game.state.phase})`);
@@ -614,6 +631,7 @@ function executeBuGang(
       }
     }
   }, 3000);
+  addGangSafetyTimeout(game.roomId, buGangSafetyTimer);
 }
 
 function handleSelfDrawHu(
@@ -797,7 +815,7 @@ function resolveActionWindow(
         const gangPlayerIdx = winner.playerIndex;
         gangDraw(io, game, gangPlayerIdx);
         // Safety timeout: if gangDraw leaves game stuck, force advance
-        setTimeout(() => {
+        const mingGangSafetyTimer = setTimeout(() => {
           if (game.state.currentTurn === gangPlayerIdx && game.state.phase === GamePhase.Playing) {
             const player = game.state.players[gangPlayerIdx];
             console.warn(`[GameEngine] gangDraw safety timeout fired for MingGang (roomId=${game.roomId}, playerIndex=${gangPlayerIdx}, turn=${game.state.currentTurn}, phase=${game.state.phase})`);
@@ -809,6 +827,7 @@ function resolveActionWindow(
             }
           }
         }, 3000);
+        addGangSafetyTimeout(game.roomId, mingGangSafetyTimer);
       } catch (e) {
         console.error(`[GameEngine] resolveActionWindow MingGang failed:`, e);
         advanceToNextPlayer(io, game, winner.playerIndex);
@@ -1178,8 +1197,8 @@ export function emitOrBotAction(
         console.log(`${tag} Safety timer skipped — game phase=${game.state.phase} ts=${Date.now()}`);
         return;
       }
-      if (game.state.phase !== GamePhase.Playing) {
-        console.warn(`[Bot:SAFETY] ${tag} Safety timeout skipped — game ended (phase=${game.state.phase})`);
+      if (game.state.currentTurn !== playerIndex && !activeWindows.has(game.roomId)) {
+        console.log(`${tag} Safety timer skipped — not this bot's turn (currentTurn=${game.state.currentTurn}) ts=${Date.now()}`);
         return;
       }
       acted = true;
@@ -1203,8 +1222,9 @@ export function emitOrBotAction(
     }, 5_000);
 
     setTimeout(() => {
+      try {
       acted = true;  // FIRST — prevent safety timer from also firing
-      clearTimeout(safetyTimer);
+      } finally { clearTimeout(safetyTimer); }
       const currentV = getBotVersion(game.roomId, playerIndex);
       console.log(`${tag} Callback fired (version=${version}, current=${currentV}, phase=${game.state.phase}) ts=${Date.now()}`);
       // Stale check: if version has advanced, another action superseded this one
@@ -1252,7 +1272,11 @@ export function emitOrBotAction(
         };
         const botAction = decideBotAction(player.hand, player.melds, actions, playerIndex, game.state.gold, lastDiscardTile, botContext);
         console.log(`${tag} Decided action=${botAction.type} (version=${version}) ts=${Date.now()}`);
-        handlePlayerAction(io, game.roomId, botAction, playerIndex);
+        const success = handlePlayerAction(io, game.roomId, botAction, playerIndex);
+        if (!success) {
+          console.warn(`${tag} handlePlayerAction rejected bot action=${botAction.type} — entering fallback chain ts=${Date.now()}`);
+          throw new Error(`Bot action ${botAction.type} was rejected by handlePlayerAction`);
+        }
       } catch (err) {
         console.error(`${tag} Action error:`, err);
         // Fallback: try pass first, then discard if pass not allowed
@@ -1277,7 +1301,8 @@ export function emitOrBotAction(
             return;
           }
           try {
-            console.warn(`${tag} Last-resort Pass ts=${Date.now()}`);
+            // Last resort: force Pass unconditionally regardless of canPass
+            console.warn(`${tag} Last-resort Pass (forced, ignoring canPass=${actions.canPass}) ts=${Date.now()}`);
             handlePlayerAction(io, game.roomId, { type: ActionType.Pass, playerIndex }, playerIndex);
           } catch (lastResortErr) {
             console.error(`${tag} Last-resort Pass also failed:`, lastResortErr);
