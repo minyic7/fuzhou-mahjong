@@ -314,13 +314,13 @@ body {
 /* Landscape compact layout for lobby/room — BREAKPOINTS.COMPACT_HEIGHT */
 @media (orientation: landscape) and (max-height: 550px) {
   .lobby-page, .room-page {
-    padding: 12px 20px;
+    padding: max(12px, env(safe-area-inset-top, 0px)) max(20px, env(safe-area-inset-right, 0px)) max(12px, env(safe-area-inset-bottom, 0px)) max(20px, env(safe-area-inset-left, 0px));
   }
   .lobby-page h1 { font-size: var(--lobby-title-font); margin-bottom: 0; }
   .lobby-page h2 { font-size: var(--lobby-subtitle-font); }
   .lobby-page input, .lobby-page button,
   .room-page input, .room-page button {
-    min-height: 36px;
+    min-height: 44px;
     padding: 6px 12px;
   }
   .lobby-page hr, .room-page hr { margin: 8px 0; }
@@ -466,7 +466,7 @@ hr {
   position: relative;
   display: flex;
   justify-content: center;
-  padding: max(16px, 3vh) max(12px, 3vw);
+  padding: max(16px, 3vh, env(safe-area-inset-top, 0px)) max(12px, 3vw, env(safe-area-inset-right, 0px)) max(16px, 3vh, env(safe-area-inset-bottom, 0px)) max(12px, 3vw, env(safe-area-inset-left, 0px));
 }
 
 /* Lobby content column */
@@ -745,7 +745,7 @@ button.lobby-create-btn:hover:not(:disabled) {
 /* Desktop large — no matching BREAKPOINTS constant */
 @media (min-width: 1440px) {
   .lobby-page, .room-page {
-    padding: 60px 40px;
+    padding: max(60px, env(safe-area-inset-top, 0px)) max(40px, env(safe-area-inset-right, 0px)) max(60px, env(safe-area-inset-bottom, 0px)) max(40px, env(safe-area-inset-left, 0px));
   }
 
   .seat-layout {
