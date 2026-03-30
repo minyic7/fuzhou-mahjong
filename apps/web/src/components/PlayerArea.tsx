@@ -388,7 +388,7 @@ export function PlayerArea({
           padding: "var(--game-padding)",
           background: isMe ? "rgba(0,100,200,0.08)" : "rgba(255,255,255,0.03)",
           borderRadius: 4,
-          maxWidth: "min(300px, 90vw)",
+          ...(!isMe && { maxWidth: "min(300px, 90vw)" }),
         }}>
           {discards.map((d) => (
             <TileView key={d.id} tile={d} faceUp gold={gold} small
