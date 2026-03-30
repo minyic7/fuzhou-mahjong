@@ -241,7 +241,7 @@ export function TutorialModal({ open, onClose, condensed }: TutorialModalProps) 
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        zIndex: 60,
+        zIndex: "var(--z-tutorial)",
         animation: "overlayFadeIn 0.2s ease-out",
         padding: 16,
       }}

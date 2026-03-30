@@ -129,6 +129,10 @@ body {
   --color-tile-back-border-right: #1e4530;
 
   /* Z-index scale */
+  --z-game-table-cell: 1;
+  --z-wall-segment: 2;
+  --z-draw-button: 10;
+  --z-swipe-hint: 11;
   --z-tile-anim: 20;
   --z-center-action: 29;
   --z-settings-btn: 30;
@@ -136,6 +140,7 @@ body {
   --z-settings-dropdown: 35;
   --z-claim-overlay: 40;
   --z-confirm-modal: 50;
+  --z-tutorial: 60;
   --z-game-over: 100;
   --z-toast: 9000;
   --z-portrait-overlay: 9999;

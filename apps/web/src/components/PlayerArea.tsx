@@ -357,7 +357,7 @@ export function PlayerArea({
                   position: "absolute", bottom: "100%", left: "50%",
                   transform: "translateX(-50%)", marginBottom: "clamp(2px, 1.5vh, 6px)",
                   fontSize: "var(--font-xs)", color: "var(--color-gold-bright)",
-                  whiteSpace: "nowrap", zIndex: 10,
+                  whiteSpace: "nowrap", zIndex: "var(--z-swipe-hint)",
                   textShadow: "0 1px 4px rgba(0,0,0,0.8)",
                 }}>↑ 上滑出牌</div>
               )}

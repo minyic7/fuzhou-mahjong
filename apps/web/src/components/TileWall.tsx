@@ -172,7 +172,7 @@ function WallSegment({ side, stacks, drawStack, canDraw, onDraw, standalone }: {
                   whiteSpace: "nowrap",
                   minHeight: 44,
                   minWidth: 44,
-                  zIndex: 10,
+                  zIndex: "var(--z-draw-button)",
                 }}
               >
                 摸牌
