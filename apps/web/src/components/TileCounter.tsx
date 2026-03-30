@@ -85,39 +85,32 @@ export function TileCounter({ gameState }: TileCounterProps) {
   const [expanded, setExpanded] = useState(false);
   const visible = useMemo(() => countVisibleTiles(gameState), [gameState]);
 
-  return (
-    <div style={{ marginTop: 4, flexShrink: 0 }}>
-      <button
-        onClick={() => setExpanded(!expanded)}
-        style={{
-          width: "100%",
-          padding: "var(--btn-padding)",
-          fontSize: "var(--label-font)",
-          background: expanded ? "rgba(255,215,0,0.1)" : "rgba(0,0,0,0.3)",
-          border: `1px solid ${expanded ? "rgba(255,215,0,0.4)" : "rgba(184,134,11,0.3)"}`,
-          color: "var(--color-text-warm)",
-          borderRadius: 4,
-          minHeight: 44,
-          cursor: "pointer",
-        }}
-      >
-        {expanded ? "▼ 记牌器" : "▶ 记牌器"}
-      </button>
+  const totalSeen = useMemo(() => {
+    let sum = 0;
+    for (const v of visible.values()) sum += v;
+    return sum;
+  }, [visible]);
+  const totalRemaining = 27 * 4 - totalSeen; // 108 suited tiles total
 
+  return (
+    <div>
       {expanded && (
         <div style={{
-          marginTop: 4,
+          marginBottom: 4,
           padding: 8,
-          background: "rgba(0,0,0,0.4)",
-          borderRadius: 6,
-          border: "1px solid rgba(255,255,255,0.08)",
+          maxWidth: 200,
+          background: "rgba(0,0,0,0.75)",
+          backdropFilter: "blur(8px)",
+          WebkitBackdropFilter: "blur(8px)",
+          borderRadius: 8,
+          border: "1px solid rgba(255,215,0,0.25)",
         }}>
           {SUITS.map(suit => (
             <div key={suit} style={{ marginBottom: 6 }}>
               <div style={{ color: SUIT_COLORS[suit], fontWeight: "bold", fontSize: 10, marginBottom: 2 }}>
                 {SUIT_LABELS[suit]}
               </div>
-              <div style={{ display: "flex", gap: 3, flexWrap: "wrap" }}>
+              <div style={{ display: "flex", gap: 2, flexWrap: "wrap" }}>
                 {[1, 2, 3, 4, 5, 6, 7, 8, 9].map(value => {
                   const key = `${suit}-${value}`;
                   const seen = visible.get(key) ?? 0;
@@ -139,6 +132,28 @@ export function TileCounter({ gameState }: TileCounterProps) {
           </div>
         </div>
       )}
+      <button
+        onClick={() => setExpanded(!expanded)}
+        style={{
+          display: "flex",
+          alignItems: "center",
+          gap: 6,
+          padding: "6px 12px",
+          fontSize: 13,
+          background: expanded ? "rgba(255,215,0,0.15)" : "rgba(0,0,0,0.7)",
+          backdropFilter: "blur(8px)",
+          WebkitBackdropFilter: "blur(8px)",
+          border: `1px solid ${expanded ? "rgba(255,215,0,0.4)" : "rgba(184,134,11,0.3)"}`,
+          color: "var(--color-text-warm)",
+          borderRadius: 20,
+          minHeight: 36,
+          cursor: "pointer",
+          whiteSpace: "nowrap",
+        }}
+      >
+        <span style={{ fontSize: 11 }}>{expanded ? "▼" : "▶"}</span>
+        <span>牌 {totalRemaining}</span>
+      </button>
     </div>
   );
 }
