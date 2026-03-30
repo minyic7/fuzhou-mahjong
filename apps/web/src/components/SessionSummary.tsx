@@ -134,7 +134,7 @@ export function SessionSummary({ data, onClose }: SessionSummaryProps) {
         border: "1px solid rgba(255,215,0,0.3)",
         borderRadius: 12,
         padding: isCompact ? "clamp(8px, 2.5vh, 16px) clamp(12px, 3vh, 20px)" : "24px 28px",
-        maxWidth: 440,
+        maxWidth: "min(440px, 90vw)",
         width: "90vw",
         maxHeight: "90dvh",
         overflowY: "auto",
