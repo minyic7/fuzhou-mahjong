@@ -162,7 +162,7 @@ body {
 
 @media (orientation: landscape) and (max-height: 500px) {
   :root {
-    --tile-w: 40px;
+    --tile-w: 36px;
     --tile-h: 54px;
     --tile-font: 11px;
     --tile-suit-font: 8px;
