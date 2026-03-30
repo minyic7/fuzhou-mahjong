@@ -126,6 +126,11 @@ class ActionWindow {
 
 const activeWindows = new Map<string, ActionWindow>();
 
+/** Exported for diagnostics (e.g. stress tests). */
+export function hasActiveWindow(roomId: string): boolean {
+  return activeWindows.has(roomId);
+}
+
 // ─── Gang Safety Timeouts ────────────────────────────────────────
 const gangSafetyTimeouts = new Map<string, NodeJS.Timeout[]>();
 
@@ -1185,7 +1190,11 @@ export function emitOrBotAction(
   lastDiscardTile?: TileInstance,
   depth = 0,
 ): void {
+  const _tag = `[Bot:${game.roomId}:p${playerIndex}:t${game.state.currentTurn}]`;
+  console.log(_tag + ` emitOrBotAction entry (depth=${depth}, hasWindow=${activeWindows.has(game.roomId)}, currentTurn=${game.state.currentTurn})`);
+
   if (game.isBot(playerIndex)) {
+    console.log(_tag + " branch=bot");
     // Guard against infinite recursion from stale re-triggers
     if (depth > 3) {
       const tag = `[Bot:${game.roomId}:p${playerIndex}:t${game.state.currentTurn}]`;
@@ -1372,16 +1381,22 @@ export function emitOrBotAction(
       }
     }, delay);
   } else {
+    console.log(_tag + " branch=human");
     const socketId = game.getSocketId(playerIndex);
     const socket = io.sockets.sockets.get(socketId);
     if (socket) {
+      console.log(_tag + " branch=human-socket-found");
       socket.emit("actionRequired", actions);
     } else {
       // Disconnected human player — auto-act to prevent game freeze
+      console.log(_tag + " branch=human-disconnected");
       console.warn(`[GameEngine] Player ${playerIndex} has no valid socket, auto-acting`);
       const savedTurn = game.state.currentTurn;
       setTimeout(() => {
-        if (game.state.phase !== GamePhase.Playing) return;
+        if (game.state.phase !== GamePhase.Playing) {
+          console.log(`[GameEngine] Player ${playerIndex} auto-act skipped — game phase=${game.state.phase}`);
+          return;
+        }
         // Skip if turn has advanced since timeout was set (stale)
         if (game.state.currentTurn !== savedTurn) {
           console.warn(`[GameEngine] Player ${playerIndex} auto-act skipped: turn has advanced`);
@@ -1397,6 +1412,8 @@ export function emitOrBotAction(
           const player = game.state.players[playerIndex];
           const fallback = emergencyDiscard(player.hand, playerIndex, game.state.gold);
           handlePlayerAction(io, game.roomId, fallback, playerIndex);
+        } else {
+          console.log(`[GameEngine] Player ${playerIndex} auto-act skipped — not their turn (currentTurn=${game.state.currentTurn})`);
         }
       }, 100);
     }

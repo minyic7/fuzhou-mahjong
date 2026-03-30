@@ -10,9 +10,9 @@
 
 import { GamePhase } from "@fuzhou-mahjong/shared";
 import { createGame, getGame, deleteGame } from "../gameState.js";
-import { emitOrBotAction } from "../gameEngine.js";
+import { emitOrBotAction, hasActiveWindow } from "../gameEngine.js";
 
-const NUM_GAMES = Number(process.argv[2]) || 50;
+const NUM_GAMES = Number(process.argv[2]) || 200;
 const GAME_TIMEOUT_MS = 30_000; // 30s per game
 
 /** Minimal mock of Socket.IO Server — bots never need real sockets. */
@@ -75,7 +75,16 @@ async function runOneGame(index: number): Promise<GameResult> {
       clearInterval(interval);
       const current = getGame(roomId);
       const phase = current?.state.phase ?? "deleted";
-      if (current) deleteGame(roomId);
+      if (current) {
+        // Stall diagnostics
+        const s = current.state;
+        console.error(`[STALL DIAG] Game ${index} (${roomId}):`);
+        console.error(`  currentTurn=${s.currentTurn}, phase=${s.phase}`);
+        console.error(`  hasActiveWindow=${hasActiveWindow(roomId)}`);
+        console.error(`  wallRemaining=${s.wall.length + s.wallTail.length - s.retainCount}`);
+        console.error(`  playerHandSizes=${s.players.map((p) => p.hand.length).join(",")}`);
+        deleteGame(roomId);
+      }
       resolve({ index, roomId, phase, durationMs: Date.now() - start, stalled: phase !== GamePhase.Finished && phase !== GamePhase.Draw });
     }, GAME_TIMEOUT_MS);
   });
@@ -97,11 +106,23 @@ async function main() {
   const finished = results.filter((r) => r.phase === GamePhase.Finished);
   const draws = results.filter((r) => r.phase === GamePhase.Draw);
 
+  // Timing summary
+  const durations = results.map((r) => r.durationMs).sort((a, b) => a - b);
+  const min = durations[0];
+  const max = durations[durations.length - 1];
+  const avg = Math.round(durations.reduce((a, b) => a + b, 0) / durations.length);
+  const p95 = durations[Math.floor(durations.length * 0.95)];
+
   console.log(`\n=== Results ===`);
   console.log(`Total:    ${results.length}`);
   console.log(`Finished: ${finished.length}`);
   console.log(`Draws:    ${draws.length}`);
   console.log(`Stalls:   ${stalls.length}`);
+  console.log(`\n=== Timing ===`);
+  console.log(`Min:  ${min}ms`);
+  console.log(`Max:  ${max}ms`);
+  console.log(`Avg:  ${avg}ms`);
+  console.log(`P95:  ${p95}ms`);
 
   if (stalls.length > 0) {
     console.error(`\nFAILED — ${stalls.length} game(s) stalled:`);
