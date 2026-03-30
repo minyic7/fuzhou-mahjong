@@ -304,7 +304,7 @@ body {
   .lobby-page h2 { font-size: var(--lobby-subtitle-font); }
   .lobby-page input, .lobby-page button,
   .room-page input, .room-page button {
-    min-height: 44px;
+    min-height: 36px;
     padding: 6px 12px;
   }
   .lobby-page hr, .room-page hr { margin: 8px 0; }
@@ -315,7 +315,7 @@ body {
   /* Tighter seat layout for landscape mobile */
   .seat-layout {
     gap: var(--seat-gap);
-    max-width: 360px;
+    max-width: 90%;
   }
   .seat-card {
     padding: var(--seat-card-padding);
