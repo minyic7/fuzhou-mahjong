@@ -392,10 +392,12 @@ export function Game({ initialGameState, onLeave }: GameProps) {
           </div>
         )}
       <div className={isWin ? "hu-celebration" : ""} style={{ textAlign: "center", padding: "clamp(12px, 3vh, 40px)", maxHeight: "100dvh", overflowY: "auto" }}>
-        <h2 style={{ fontSize: 28, marginBottom: 16 }}>
+        <div style={{ display: isCompact ? "grid" : "block", gridTemplateColumns: isCompact ? "1fr 1fr" : undefined, gap: 12 }}>
+          <div>
+        <h2 style={{ fontSize: isCompact ? 20 : 28, marginBottom: isCompact ? 8 : 16 }}>
           {isWin ? `🎉 ${getPlayerName(gameOver.winnerId!)} 胡了!` : "流局 / Draw"}
         </h2>
-        <p style={{ fontSize: 18, color: "var(--color-text-gold)", marginBottom: 12 }}>
+        <p style={{ fontSize: isCompact ? 14 : 18, color: "var(--color-text-gold)", marginBottom: 12 }}>
           {winTypeNames[gameOver.winType] || gameOver.winType}
         </p>
 
@@ -414,17 +416,18 @@ export function Game({ initialGameState, onLeave }: GameProps) {
             </div>
           </div>
         )}
-
+          </div>
+          <div>
         {/* Round scores */}
         <div style={{ marginBottom: 12 }}>
-          <div style={{ fontSize: 12, color: "var(--color-text-secondary)", marginBottom: 6 }}>本局得分</div>
+          <div style={{ fontSize: isCompact ? 12 : 14, color: "var(--color-text-secondary)", marginBottom: 6 }}>本局得分</div>
           {gameOver.scores
             .map((score, i) => ({ name: (gameOver.playerNames ?? [])[i] || getPlayerName(i), score, i }))
             .sort((a, b) => b.score - a.score)
             .map((p, rank) => (
               <div key={p.i} style={{
                 display: "flex", justifyContent: "space-between", alignItems: "center",
-                padding: "6px 16px", marginBottom: 4, borderRadius: 4,
+                padding: "6px 16px", marginBottom: 4, borderRadius: 4, fontSize: isCompact ? 12 : 14,
                 background: p.score > 0 ? "rgba(76,175,80,0.15)" : p.score < 0 ? "rgba(244,67,54,0.1)" : "transparent",
                 border: rank === 0 && p.score > 0 ? "1px solid var(--color-success)" : "1px solid transparent",
                 animation: `scoreReveal 0.3s ease-out ${rank * 0.1}s both`,
@@ -442,8 +445,8 @@ export function Game({ initialGameState, onLeave }: GameProps) {
 
         {/* Cumulative standings */}
         {gameOver.cumulative && gameOver.cumulative.roundsPlayed > 0 && (
-          <div style={{ marginBottom: 20 }}>
-            <div style={{ fontSize: 12, color: "var(--color-text-secondary)", marginBottom: 6 }}>
+          <div style={{ marginBottom: isCompact ? 12 : 20 }}>
+            <div style={{ fontSize: isCompact ? 12 : 14, color: "var(--color-text-secondary)", marginBottom: 6 }}>
               累计排名 ({gameOver.cumulative.roundsPlayed} 局)
             </div>
             {gameOver.cumulative.scores
@@ -452,7 +455,7 @@ export function Game({ initialGameState, onLeave }: GameProps) {
               .map((p, rank) => (
                 <div key={p.i} style={{
                   display: "flex", justifyContent: "space-between", alignItems: "center",
-                  padding: "6px 16px", marginBottom: 4, borderRadius: 4,
+                  padding: "6px 16px", marginBottom: 4, borderRadius: 4, fontSize: isCompact ? 12 : 14,
                   background: rank === 0 ? "rgba(255,215,0,0.12)" : "transparent",
                   border: rank === 0 ? "1px solid rgba(255,215,0,0.4)" : "1px solid transparent",
                   animation: `scoreReveal 0.3s ease-out ${rank * 0.1}s both`,
@@ -468,6 +471,8 @@ export function Game({ initialGameState, onLeave }: GameProps) {
               ))}
           </div>
         )}
+          </div>
+        </div>
         {/* All player hands */}
         {gameOver.allHands && gameOver.allHands.length > 0 && (
           <div style={{ marginBottom: 20, textAlign: "left" }}>
