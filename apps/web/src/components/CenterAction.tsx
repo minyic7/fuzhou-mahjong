@@ -57,7 +57,7 @@ export function CenterAction({ display, gold }: { display: ActionDisplay | null;
         top: "50%",
         left: "50%",
         transform: "translate(-50%, -50%)",
-        zIndex: 29,
+        zIndex: "var(--z-center-action)" as any,
         textAlign: "center",
         animation: "centerActionIn 0.3s ease-out, centerActionOut 0.4s ease-in 0.8s forwards",
         pointerEvents: "none",

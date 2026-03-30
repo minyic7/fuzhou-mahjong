@@ -387,7 +387,7 @@ export function Game({ initialGameState, onLeave }: GameProps) {
 
 
   if (!gameState) {
-    return <div className="loading-state" style={{ minHeight: "80vh" }}><div className="spinner" />等待游戏数据...</div>;
+    return <div className="loading-state" style={{ minHeight: "80dvh" }}><div className="spinner" />等待游戏数据...</div>;
   }
 
   return (
@@ -472,7 +472,7 @@ export function Game({ initialGameState, onLeave }: GameProps) {
         position: 'fixed',
         top: 'calc(8px + env(safe-area-inset-top, 0px))',
         right: 'calc(8px + env(safe-area-inset-right, 0px))',
-        zIndex: 30,
+        zIndex: "var(--z-settings-btn)" as any,
       }}>
         <button
           onClick={() => setSettingsOpen((v) => !v)}
@@ -487,7 +487,7 @@ export function Game({ initialGameState, onLeave }: GameProps) {
         >⚙</button>
         {settingsOpen && (
           <div style={{
-            position: 'absolute', top: 'calc(100% + 4px)', right: 0, zIndex: 35,
+            position: 'absolute', top: 'calc(100% + 4px)', right: 0, zIndex: "var(--z-settings-dropdown)" as any,
             background: 'var(--overlay-bg)', border: '1px solid var(--color-gold-border-hover)',
             borderRadius: 'var(--radius-md)', padding: 4, minWidth: "clamp(120px, 35vw, 160px)",
             display: 'flex', flexDirection: 'column', gap: 2,
@@ -538,7 +538,7 @@ export function Game({ initialGameState, onLeave }: GameProps) {
         const go = gameOver!;
         return (
         <div style={{
-          position: "fixed", inset: 0, zIndex: 100,
+          position: "fixed", inset: 0, zIndex: "var(--z-game-over)" as any,
           background: "rgba(0,0,0,0.35)",
           display: "flex", alignItems: "center", justifyContent: "center",
           animation: "overlayFadeIn 0.3s ease-out",

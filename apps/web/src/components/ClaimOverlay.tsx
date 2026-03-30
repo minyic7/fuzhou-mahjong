@@ -67,7 +67,7 @@ export function ClaimOverlay({ actions, gameState, onAction }: ClaimOverlayProps
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        zIndex: 40,
+        zIndex: "var(--z-claim-overlay)" as any,
         animation: exiting ? "overlayFadeOut 0.18s ease-in forwards" : "overlayFadeIn 0.2s ease-out",
       }}
       onClick={(e) => {
