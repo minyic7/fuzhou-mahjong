@@ -212,7 +212,7 @@ export function TileWall({ wallRemaining, wallDrawCount, wallSupplementCount, go
           </div>
         )}
         <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-          <div style={{ width: 80, height: 6, background: "rgba(255,255,255,0.1)", borderRadius: 3 }}>
+          <div style={{ width: "var(--wall-progress-w)", height: 6, background: "rgba(255,255,255,0.1)", borderRadius: 3 }}>
             <div style={{
               width: `${(wallRemaining / 144) * 100}%`, height: "100%",
               background: wallRemaining > 20 ? "var(--color-success)" : wallRemaining > 10 ? "var(--color-accent-orange)" : "var(--color-error)",
