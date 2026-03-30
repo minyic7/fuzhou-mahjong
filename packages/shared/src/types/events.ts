@@ -37,6 +37,8 @@ export interface ClientGameState {
   lianZhuangCount: number;
   gold: GoldState | null;
   wallRemaining: number;
+  wallDrawCount: number;
+  wallSupplementCount: number;
   lastDiscard: { tile: TileInstance; playerIndex: number } | null;
   tenpaiTiles: import('../types/tile.js').SuitedTile[];
   lastDrawnTileId: number | null;
