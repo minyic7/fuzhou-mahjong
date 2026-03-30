@@ -277,6 +277,7 @@ export function TutorialModal({ open, onClose, condensed }: TutorialModalProps) 
             cursor: "pointer",
             padding: "4px 8px",
             minHeight: 44,
+            minWidth: 44,
             lineHeight: 1,
           }}
         >
@@ -307,6 +308,7 @@ export function TutorialModal({ open, onClose, condensed }: TutorialModalProps) 
               background: isFirst ? "transparent" : "var(--color-bg-button)",
               border: isFirst ? "1px solid transparent" : "1px solid var(--color-bg-button-hover)",
               minHeight: 44,
+              minWidth: 44,
             }}
           >
             上一页
@@ -356,6 +358,7 @@ export function TutorialModal({ open, onClose, condensed }: TutorialModalProps) 
                 border: "1px solid var(--color-text-gold)",
                 color: "var(--color-gold-bright)",
                 minHeight: 44,
+                minWidth: 44,
               }}
             >
               知道了
@@ -367,6 +370,7 @@ export function TutorialModal({ open, onClose, condensed }: TutorialModalProps) 
                 padding: isCompact ? "6px 12px" : "8px 18px",
                 fontSize: isCompact ? 13 : 14,
                 minHeight: 44,
+                minWidth: 44,
               }}
             >
               下一页

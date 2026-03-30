@@ -366,8 +366,8 @@ export function PlayerArea({
                 <div className="discard-bubble" style={{
                   position: "absolute",
                   bottom: "100%", marginBottom: "clamp(2px, 1dvh, 4px)",
-                  left: "50%",
-                  transform: "translateX(-50%)",
+                  left: "max(8px, 50%)",
+                  transform: "translateX(max(-50%, calc(-100% + 8px)))",
                   display: "flex",
                   flexDirection: ultraCompact ? "row" : "column",
                   flexWrap: ultraCompact ? "wrap" : "nowrap",
