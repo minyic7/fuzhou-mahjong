@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import type { GoldState, TileInstance } from "@fuzhou-mahjong/shared";
 import { TileView } from "./Tile";
 import { isMuted, setMuted } from "../sounds";
@@ -14,6 +14,22 @@ interface GameInfoProps {
 }
 
 export function GameInfo({ gold, dealerIndex, lianZhuangCount, myIndex, lastDiscard, playerNames }: GameInfoProps) {
+  const [goldFlip, setGoldFlip] = useState(false);
+  const prevGoldRef = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (gold) {
+      const key = gold.indicatorTile.id;
+      if (prevGoldRef.current !== key) {
+        prevGoldRef.current = key;
+        setGoldFlip(true);
+      }
+    } else {
+      prevGoldRef.current = null;
+      setGoldFlip(false);
+    }
+  }, [gold]);
+
   const posLabel = (idx: number) => {
     const rel = (idx - myIndex + 4) % 4;
     return rel === 0 ? "我" : (playerNames[rel] || ["我", "右", "上", "左"][rel]);
@@ -31,7 +47,7 @@ export function GameInfo({ gold, dealerIndex, lianZhuangCount, myIndex, lastDisc
     }}>
       <div style={{ marginBottom: 8 }}>
         <span style={{ color: "#aaa", fontSize: 12 }}>金牌: </span>
-        {gold && <TileView tile={gold.indicatorTile} faceUp gold={null} small className="gold-indicator-glow" />}
+        {gold && <TileView tile={gold.indicatorTile} faceUp gold={null} small className={`gold-indicator-glow${goldFlip ? " gold-flip-reveal" : ""}`} />}
       </div>
 
       {lastDiscard && (
