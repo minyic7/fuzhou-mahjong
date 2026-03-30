@@ -326,3 +326,12 @@ button.lobby-create-btn:hover:not(:disabled) {
     font-size: 14px;
   }
 }
+
+/* Chi picker horizontal scroll — hide scrollbar */
+.chi-picker-scroll {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+}
+.chi-picker-scroll::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}
