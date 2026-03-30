@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 import type { TileInstance, Meld, GoldState } from "@fuzhou-mahjong/shared";
 import { MeldType } from "@fuzhou-mahjong/shared";
 import { TileView } from "./Tile";
@@ -83,6 +83,19 @@ export function PlayerArea({
     threshold: 40,
   });
 
+  // Track newest meld index for entrance animation
+  const [newestMeldIdx, setNewestMeldIdx] = useState<number | null>(null);
+  const prevMeldCountRef = useRef(melds.length);
+  useEffect(() => {
+    if (melds.length > prevMeldCountRef.current) {
+      const idx = melds.length - 1;
+      setNewestMeldIdx(idx);
+      const timer = setTimeout(() => setNewestMeldIdx(null), 400);
+      return () => clearTimeout(timer);
+    }
+    prevMeldCountRef.current = melds.length;
+  }, [melds.length]);
+
   // Compact single-row layout for opponents on mobile landscape
   if (compact) {
     return (
@@ -109,7 +122,7 @@ export function PlayerArea({
         {isDealer && <span style={{ fontSize: 9, background: "#b71c1c", color: "#ffd700", padding: "0 4px", borderRadius: 3, fontWeight: "bold", flexShrink: 0 }}>庄</span>}
         {isDisconnected && <span style={{ fontSize: 9, background: "#ff5722", color: "#fff", padding: "0 4px", borderRadius: 3, fontWeight: "bold", flexShrink: 0 }}>断线</span>}
         {hasDiscardedGold && <span style={{ fontSize: 9, background: "#c41e3a", color: "#fff", padding: "0 4px", borderRadius: 3, fontWeight: "bold", flexShrink: 0 }}>弃金</span>}
-        {isCurrentTurn && <span style={{ fontSize: 9, background: "rgba(255,215,0,0.2)", color: "#ffd700", padding: "0 4px", borderRadius: 3, border: "1px solid #ffd700", flexShrink: 0 }}>出牌</span>}
+        {isCurrentTurn && <span className="your-turn-prompt" style={{ fontSize: 9, background: "rgba(255,215,0,0.2)", color: "#ffd700", padding: "0 4px", borderRadius: 3, border: "1px solid #ffd700", flexShrink: 0 }}>出牌</span>}
 
         {/* Hand count */}
         <span style={{ fontSize: 11, color: "#8fbc8f", flexShrink: 0 }}>{handCount ?? 0}张</span>
@@ -118,7 +131,7 @@ export function PlayerArea({
         {melds.length > 0 && (
           <div style={{ display: "flex", gap: 4, flexShrink: 0 }}>
             {melds.map((m, mi) => (
-              <div key={mi} style={{ display: "flex", gap: 0 }}>
+              <div key={mi} className={newestMeldIdx === mi ? "meld-new" : undefined} style={{ display: "flex", gap: 0 }}>
                 {m.tiles.map((t, ti) => (
                   <TileView key={ti} tile={t} faceUp={m.type !== MeldType.AnGang} gold={gold} small />
                 ))}
@@ -139,7 +152,7 @@ export function PlayerArea({
           }}>
             {discards.map((d) => (
               <TileView key={d.id} tile={d} faceUp gold={gold} small
-                className={lastDiscardedTileId === d.id ? "discard-arrive" : undefined}
+                className={lastDiscardedTileId === d.id ? "discard-arrive last-discard" : undefined}
               />
             ))}
           </div>
@@ -187,7 +200,7 @@ export function PlayerArea({
         {isDealer && <span style={{ fontSize: 10, background: "#b71c1c", color: "#ffd700", padding: "1px 5px", borderRadius: 3, fontWeight: "bold" }}>庄</span>}
         {isDisconnected && <span style={{ fontSize: 10, background: "#ff5722", color: "#fff", padding: "1px 5px", borderRadius: 3, fontWeight: "bold", animation: "disconnectPulse 2s ease-in-out infinite" }}>断线</span>}
         {hasDiscardedGold && <span style={{ fontSize: 10, background: "#c41e3a", color: "#fff", padding: "1px 5px", borderRadius: 3, fontWeight: "bold" }}>弃金</span>}
-        {isCurrentTurn && <span style={{ fontSize: 10, background: "rgba(255,215,0,0.2)", color: "#ffd700", padding: "1px 5px", borderRadius: 3, border: "1px solid #ffd700" }}>出牌</span>}
+        {isCurrentTurn && <span className="your-turn-prompt" style={{ fontSize: 10, background: "rgba(255,215,0,0.2)", color: "#ffd700", padding: "1px 5px", borderRadius: 3, border: "1px solid #ffd700" }}>出牌</span>}
         <span style={{ fontSize: 11, color: "#8fbc8f", marginLeft: "auto" }}>
           🌸{flowers.length}
         </span>
@@ -325,7 +338,7 @@ export function PlayerArea({
       {melds.length > 0 && (
         <div style={{ display: "flex", gap: 8, marginBottom: 4 }}>
           {melds.map((m, mi) => (
-            <div key={mi} style={{ display: "flex", gap: 0 }}>
+            <div key={mi} className={newestMeldIdx === mi ? "meld-new" : undefined} style={{ display: "flex", gap: 0 }}>
               {m.tiles.map((t, ti) => (
                 <TileView
                   key={ti}
@@ -362,7 +375,7 @@ export function PlayerArea({
         }}>
           {discards.map((d) => (
             <TileView key={d.id} tile={d} faceUp gold={gold} small
-              className={lastDiscardedTileId === d.id ? "discard-arrive" : undefined}
+              className={lastDiscardedTileId === d.id ? "discard-arrive last-discard" : undefined}
             />
           ))}
         </div>

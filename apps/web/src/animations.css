@@ -4,17 +4,6 @@
   50% { transform: rotate(90deg); }
 }
 
-/* Tile discard animation */
-@keyframes discardFly {
-  0% { transform: scale(1); opacity: 1; }
-  50% { transform: scale(0.6) translateY(-30px); opacity: 0.7; }
-  100% { transform: scale(0.5) translateY(0); opacity: 1; }
-}
-
-.tile-discarding {
-  animation: discardFly 0.4s ease-out;
-}
-
 /* Tile draw-in animation (new draw slides into hand) */
 @keyframes tileDrawIn {
   0% { opacity: 0; transform: translateY(-40px) scale(0.7); }
@@ -38,17 +27,6 @@
 
 .discard-arrive {
   animation: discardArrive 0.3s ease-out;
-}
-
-/* Tile flip animation */
-@keyframes tileFlip {
-  0% { transform: rotateY(180deg); }
-  100% { transform: rotateY(0deg); }
-}
-
-.tile-flip {
-  animation: tileFlip 0.5s ease-out;
-  transform-style: preserve-3d;
 }
 
 /* Hu celebration */
@@ -121,16 +99,6 @@
 
 .current-turn {
   animation: turnGlow 1.5s ease-in-out infinite;
-}
-
-/* Claim action alert */
-@keyframes claimPulse {
-  0%, 100% { border-color: rgba(255, 165, 0, 0.4); background: rgba(255, 140, 0, 0.1); }
-  50% { border-color: rgba(255, 165, 0, 1); background: rgba(255, 140, 0, 0.25); }
-}
-
-.claim-alert {
-  animation: claimPulse 1s ease-in-out infinite;
 }
 
 /* Your turn prompt pulse */
@@ -330,4 +298,29 @@
 @keyframes tutorialSlideIn {
   0% { opacity: 0; transform: translateX(16px); }
   100% { opacity: 1; transform: translateX(0); }
+}
+
+/* Score reveal staggered animation (game-over screen) */
+@keyframes scoreReveal {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Meld entrance animation */
+@keyframes meldEntrance {
+  from { opacity: 0; transform: scale(0.8); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.meld-new {
+  animation: meldEntrance 0.3s ease-out;
+}
+
+/* Respect reduced-motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }

@@ -389,6 +389,7 @@ export function Game({ initialGameState, onLeave }: GameProps) {
                 padding: "6px 16px", marginBottom: 4, borderRadius: 4,
                 background: p.score > 0 ? "rgba(76,175,80,0.15)" : p.score < 0 ? "rgba(244,67,54,0.1)" : "transparent",
                 border: rank === 0 && p.score > 0 ? "1px solid var(--color-success)" : "1px solid transparent",
+                animation: `scoreReveal 0.3s ease-out ${rank * 0.1}s both`,
               }}>
                 <span>
                   {rank === 0 && p.score > 0 ? "🏆 " : `${rank + 1}. `}
@@ -416,6 +417,7 @@ export function Game({ initialGameState, onLeave }: GameProps) {
                   padding: "6px 16px", marginBottom: 4, borderRadius: 4,
                   background: rank === 0 ? "rgba(255,215,0,0.12)" : "transparent",
                   border: rank === 0 ? "1px solid rgba(255,215,0,0.4)" : "1px solid transparent",
+                  animation: `scoreReveal 0.3s ease-out ${rank * 0.1}s both`,
                 }}>
                   <span>
                     {rank === 0 ? "👑 " : `${rank + 1}. `}
