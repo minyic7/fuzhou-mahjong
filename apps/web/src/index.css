@@ -309,7 +309,7 @@ body {
   :root {
     --game-gap: 1px;
     --game-padding: 1px;
-    --tile-w: 30px;
+    --tile-w: 34px;
     --tile-h: 44px;
     --tile-font: 10px;
     --tile-suit-font: 7px;
@@ -336,6 +336,21 @@ body {
     --wall-progress-w: 60px;
     --fp-side-col: 36px;
     --fp-top-row: 20px;
+  }
+}
+
+/* iPhone SE landscape (667×375) — reclaim space from gaps/padding, not tile size */
+@media (orientation: landscape) and (max-height: 340px) {
+  :root {
+    --tile-w: 34px;
+    --game-gap: 0px;
+    --game-padding: 0px;
+    --overlay-padding-y: 4px;
+    --overlay-padding-x: 6px;
+    --compact-gap: 2px;
+    --compact-padding: 1px 2px;
+    --hand-padding-top: 2px;
+    --hand-new-tile-margin: 2px;
   }
 }
 

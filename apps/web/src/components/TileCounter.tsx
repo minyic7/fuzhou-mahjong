@@ -38,7 +38,7 @@ function Dots({ total, remaining }: { total: number; remaining: number }) {
     <div style={{ display: "flex", gap: 1, justifyContent: "center", marginTop: 2 }}>
       {Array.from({ length: total }).map((_, i) => (
         <span key={i} style={{
-          fontSize: 6,
+          fontSize: 9,
           color: i < remaining ? "var(--color-success)" : "var(--color-text-muted)",
           opacity: i < remaining ? 1 : 0.2,
         }}>
