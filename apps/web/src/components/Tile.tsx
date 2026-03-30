@@ -166,9 +166,16 @@ function TileFace({ tile, w, h, value, suit, color, fontSize, suitSize }: {
     );
   }
 
-  // Text fallback
+  // Text fallback — wrapped to match SVG sizing
   return (
-    <>
+    <div style={{
+      width: `calc(${w} - 6px)`,
+      height: `calc(${h} - 6px)`,
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "center",
+    }}>
       <span style={{ fontSize, fontWeight: 900, color, lineHeight: 1, textShadow: "0 1px 0 rgba(255,255,255,0.5)" }}>
         {value}
       </span>
@@ -177,6 +184,6 @@ function TileFace({ tile, w, h, value, suit, color, fontSize, suitSize }: {
           {suit}
         </span>
       )}
-    </>
+    </div>
   );
 }
