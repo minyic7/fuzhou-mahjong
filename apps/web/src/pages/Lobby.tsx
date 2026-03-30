@@ -169,19 +169,13 @@ export function Lobby({ onJoined }: LobbyProps) {
       {error && <p className="error-msg">{error}</p>}
 
       <hr />
-      <button
+      <Button
+        variant="secondary"
         onClick={() => setShowTutorial(true)}
-        style={{
-          width: "100%",
-          padding: "10px 12px",
-          fontSize: 14,
-          background: "transparent",
-          border: "1px solid rgba(184,134,11,0.3)",
-          color: "var(--color-text-secondary)",
-        }}
+        style={{ width: "100%", background: "transparent", border: "1px solid var(--color-gold-border-hover)" }}
       >
         游戏规则 / How to Play
-      </button>
+      </Button>
 
       <TutorialModal open={showTutorial} onClose={() => setShowTutorial(false)} />
     </div>
