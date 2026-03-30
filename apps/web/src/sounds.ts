@@ -145,4 +145,11 @@ export const sounds = {
   toggle() {
     playTone(500, 0.05, "triangle", 0.08);
   },
+
+  supplementDraw() {
+    // Brighter ascending tones — sparkly draw from kong/flower
+    playTone(800, 0.08, "sine", 0.12);
+    setTimeout(() => playTone(1000, 0.08, "sine", 0.1), 60);
+    setTimeout(() => playTone(1200, 0.1, "sine", 0.08), 120);
+  },
 };
