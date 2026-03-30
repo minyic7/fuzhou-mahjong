@@ -109,6 +109,7 @@ body {
   --color-accent-orange: #ffa500;
   --color-overlay-backdrop: rgba(0, 0, 0, 0.5);
   --color-separator: rgba(184, 134, 11, 0.2);
+  --btn-min-size: 44px;
   --color-dealer-bg: #b71c1c;
   --color-disconnect: #ff5722;
 
