@@ -1222,6 +1222,17 @@ export function emitOrBotAction(
 
     const safetyTimer = setTimeout(() => {
       if (acted) {
+        // Verify the turn actually advanced — if still on this bot, something went wrong
+        if (game.state.currentTurn === playerIndex && game.state.phase === GamePhase.Playing && !activeWindows.has(game.roomId)) {
+          console.warn(`${tag} Safety timer: acted=true but turn STILL on this bot (currentTurn=${game.state.currentTurn}, phase=${game.state.phase}) — forcing emergency action ts=${Date.now()}`);
+          try {
+            const player = game.state.players[playerIndex];
+            handlePlayerAction(io, game.roomId, emergencyDiscard(player.hand, playerIndex, game.state.gold), playerIndex);
+          } catch (e) {
+            console.error(`${tag} Safety timer acted-verify fallback failed:`, e);
+          }
+          return;
+        }
         console.log(`${tag} Safety timer fired but already acted (version=${version}) ts=${Date.now()}`);
         return;
       }
@@ -1282,7 +1293,6 @@ export function emitOrBotAction(
 
     setTimeout(() => {
       try {
-      acted = true;  // FIRST — prevent safety timer from also firing
       const currentV = getBotVersion(game.roomId, playerIndex);
       console.log(`${tag} Callback fired (version=${version}, current=${currentV}, phase=${game.state.phase}) ts=${Date.now()}`);
       // Stale check: if version has advanced, another action superseded this one
@@ -1334,9 +1344,14 @@ export function emitOrBotAction(
             .filter((_, i) => i !== playerIndex)
             .map(p => p.discards),
         };
-        const botAction = decideBotAction(player.hand, player.melds, actions, playerIndex, game.state.gold, lastDiscardTile, botContext);
+        // Re-query actions at execution time — the captured `actions` may be stale
+        // since 300-800ms have passed since emitOrBotAction was called
+        const inFinal = isInFinalDraws(game.state.wall.length, game.state.wallTail.length, game.state.retainCount);
+        const freshActions = activeWindows.has(game.roomId) ? actions : getPostDrawActions(game, playerIndex, inFinal);
+        const botAction = decideBotAction(player.hand, player.melds, freshActions, playerIndex, game.state.gold, lastDiscardTile, botContext);
         console.log(`${tag} Decided action=${botAction.type} (version=${version}) ts=${Date.now()}`);
         const success = handlePlayerAction(io, game.roomId, botAction, playerIndex);
+        if (success) acted = true;  // Only mark acted after successful action — safety timer can still rescue on failure
         if (!success) {
           console.warn(`${tag} handlePlayerAction rejected bot action=${botAction.type} — entering fallback chain ts=${Date.now()}`);
           throw new Error(`Bot action ${botAction.type} was rejected by handlePlayerAction`);
