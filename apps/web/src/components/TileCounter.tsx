@@ -39,7 +39,8 @@ function Dots({ total, remaining }: { total: number; remaining: number }) {
       {Array.from({ length: total }).map((_, i) => (
         <span key={i} style={{
           fontSize: 6,
-          color: i < remaining ? "#4caf50" : "rgba(255,255,255,0.2)",
+          color: i < remaining ? "var(--color-success)" : "var(--color-text-muted)",
+          opacity: i < remaining ? 1 : 0.2,
         }}>
           ●
         </span>
@@ -69,7 +70,8 @@ function TileCell({ label, remaining, total, color }: {
       <span style={{
         fontSize: 14,
         fontWeight: "bold",
-        color: allGone ? "#666" : color,
+        color: allGone ? "var(--color-text-secondary)" : color,
+        opacity: allGone ? 0.5 : 1,
         lineHeight: 1,
       }}>
         {label}
@@ -89,11 +91,11 @@ export function TileCounter({ gameState }: TileCounterProps) {
         onClick={() => setExpanded(!expanded)}
         style={{
           width: "100%",
-          padding: "4px 12px",
-          fontSize: 12,
+          padding: "var(--btn-padding)",
+          fontSize: "var(--label-font)",
           background: expanded ? "rgba(255,215,0,0.1)" : "rgba(0,0,0,0.3)",
           border: `1px solid ${expanded ? "rgba(255,215,0,0.4)" : "rgba(184,134,11,0.3)"}`,
-          color: "#e8d5a3",
+          color: "var(--color-text-warm)",
           borderRadius: 4,
           minHeight: 44,
           cursor: "pointer",
@@ -132,7 +134,7 @@ export function TileCounter({ gameState }: TileCounterProps) {
               </div>
             </div>
           ))}
-          <div style={{ fontSize: 9, color: "rgba(255,255,255,0.3)", marginTop: 4, textAlign: "center" }}>
+          <div style={{ fontSize: 9, color: "var(--color-text-muted)", opacity: 0.3, marginTop: 4, textAlign: "center" }}>
             ● 剩余 &nbsp; ○ 已见
           </div>
         </div>
