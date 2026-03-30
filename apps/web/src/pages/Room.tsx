@@ -50,7 +50,7 @@ export function Room({ initialRoomState, sessionScores }: RoomProps) {
   return (
     <div className="room-page" style={{ display: "flex", justifyContent: "center", padding: "max(16px, 3vh) max(12px, 3vw)" }}>
     <div style={{ maxWidth: 480, width: "100%" }}>
-      <h2 style={{ textAlign: "center", color: "var(--color-text-secondary)", fontSize: 15, fontWeight: 400, marginBottom: 20 }}>房间 / Room</h2>
+      <h2 style={{ textAlign: "center", color: "var(--color-text-secondary)", fontSize: "var(--label-font)", fontWeight: 400, marginBottom: 20 }}>房间 / Room</h2>
 
       {/* Mahjong table seat layout */}
       <div className="seat-layout">
@@ -64,15 +64,15 @@ export function Room({ initialRoomState, sessionScores }: RoomProps) {
         </div>
         {/* Center: room ID */}
         <div className="table-center" style={{ gridArea: "center" }}>
-          <div style={{ fontSize: 11, color: "var(--color-text-secondary)", marginBottom: 4 }}>ROOM</div>
-          <div style={{ fontSize: 28, fontWeight: "bold", fontFamily: "monospace", letterSpacing: 6, color: "var(--color-text-gold)" }}>
+          <div style={{ fontSize: "var(--compact-info-font)", color: "var(--color-text-secondary)", marginBottom: 4 }}>ROOM</div>
+          <div style={{ fontSize: "var(--lobby-title-font)", fontWeight: "bold", fontFamily: "monospace", letterSpacing: 6, color: "var(--color-text-gold)" }}>
             {room.roomId}
           </div>
-          <div style={{ fontSize: 12, color: "var(--color-text-secondary)", marginTop: 6 }}>
+          <div style={{ fontSize: "var(--compact-info-font)", color: "var(--color-text-secondary)", marginTop: 6 }}>
             {room.players.length}/4 玩家
           </div>
           {sessionScores && sessionScores.roundsPlayed > 0 && (
-            <div style={{ fontSize: 11, color: "var(--color-text-gold)", marginTop: 4 }}>
+            <div style={{ fontSize: "var(--compact-info-font)", color: "var(--color-text-gold)", marginTop: 4 }}>
               已完成 {sessionScores.roundsPlayed} 局
             </div>
           )}
@@ -125,7 +125,7 @@ export function Room({ initialRoomState, sessionScores }: RoomProps) {
       {showLeaveConfirm && (
         <div className="confirm-modal-backdrop">
           <div className="confirm-modal">
-            <p style={{ fontSize: 18, marginBottom: 16 }}>确定要离开房间吗？</p>
+            <p style={{ fontSize: "var(--lobby-subtitle-font)", marginBottom: 16 }}>确定要离开房间吗？</p>
             <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
               <Button variant='secondary' onClick={() => setShowLeaveConfirm(false)}>取消</Button>
               <Button variant='danger' onClick={handleLeave}>离开</Button>
@@ -144,16 +144,16 @@ function SeatCard({ seat, score }: { seat: { index: number; player: { name: stri
 
   return (
     <div className={`seat-card ${isEmpty ? "seat-empty" : "seat-filled"}`}>
-      <div style={{ fontSize: 11, color: "var(--color-text-gold)", marginBottom: 4, letterSpacing: 1 }}>{wind}</div>
+      <div style={{ fontSize: "var(--compact-info-font)", color: "var(--color-text-gold)", marginBottom: 4, letterSpacing: 1 }}>{wind}</div>
       {player ? (
         <>
-          <div style={{ fontSize: 15, fontWeight: 600, color: "var(--color-text-primary)" }}>
+          <div style={{ fontSize: "var(--label-font)", fontWeight: 600, color: "var(--color-text-primary)" }}>
             {player.name}
           </div>
-          {player.isBot && <div style={{ fontSize: 11, color: "var(--color-text-secondary)", marginTop: 2 }}>🤖 Bot</div>}
+          {player.isBot && <div style={{ fontSize: "var(--compact-info-font)", color: "var(--color-text-secondary)", marginTop: 2 }}>🤖 Bot</div>}
           {score != null && (
             <div style={{
-              fontSize: 12, fontWeight: "bold", marginTop: 2,
+              fontSize: "var(--compact-info-font)", fontWeight: "bold", marginTop: 2,
               color: score > 0 ? "var(--color-text-gold)" : score < 0 ? "var(--color-error)" : "var(--color-text-secondary)",
             }}>
               {score > 0 ? "+" : ""}{score}
@@ -161,7 +161,7 @@ function SeatCard({ seat, score }: { seat: { index: number; player: { name: stri
           )}
         </>
       ) : (
-        <div style={{ fontSize: 13, opacity: 0.5, color: "var(--color-text-secondary)" }}>空位 / Empty</div>
+        <div style={{ fontSize: "var(--label-font)", opacity: 0.5, color: "var(--color-text-secondary)" }}>空位 / Empty</div>
       )}
     </div>
   );
