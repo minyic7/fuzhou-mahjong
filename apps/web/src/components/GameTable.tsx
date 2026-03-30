@@ -4,6 +4,7 @@ import { PlayerArea } from "./PlayerArea";
 import { GameInfo } from "./GameInfo";
 import { TileWall } from "./TileWall";
 import { TILE_BACK_URL } from "../tileSvg";
+import { TileView } from "./Tile";
 import { useIsCompactLandscape, useIsFirstPersonMobile } from "../hooks/useIsMobile";
 
 export type DrawAnimationSeat = "bottom" | "top" | "left" | "right";
@@ -33,10 +34,10 @@ interface GameTableProps {
   disconnectedPlayers?: Set<number>;
   drawAnimation?: DrawAnimationState | null;
   claimAnimation?: { seat: DrawAnimationSeat; key: number } | null;
-  departingTileId?: number | null;
+  departingTile?: TileInstance | null;
 }
 
-export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTileId, claimableTileIds, canDiscard, onDiscard, canHu, onHu, canDraw, onDraw, kongTileIds, onAnGang, onBuGang, onBackgroundClick, disconnectedPlayers, drawAnimation, claimAnimation, departingTileId }: GameTableProps) {
+export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTileId, claimableTileIds, canDiscard, onDiscard, canHu, onHu, canDraw, onDraw, kongTileIds, onAnGang, onBuGang, onBackgroundClick, disconnectedPlayers, drawAnimation, claimAnimation, departingTile }: GameTableProps) {
   const isCompact = useIsCompactLandscape();
   const isFirstPersonMobile = useIsFirstPersonMobile();
 
@@ -44,12 +45,12 @@ export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTile
   const [discardFlyKey, setDiscardFlyKey] = useState<number | null>(null);
   const discardFlyKeyRef = useRef(0);
   useEffect(() => {
-    if (departingTileId != null) {
+    if (departingTile != null) {
       const key = ++discardFlyKeyRef.current;
       setDiscardFlyKey(key);
       setTimeout(() => setDiscardFlyKey((cur) => (cur === key ? null : cur)), 500);
     }
-  }, [departingTileId]);
+  }, [departingTile]);
   const { myHand, myFlowers, myMelds, myDiscards, myName, otherPlayers, currentTurn, myIndex, gold, dealerIndex, lianZhuangCount, wallRemaining, myHasDiscardedGold, cumulativeScores, roundsPlayed } = state;
   const lastDiscardTileId = state.lastDiscard?.tile.id ?? null;
   const lastDiscardPlayerIndex = state.lastDiscard?.playerIndex ?? -1;
@@ -180,7 +181,7 @@ export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTile
           hasDiscardedGold={myHasDiscardedGold}
           lastDrawnTileId={state.lastDrawnTileId}
           lastDiscardedTileId={lastDiscardPlayerIndex === myIndex ? lastDiscardTileId : null}
-          departingTileId={departingTileId}
+          departingTileId={departingTile?.id ?? null}
           tenpaiTiles={state.tenpaiTiles}
           firstPerson={isFirstPersonMobile}
           cumulativeScore={roundsPlayed > 0 ? cumulativeScores[myIndex] : undefined}
@@ -188,7 +189,7 @@ export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTile
       </div>
 
       {/* Discard fly overlay — tile travels from hand toward discard pool */}
-      {discardFlyKey != null && (
+      {discardFlyKey != null && departingTile && (
         <div
           key={discardFlyKey}
           style={{
@@ -201,18 +202,7 @@ export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTile
             animation: "discardFlyToPool 0.3s ease-in forwards",
           }}
         >
-          <img
-            src={TILE_BACK_URL}
-            alt=""
-            style={{
-              width: "var(--wall-tw)",
-              height: "var(--wall-th)",
-              display: "block",
-              borderRadius: 2,
-              boxShadow: "0 1px 4px rgba(0,0,0,0.4)",
-            }}
-            draggable={false}
-          />
+          <TileView tile={departingTile} faceUp gold={gold} small />
         </div>
       )}
 
