@@ -19,12 +19,12 @@ export function useCenterAction() {
   const [display, setDisplay] = useState<ActionDisplay | null>(null);
 
   const showDiscard = (tile: TileInstance, playerName: string) => {
-    setDisplay({ tiles: [tile], label: `${playerName} 打`, color: "#e8d5a3", id: ++actionId });
+    setDisplay({ tiles: [tile], label: `${playerName} 打`, color: "var(--color-text-warm)", id: ++actionId });
   };
 
   const showClaim = (tiles: TileInstance[], type: string, playerName: string) => {
     const labels: Record<string, string> = { chi: "吃!", peng: "碰!", mingGang: "杠!", anGang: "暗杠!", buGang: "补杠!", hu: "胡!" };
-    const colors: Record<string, string> = { chi: "#4caf50", peng: "#2196f3", mingGang: "#ff9800", anGang: "#ff9800", buGang: "#ff9800", hu: "#f44336" };
+    const colors: Record<string, string> = { chi: "var(--color-action-chi)", peng: "var(--color-action-peng)", mingGang: "var(--color-action-gang)", anGang: "var(--color-action-gang)", buGang: "var(--color-action-gang)", hu: "var(--color-action-hu)" };
     setDisplay({
       tiles,
       label: `${playerName} ${labels[type] || type}`,

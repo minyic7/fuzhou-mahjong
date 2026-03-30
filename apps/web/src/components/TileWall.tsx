@@ -70,8 +70,8 @@ function WallTile() {
       width: "var(--wall-tw)",
       height: "var(--wall-th)",
       borderRadius: 2,
-      borderBottom: "1.5px solid #1a3c2a",
-      borderRight: "1px solid #1e4530",
+      borderBottom: "1.5px solid var(--color-tile-back-border)",
+      borderRight: "1px solid var(--color-tile-back-border-right)",
       overflow: "hidden",
       boxShadow: "0 1px 2px rgba(0,0,0,0.35)",
       flexShrink: 0,
@@ -157,7 +157,7 @@ function WallSegment({ side, stacks, drawStack, canDraw, onDraw }: {
                   padding: "6px 16px",
                   fontSize: 14,
                   fontWeight: "bold",
-                  background: "#6a5acd",
+                  background: "var(--color-draw-action)",
                   color: "#fff",
                   border: "none",
                   borderRadius: 6,
@@ -207,7 +207,7 @@ export function TileWall({ wallRemaining, wallDrawCount, wallSupplementCount, go
       }}>
         {gold && (
           <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-            <span style={{ fontSize: 10, color: "#ffd700" }}>金</span>
+            <span style={{ fontSize: 10, color: "var(--color-gold-bright)" }}>金</span>
             <TileView tile={gold.indicatorTile} faceUp gold={null} small className={goldFlip ? "gold-flip-reveal" : undefined} />
           </div>
         )}
@@ -215,11 +215,11 @@ export function TileWall({ wallRemaining, wallDrawCount, wallSupplementCount, go
           <div style={{ width: 80, height: 6, background: "rgba(255,255,255,0.1)", borderRadius: 3 }}>
             <div style={{
               width: `${(wallRemaining / 144) * 100}%`, height: "100%",
-              background: wallRemaining > 20 ? "#4caf50" : wallRemaining > 10 ? "#ff9800" : "#f44336",
+              background: wallRemaining > 20 ? "var(--color-success)" : wallRemaining > 10 ? "var(--color-accent-orange)" : "var(--color-error)",
               borderRadius: 3, transition: "width 0.3s ease",
             }} />
           </div>
-          <span style={{ fontSize: 11, color: "#8fbc8f" }}>{wallRemaining}</span>
+          <span style={{ fontSize: 11, color: "var(--color-text-secondary)" }}>{wallRemaining}</span>
         </div>
         {canDraw && (
           <button
@@ -227,7 +227,7 @@ export function TileWall({ wallRemaining, wallDrawCount, wallSupplementCount, go
             onClick={onDraw}
             style={{
               padding: "4px 12px", fontSize: 12, fontWeight: "bold",
-              background: "#6a5acd", color: "#fff", border: "none",
+              background: "var(--color-draw-action)", color: "#fff", border: "none",
               borderRadius: 4, minHeight: 44, minWidth: 44,
               boxShadow: "0 0 12px rgba(106,90,205,0.6)",
             }}
@@ -271,7 +271,7 @@ export function TileWall({ wallRemaining, wallDrawCount, wallSupplementCount, go
       }}>
         {gold && (
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-            <div style={{ fontSize: 10, color: "#ffd700", marginBottom: 2 }}>金</div>
+            <div style={{ fontSize: 10, color: "var(--color-gold-bright)", marginBottom: 2 }}>金</div>
             <TileView tile={gold.indicatorTile} faceUp gold={null} small className={goldFlip ? "gold-flip-reveal" : undefined} />
           </div>
         )}
@@ -280,7 +280,7 @@ export function TileWall({ wallRemaining, wallDrawCount, wallSupplementCount, go
             className="wall-low-pulse"
             style={{
               fontSize: 11,
-              color: "#f44336",
+              color: "var(--color-error)",
               padding: "2px 6px",
               borderRadius: 4,
               background: "rgba(244,67,54,0.15)",
