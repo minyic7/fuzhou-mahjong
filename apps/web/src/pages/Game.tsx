@@ -565,7 +565,16 @@ export function Game({ initialGameState, onLeave }: GameProps) {
             {/* Winning hand tiles */}
             {go.winnerId !== null && go.allHands?.[go.winnerId] && (() => {
               const winnerHand = go.allHands[go.winnerId!];
-              const tileStyle = { width: "var(--fp-opponent-tile-w)", height: "var(--fp-opponent-tile-h)" };
+              const meldTileCount = winnerHand.melds.reduce((s, m) => s + m.tiles.length, 0);
+              const totalTiles = meldTileCount + winnerHand.hand.length + winnerHand.flowers.length;
+              const meldGaps = winnerHand.melds.length * 4;
+              const flowerGap = winnerHand.flowers.length > 0 ? 6 : 0;
+              const tileGaps = Math.max(0, totalTiles - 1) * 1;
+              const usableWidth = 280;
+              const maxTileW = Math.max(12, Math.floor((usableWidth - meldGaps - flowerGap - tileGaps) / totalTiles));
+              const tileW = Math.min(maxTileW, 22);
+              const tileH = Math.round(tileW * 4 / 3);
+              const tileStyle = { width: tileW, height: tileH };
               return (
                 <div style={{ display: "flex", flexWrap: "wrap", gap: 2, justifyContent: "center", marginBottom: "clamp(6px, 2dvh, 12px)" }}>
                   {winnerHand.melds.map((m, mi) => (
