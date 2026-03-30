@@ -730,11 +730,14 @@ function gangDraw(
   const player = state.players[playerIndex];
 
   // Iterative loop to handle consecutive flowers from wallTail
+  const maxFlowers = 8; // max flower tiles in the game
+  let iterations = 0;
   while (true) {
-    if (state.wallTail.length === 0) {
+    if (state.wallTail.length === 0 || iterations >= maxFlowers) {
       endGameDraw(io, game);
       return;
     }
+    iterations++;
 
     const tile = state.wallTail.pop()!;
 

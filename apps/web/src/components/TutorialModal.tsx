@@ -256,7 +256,7 @@ export function TutorialModal({ open, onClose, condensed }: TutorialModalProps) 
           padding: isCompact ? "12px 16px" : "20px 24px",
           maxWidth: 480,
           width: "100%",
-          maxHeight: isCompact ? "95dvh" : "85vh",
+          maxHeight: isCompact ? "95dvh" : "85dvh",
           overflowY: "auto",
           position: "relative",
           animation: "overlayScaleIn 0.25s ease-out",
