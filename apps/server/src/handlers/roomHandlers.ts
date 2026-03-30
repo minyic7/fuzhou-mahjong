@@ -112,7 +112,19 @@ export function registerRoomHandlers(io: GameServer, socket: GameSocket): void {
 
   socket.on("quickStart", (playerName: string) => {
     try {
-      leaveCurrentRoom(io, socket);
+      // Force leave even during active game (unlike leaveCurrentRoom which skips if gameStarted)
+      const oldRoom = findRoomBySocket(socket.id);
+      if (oldRoom) {
+        const oldPlayer = oldRoom.players.find((p) => p.socketId === socket.id);
+        if (oldPlayer) unregisterPlayerRoom(oldPlayer.playerId);
+        oldRoom.removePlayer(socket.id);
+        socket.leave(oldRoom.id);
+        const hasHumans = oldRoom.players.some((p) => !p.isBot && p.socketId);
+        if (!hasHumans) {
+          oldRoom.players = [];
+          deleteRoomIfEmpty(oldRoom.id);
+        }
+      }
 
       const room = createRoom();
       const player = room.addPlayer(socket.id, playerName);
