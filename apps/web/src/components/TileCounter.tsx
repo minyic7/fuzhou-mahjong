@@ -98,7 +98,7 @@ export function TileCounter({ gameState }: TileCounterProps) {
         <div style={{
           marginBottom: 4,
           padding: 8,
-          maxWidth: 200,
+          maxWidth: 'clamp(160px, 50vw, 240px)',
           background: "rgba(0,0,0,0.75)",
           backdropFilter: "blur(8px)",
           WebkitBackdropFilter: "blur(8px)",
