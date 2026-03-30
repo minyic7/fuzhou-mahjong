@@ -55,7 +55,8 @@ export function Lobby({ onJoined }: LobbyProps) {
   };
 
   return (
-    <div className="lobby-page" style={{ maxWidth: 560, margin: "0 auto", padding: "40px 20px", display: "flex", flexDirection: "column", gap: 20 }}>
+    <div className="lobby-page" style={{ display: "flex", justifyContent: "center", padding: "40px 20px" }}>
+    <div style={{ maxWidth: 560, width: "100%", display: "flex", flexDirection: "column", gap: 20 }}>
       <div style={{ textAlign: "center", marginBottom: 8 }}>
         <h1 style={{ fontSize: 36, color: "var(--color-text-primary)", marginBottom: 4 }}>福州麻将</h1>
         <h2 style={{ fontSize: 16, color: "var(--color-text-secondary)", fontWeight: 400 }}>Fuzhou Mahjong</h2>
@@ -160,6 +161,7 @@ export function Lobby({ onJoined }: LobbyProps) {
       </div>
 
       {error && <p className="error-msg">{error}</p>}
+    </div>
     </div>
   );
 }
