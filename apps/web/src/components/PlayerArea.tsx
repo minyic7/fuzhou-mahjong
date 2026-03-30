@@ -339,7 +339,7 @@ export function PlayerArea({
                 display: "inline-flex",
                 marginLeft: lastDrawnTileId === t.id ? "var(--hand-new-tile-margin)" : 0,
                 position: "relative",
-                transform: tileSwipeOffset < 0 ? `translateY(${tileSwipeOffset}px)` : undefined,
+                transform: tileSwipeOffset < 0 ? `translateY(${Math.max(-80, Math.min(0, tileSwipeOffset))}px)` : undefined,
                 opacity: isSwiping ? 1 - Math.min(0.5, Math.abs(tileSwipeOffset) / 100) : 1,
                 touchAction: "manipulation",
                 transition: isSwiping ? "none" : "transform 0.2s ease, opacity 0.2s ease, margin 0.15s ease",
