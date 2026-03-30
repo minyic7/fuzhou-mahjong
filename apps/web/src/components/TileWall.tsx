@@ -7,8 +7,6 @@ interface TileWallProps {
   gold: GoldState | null;
 }
 
-const MAX_STACKS_PER_SIDE = 18;
-
 export function TileWall({ wallRemaining, gold }: TileWallProps) {
   const prevRef = useRef(wallRemaining);
   const [flash, setFlash] = useState(false);
@@ -24,10 +22,17 @@ export function TileWall({ wallRemaining, gold }: TileWallProps) {
     prevRef.current = wallRemaining;
   }, [wallRemaining]);
 
-  const tilesPerSide = Math.ceil(wallRemaining / 4);
-  const stacksPerSide = Math.min(Math.ceil(tilesPerSide / 2), MAX_STACKS_PER_SIDE);
+  // Distribute tiles exactly across 4 walls (top, right, bottom, left)
+  const base = Math.floor(wallRemaining / 4);
+  const extra = wallRemaining % 4;
+  const wallTiles: [number, number, number, number] = [
+    base + (extra > 0 ? 1 : 0), // top (draw side)
+    base + (extra > 1 ? 1 : 0), // right
+    base + (extra > 2 ? 1 : 0), // bottom (tail side)
+    base + (extra > 3 ? 1 : 0), // left
+  ];
 
-  const renderWall = (stacks: number, side: "top" | "bottom" | "left" | "right") => {
+  const renderWall = (tileCount: number, side: "top" | "bottom" | "left" | "right") => {
     const isH = side === "top" || side === "bottom";
     const isDrawSide = side === "top"; // head side for drawing
 
@@ -44,14 +49,14 @@ export function TileWall({ wallRemaining, gold }: TileWallProps) {
         ...(side === "left" && { left: 0, top: "50%", transform: "translateY(-50%)" }),
         ...(side === "right" && { right: 0, top: "50%", transform: "translateY(-50%)" }),
       }}>
-        {Array.from({ length: stacks }).map((_, i) => {
-          const isEdgeTile = isDrawSide && i === stacks - 1;
+        {Array.from({ length: tileCount }).map((_, i) => {
+          const isEdgeTile = isDrawSide && i === tileCount - 1;
           return (
             <div
               key={`${side}-${i}`}
               style={{
-                width: isH ? 10 : 16,
-                height: isH ? 16 : 10,
+                width: isH ? 6 : 14,
+                height: isH ? 14 : 6,
                 background: isEdgeTile && flash
                   ? "rgba(255,215,0,0.6)"
                   : "linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%)",
@@ -78,10 +83,10 @@ export function TileWall({ wallRemaining, gold }: TileWallProps) {
       margin: "0 auto",
       flexShrink: 0,
     }}>
-      {renderWall(stacksPerSide, "top")}
-      {renderWall(stacksPerSide, "right")}
-      {renderWall(stacksPerSide, "bottom")}
-      {renderWall(stacksPerSide, "left")}
+      {renderWall(wallTiles[0], "top")}
+      {renderWall(wallTiles[1], "right")}
+      {renderWall(wallTiles[2], "bottom")}
+      {renderWall(wallTiles[3], "left")}
 
       {/* Center: gold + remaining */}
       <div style={{
