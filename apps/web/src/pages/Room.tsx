@@ -123,8 +123,8 @@ export function Room({ initialRoomState, sessionScores }: RoomProps) {
         </Button>
       </div>
       {showLeaveConfirm && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50 }}>
-          <div style={{ background: 'rgba(15,30,25,0.97)', border: '2px solid rgba(184,134,11,0.4)', borderRadius: 12, padding: '24px', maxWidth: 360, textAlign: 'center' }}>
+        <div className="confirm-modal-backdrop">
+          <div className="confirm-modal">
             <p style={{ fontSize: 18, marginBottom: 16 }}>确定要离开房间吗？</p>
             <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
               <Button variant='secondary' onClick={() => setShowLeaveConfirm(false)}>取消</Button>
