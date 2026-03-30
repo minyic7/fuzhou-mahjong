@@ -1154,6 +1154,8 @@ export function emitOrBotAction(
             const currentActions = getPostDrawActions(game, playerIndex, false);
             console.warn(`[Bot:FALLBACK] ${tag} Stale safety re-trigger on own turn (roomId=${game.roomId}, playerIndex=${playerIndex}, turn=${turnNumber}, phase=${game.state.phase}, hasActionWindow=false) ts=${Date.now()}`);
             emitOrBotAction(io, game, playerIndex, currentActions);
+          } else {
+            console.warn(`${tag} Stale safety bail — not this bot's turn (currentTurn=${game.state.currentTurn}), no window. Watchdog will handle.`);
           }
         }
         return;
@@ -1162,12 +1164,12 @@ export function emitOrBotAction(
         console.log(`${tag} Safety timer skipped — game phase=${game.state.phase} ts=${Date.now()}`);
         return;
       }
-      acted = true;
-      const safetyWindow = activeWindows.get(game.roomId);
       if (game.state.phase !== GamePhase.Playing) {
         console.warn(`[Bot:SAFETY] ${tag} Safety timeout skipped — game ended (phase=${game.state.phase})`);
         return;
       }
+      acted = true;
+      const safetyWindow = activeWindows.get(game.roomId);
       if (safetyWindow) {
         console.warn(`[Bot:SAFETY] ${tag} Safety timeout during action window — passing (roomId=${game.roomId}, playerIndex=${playerIndex}, turn=${turnNumber}, phase=${game.state.phase}, version=${version}, hasActionWindow=true) ts=${Date.now()}`);
         try {
@@ -1204,6 +1206,8 @@ export function emitOrBotAction(
             const currentActions = getPostDrawActions(game, playerIndex, false);
             console.warn(`[Bot:FALLBACK] ${tag} Stale callback re-trigger on own turn (roomId=${game.roomId}, playerIndex=${playerIndex}, turn=${turnNumber}, phase=${game.state.phase}, hasActionWindow=false) ts=${Date.now()}`);
             emitOrBotAction(io, game, playerIndex, currentActions);
+          } else {
+            console.warn(`${tag} Stale callback bail — not this bot's turn (currentTurn=${game.state.currentTurn}), no window. Watchdog will handle.`);
           }
         }
         return;
