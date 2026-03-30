@@ -11,7 +11,8 @@ const WIND_MAP: Record<string, string> = { east: "Ton", south: "Nan", west: "Sha
 const DRAGON_MAP: Record<string, string> = { red: "Chun", green: "Hatsu", white: "Haku" };
 
 function makeFlowerSvg(char: string, color: string, label: string, labelColor: string): string {
-  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 110"><text x="40" y="58" text-anchor="middle" dominant-baseline="central" font-family="serif" font-size="48" font-weight="bold" fill="${color}">${char}</text><text x="40" y="96" text-anchor="middle" font-family="sans-serif" font-size="14" fill="${labelColor}" opacity="0.7">${label}</text></svg>`;
+  // viewBox matches FluffyStuff tiles (300×400) for consistent proportions
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 400"><text x="150" y="210" text-anchor="middle" dominant-baseline="central" font-family="serif" font-size="170" font-weight="bold" fill="${color}">${char}</text><text x="150" y="350" text-anchor="middle" font-family="sans-serif" font-size="50" fill="${labelColor}" opacity="0.7">${label}</text></svg>`;
   return `data:image/svg+xml,${encodeURIComponent(svg)}`;
 }
 

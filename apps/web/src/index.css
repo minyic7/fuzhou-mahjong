@@ -89,6 +89,7 @@ body {
   --tile-w-sm: calc(var(--tile-w) * 0.68);
   --tile-h-sm: calc(var(--tile-h) * 0.67);
   --tile-font-sm: calc(var(--tile-font) * 0.72);
+  --tile-suit-font-sm: calc(var(--tile-suit-font) * 0.72);
   /* Wall tile sizing — small face-down tiles for the wall display */
   --wall-tw: 11px;
   --wall-th: 15px;
