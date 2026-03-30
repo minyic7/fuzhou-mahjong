@@ -223,7 +223,7 @@ export function TileWall({ wallRemaining, wallDrawCount, wallSupplementCount, go
             style={{
               padding: "4px 12px", fontSize: 12, fontWeight: "bold",
               background: "#6a5acd", color: "#fff", border: "none",
-              borderRadius: 4, minHeight: 32, minWidth: 44,
+              borderRadius: 4, minHeight: 44, minWidth: 44,
               boxShadow: "0 0 12px rgba(106,90,205,0.6)",
             }}
           >

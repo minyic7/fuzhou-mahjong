@@ -57,7 +57,7 @@ export function Lobby({ onJoined }: LobbyProps) {
   };
 
   return (
-    <div className="lobby-page" style={{ display: "flex", justifyContent: "center", padding: "40px 20px" }}>
+    <div className="lobby-page" style={{ display: "flex", justifyContent: "center", padding: "max(16px, 3vh) max(12px, 3vw)" }}>
     <div style={{ maxWidth: 560, width: "100%", display: "flex", flexDirection: "column", gap: 20 }}>
       <div style={{ textAlign: "center", marginBottom: 8 }}>
         <h1 style={{ fontSize: 36, color: "var(--color-text-primary)", marginBottom: 4 }}>福州麻将</h1>

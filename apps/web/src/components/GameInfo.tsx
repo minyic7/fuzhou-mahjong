@@ -100,7 +100,7 @@ function MuteButton() {
       style={{
         marginTop: 6, padding: "2px 8px", fontSize: 12,
         background: "transparent", border: "1px solid #555",
-        color: "#8fbc8f", borderRadius: 4, minHeight: "auto",
+        color: "#8fbc8f", borderRadius: 4, minHeight: 44,
         cursor: "pointer",
       }}
     >

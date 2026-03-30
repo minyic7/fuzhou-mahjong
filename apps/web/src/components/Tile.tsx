@@ -63,7 +63,7 @@ export function TileView({ tile, faceUp = true, selected, claimable, onClick, on
         display: "inline-flex",
         alignItems: "center",
         justifyContent: "center",
-        margin: 1,
+        margin: "var(--tile-margin, 1px)",
         boxShadow: "0 3px 6px rgba(0,0,0,0.4), 0 1px 2px rgba(0,0,0,0.2)",
         overflow: "hidden",
       }}>
@@ -114,7 +114,7 @@ export function TileView({ tile, faceUp = true, selected, claimable, onClick, on
         alignItems: "center",
         justifyContent: "center",
         cursor: onClick ? "pointer" : "default",
-        margin: 1,
+        margin: "var(--tile-margin, 1px)",
         boxShadow: selected
           ? "0 8px 20px rgba(255,143,0,0.4), 0 4px 6px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.8)"
           : isGold
