@@ -206,4 +206,11 @@ export function getGame(roomId: string): ServerGameState | undefined {
 
 export function deleteGame(roomId: string): void {
   games.delete(roomId);
+  onGameDeleted?.(roomId);
+}
+
+/** Hook called when a game is deleted, used by gameEngine to clean up per-room state. */
+let onGameDeleted: ((roomId: string) => void) | null = null;
+export function setOnGameDeleted(cb: (roomId: string) => void): void {
+  onGameDeleted = cb;
 }
