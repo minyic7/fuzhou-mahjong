@@ -47,7 +47,7 @@ export function Room({ initialRoomState }: RoomProps) {
   });
 
   return (
-    <div className="room-page" style={{ display: "flex", justifyContent: "center", padding: "40px 20px" }}>
+    <div className="room-page" style={{ display: "flex", justifyContent: "center", padding: "max(16px, 3vh) max(12px, 3vw)" }}>
     <div style={{ maxWidth: 480, width: "100%" }}>
       <h2 style={{ textAlign: "center", color: "var(--color-text-secondary)", fontSize: 15, fontWeight: 400, marginBottom: 20 }}>房间 / Room</h2>
 

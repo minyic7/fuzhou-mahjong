@@ -105,6 +105,7 @@ body {
   --discard-cols: 6;
   --hand-new-tile-margin: 16px;
   --hand-padding-top: 18px;
+  --tile-margin: 1px;
 }
 
 @media (max-width: 768px) {
@@ -174,6 +175,7 @@ body {
     --btn-padding: 8px 14px;
     --hand-new-tile-margin: 6px;
     --hand-padding-top: 8px;
+    --tile-margin: 2px;
   }
 }
 
@@ -186,7 +188,7 @@ body {
   .lobby-page h2 { font-size: 13px; }
   .lobby-page input, .lobby-page button,
   .room-page input, .room-page button {
-    min-height: 36px;
+    min-height: 44px;
     padding: 6px 12px;
   }
   .lobby-page hr, .room-page hr { margin: 8px 0; }

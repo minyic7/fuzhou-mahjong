@@ -54,7 +54,7 @@ export function ClaimOverlay({ actions, gameState, onAction }: ClaimOverlayProps
         alignItems: "center",
         gap: 12,
         maxWidth: "90vw",
-        maxHeight: "90vh",
+        maxHeight: "90dvh",
         overflowY: "auto",
         animation: "overlayScaleIn 0.2s ease-out",
       }}>
