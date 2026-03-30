@@ -7,6 +7,7 @@ import { sounds, setMuted, isMuted } from "../sounds";
 import { TileCounter } from "../components/TileCounter";
 import { TutorialModal } from "../components/TutorialModal";
 import { BREAKPOINTS } from "../hooks/useIsMobile";
+import { useWindowSize } from "../hooks/useWindowSize";
 import { TileView } from "../components/Tile";
 import { SessionSummary, type SessionData } from "../components/SessionSummary";
 import { Button } from "../components/Button";
@@ -350,7 +351,8 @@ export function Game({ initialGameState, onLeave }: GameProps) {
     ? (actions.canHu || actions.canPeng || actions.canMingGang || actions.chiOptions.length > 0) && !actions.canDiscard
     : false;
 
-  const isCompactMain = window.innerHeight <= BREAKPOINTS.COMPACT_HEIGHT;
+  const { height: windowHeight } = useWindowSize();
+  const isCompactMain = windowHeight <= BREAKPOINTS.COMPACT_HEIGHT;
 
   const handleAction = (action: GameAction) => {
     socket.emit("playerAction", action);
