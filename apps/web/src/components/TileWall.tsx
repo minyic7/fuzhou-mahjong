@@ -170,8 +170,8 @@ function WallSegment({ side, stacks, drawStack, canDraw, onDraw, standalone }: {
                   borderRadius: 6,
                   boxShadow: "0 0 12px rgba(106,90,205,0.6)",
                   whiteSpace: "nowrap",
-                  minHeight: 44,
-                  minWidth: 44,
+                  minHeight: "var(--btn-min-size)",
+                  minWidth: "var(--btn-min-size)",
                   zIndex: "var(--z-draw-button)",
                 }}
               >
@@ -224,7 +224,7 @@ export function TileWall({ wallRemaining, wallDrawCount, wallSupplementCount, go
     return (
       <div style={{
         display: "flex", alignItems: "center", justifyContent: "center",
-        gap: 8, padding: "4px 8px", maxHeight: 44,
+        gap: 8, padding: "4px 8px", maxHeight: "var(--btn-min-size)",
         background: "rgba(0,0,0,0.2)", borderRadius: 6,
       }}>
         {gold && (
@@ -250,7 +250,7 @@ export function TileWall({ wallRemaining, wallDrawCount, wallSupplementCount, go
             style={{
               padding: "var(--btn-padding)", fontSize: "var(--btn-font)", fontWeight: "bold",
               background: "var(--color-draw-action)", color: "#fff", border: "none",
-              borderRadius: 4, minHeight: 44, minWidth: 44,
+              borderRadius: 4, minHeight: "var(--btn-min-size)", minWidth: "var(--btn-min-size)",
               boxShadow: "0 0 12px rgba(106,90,205,0.6)",
             }}
           >

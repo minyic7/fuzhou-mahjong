@@ -478,7 +478,7 @@ export function Game({ initialGameState, onLeave }: GameProps) {
           onClick={() => setSettingsOpen((v) => !v)}
           aria-label="Settings"
           style={{
-            width: 44, height: 44, minHeight: 44, borderRadius: "50%",
+            width: "var(--btn-min-size)", height: "var(--btn-min-size)", minHeight: "var(--btn-min-size)", borderRadius: "50%",
             background: "var(--overlay-bg)", border: "1px solid var(--color-gold-border-hover)",
             color: "var(--color-text-secondary)", fontSize: 20, fontWeight: 700,
             display: "flex", alignItems: "center", justifyContent: "center",
@@ -596,7 +596,7 @@ export function Game({ initialGameState, onLeave }: GameProps) {
 
             {/* Actions */}
             <div style={{ display: "flex", gap: "clamp(6px, 2dvh, 12px)", justifyContent: "center", flexWrap: "wrap" }}>
-              <Button variant="gold" size="lg" onClick={handleNextRound} style={{ minHeight: "clamp(44px, 10dvh, 48px)" }}>
+              <Button variant="gold" size="lg" onClick={handleNextRound} style={{ minHeight: "clamp(var(--btn-min-size), 10dvh, 48px)" }}>
                 下一局 / Next Round
               </Button>
               {onLeave && (
@@ -613,7 +613,7 @@ export function Game({ initialGameState, onLeave }: GameProps) {
                     socket.emit("leaveRoom");
                     onLeave();
                   }
-                }} style={{ minHeight: "clamp(44px, 10dvh, 48px)" }}>
+                }} style={{ minHeight: "clamp(var(--btn-min-size), 10dvh, 48px)" }}>
                   离开 / Leave
                 </Button>
               )}

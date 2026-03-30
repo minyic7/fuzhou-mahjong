@@ -136,7 +136,7 @@ export function SessionSummary({ data, onClose }: SessionSummaryProps) {
         border: "1px solid rgba(255,215,0,0.3)",
         borderRadius: 12,
         padding: isCompact ? "clamp(8px, 2.5dvh, 16px) clamp(12px, 3dvh, 20px)" : "24px 28px",
-        maxWidth: "min(440px, 90vw)",
+        maxWidth: "min(440px, calc(100vw - 24px))",
         width: "90vw",
         maxHeight: "clamp(200px, 80dvh, 90dvh)",
         overflowY: "auto",
@@ -210,7 +210,7 @@ export function SessionSummary({ data, onClose }: SessionSummaryProps) {
             background: "var(--color-bg-button)", color: "var(--color-text-primary)",
             border: "1px solid rgba(255,215,0,0.3)",
             borderRadius: 6, cursor: "pointer",
-            minHeight: "max(44px, 9dvh)",
+            minHeight: "max(var(--btn-min-size), 9dvh)",
           }}
         >
           返回大厅 / Back to Lobby
