@@ -35,6 +35,8 @@ interface PlayerAreaProps {
   hasDiscardedGold?: boolean;
   isDisconnected?: boolean;
   compact?: boolean;
+  ultraCompact?: boolean;
+  firstPerson?: boolean;
   cumulativeScore?: number;
 }
 
@@ -50,7 +52,7 @@ export function PlayerArea({
   isCurrentTurn, isDealer, gold, selectedTileId, onTileClick, label,
   claimableTileIds, onTileDoubleClick, lastDrawnTileId, lastDiscardedTileId, tenpaiTiles,
   canDiscard, onDiscard, canHu, onHu, kongTileIds, onAnGang, onBuGang, departingTileId, hasDiscardedGold,
-  isDisconnected, compact, cumulativeScore,
+  isDisconnected, compact, ultraCompact, firstPerson, cumulativeScore,
 }: PlayerAreaProps) {
   const { onTouchStart: lpTouchStart, onTouchEnd: lpTouchEnd, onMouseEnter, onMouseLeave, Tooltip } = useLongPress(gold);
   const isCompactLandscape = useIsCompactLandscape();
@@ -98,6 +100,58 @@ export function PlayerArea({
     }
     prevMeldCountRef.current = melds.length;
   }, [melds.length]);
+
+  // Ultra-compact layout for opponents in first-person mobile mode
+  if (ultraCompact) {
+    return (
+      <div
+        className={`player-area-card${isCurrentTurn ? " current-turn" : ""} compact-opponent ultra-compact-opponent`}
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: 1,
+          padding: "2px",
+          background: isCurrentTurn ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.3)",
+          border: isCurrentTurn ? "1px solid var(--color-gold-bright)" : undefined,
+          borderRadius: 3,
+          opacity: isDisconnected ? 0.5 : 1,
+          overflow: "hidden",
+          minHeight: 0,
+          fontSize: 8,
+        }}
+      >
+        <div style={{ display: "flex", alignItems: "center", gap: 2 }}>
+          <span style={{ fontSize: 9, fontWeight: "bold", color: "#e8d5a3", whiteSpace: "nowrap" }}>{label}</span>
+          {isDealer && <span style={{ fontSize: 7, background: "#b71c1c", color: "var(--color-gold-bright)", padding: "0 2px", borderRadius: 2, fontWeight: "bold" }}>庄</span>}
+          {isCurrentTurn && <span style={{ fontSize: 7, background: "rgba(255,215,0,0.2)", color: "var(--color-gold-bright)", padding: "0 2px", borderRadius: 2 }}>出牌</span>}
+          <span style={{ fontSize: 8, color: "#8fbc8f", marginLeft: "auto" }}>{handCount ?? 0}张 🌸{flowers.length}</span>
+        </div>
+        {melds.length > 0 && (
+          <div style={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
+            {melds.map((m, mi) => (
+              <div key={mi} className={newestMeldIdx === mi ? "meld-new" : undefined} style={{ display: "flex", gap: 0 }}>
+                {m.tiles.map((t, ti) => (
+                  <TileView key={ti} tile={t} faceUp={m.type !== MeldType.AnGang} gold={gold} small
+                    style={{ width: "var(--fp-opponent-tile-w)", height: "var(--fp-opponent-tile-h)", fontSize: 6 }}
+                  />
+                ))}
+              </div>
+            ))}
+          </div>
+        )}
+        {discards.length > 0 && (
+          <div className="compact-discards" style={{ display: "flex", gap: 0, overflowX: "auto", overflowY: "hidden", minWidth: 0 }}>
+            {discards.map((d) => (
+              <TileView key={d.id} tile={d} faceUp gold={gold} small
+                style={{ width: "var(--fp-opponent-tile-w)", height: "var(--fp-opponent-tile-h)", fontSize: 6 }}
+                className={lastDiscardedTileId === d.id ? "discard-arrive last-discard" : undefined}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+    );
+  }
 
   // Compact single-row layout for opponents on mobile landscape
   if (compact) {
@@ -219,7 +273,11 @@ export function PlayerArea({
       </div>
 
       {/* Hand */}
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 1, marginBottom: 4, alignItems: "flex-end", paddingTop: isMe ? "var(--hand-padding-top)" : 0, overflow: "visible", position: "relative" }}>
+      <div style={{
+        display: "flex", flexWrap: "wrap", gap: firstPerson ? "var(--fp-hand-gap)" : 1, marginBottom: 4, alignItems: "flex-end",
+        paddingTop: isMe ? "var(--hand-padding-top)" : 0, overflow: "visible", position: "relative",
+        ...(firstPerson ? { "--tile-w": "var(--fp-tile-w)", "--tile-h": "var(--fp-tile-h)" } as React.CSSProperties : {}),
+      }}>
         {isMe && hand ? (
           hand.map((t, idx) => {
             const isSelected = selectedTileId === t.id;
@@ -365,8 +423,8 @@ export function PlayerArea({
         </div>
       )}
 
-      {/* Discards - horizontal scroll on compact landscape, grid otherwise */}
-      {discards.length > 0 && (isMe && isCompactLandscape ? (
+      {/* Discards - horizontal scroll on compact landscape / first-person, grid otherwise */}
+      {discards.length > 0 && (isMe && (isCompactLandscape || firstPerson) ? (
         <div className="compact-discards" style={{
           display: "flex",
           gap: 1,

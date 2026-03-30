@@ -19,3 +19,16 @@ export function useIsCompactLandscape(): boolean {
 
   return isCompact;
 }
+
+export function useIsFirstPersonMobile(): boolean {
+  const [isFP, setIsFP] = useState(
+    () => window.innerHeight <= BREAKPOINTS.COMPACT_HEIGHT && window.innerWidth <= 900
+  );
+  useEffect(() => {
+    const onResize = () =>
+      setIsFP(window.innerHeight <= BREAKPOINTS.COMPACT_HEIGHT && window.innerWidth <= 900);
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+  return isFP;
+}

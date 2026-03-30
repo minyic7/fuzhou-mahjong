@@ -3,7 +3,7 @@ import { PlayerArea } from "./PlayerArea";
 import { GameInfo } from "./GameInfo";
 import { TileWall } from "./TileWall";
 import { TILE_BACK_URL } from "../tileSvg";
-import { useIsCompactLandscape } from "../hooks/useIsMobile";
+import { useIsCompactLandscape, useIsFirstPersonMobile } from "../hooks/useIsMobile";
 
 export type DrawAnimationSeat = "bottom" | "top" | "left" | "right";
 
@@ -36,6 +36,7 @@ interface GameTableProps {
 
 export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTileId, claimableTileIds, canDiscard, onDiscard, canHu, onHu, canDraw, onDraw, kongTileIds, onAnGang, onBuGang, onBackgroundClick, disconnectedPlayers, drawAnimation, departingTileId }: GameTableProps) {
   const isCompact = useIsCompactLandscape();
+  const isFirstPersonMobile = useIsFirstPersonMobile();
   const { myHand, myFlowers, myMelds, myDiscards, myName, otherPlayers, currentTurn, myIndex, gold, dealerIndex, lianZhuangCount, wallRemaining, myHasDiscardedGold, cumulativeScores, roundsPlayed } = state;
   const lastDiscardTileId = state.lastDiscard?.tile.id ?? null;
   const lastDiscardPlayerIndex = state.lastDiscard?.playerIndex ?? -1;
@@ -50,13 +51,11 @@ export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTile
   return (
     <div className="game-table" onClick={(e) => { if (e.target === e.currentTarget) onBackgroundClick?.(); }} style={{
       display: "grid",
-      gridTemplateAreas: `
-        ". top ."
-        "left center right"
-        ". bottom ."
-      `,
-      gridTemplateColumns: isCompact ? "60px 1fr 60px" : "1fr 2fr 1fr",
-      gridTemplateRows: isCompact ? "28px 40px 1fr" : "auto 1fr auto",
+      gridTemplateAreas: isFirstPersonMobile
+        ? `"left top right" "left center right" "bottom bottom bottom"`
+        : `". top ." "left center right" ". bottom ."`,
+      gridTemplateColumns: isFirstPersonMobile ? "44px 1fr 44px" : isCompact ? "60px 1fr 60px" : "1fr 2fr 1fr",
+      gridTemplateRows: isFirstPersonMobile ? "24px 1fr minmax(55%, 65%)" : isCompact ? "28px 40px 1fr" : "auto 1fr auto",
       flex: 1,
       minHeight: 0,
       gap: "var(--game-gap)",
@@ -80,6 +79,7 @@ export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTile
           hasDiscardedGold={otherPlayers[1]?.hasDiscardedGold}
           isDisconnected={disconnectedPlayers?.has((myIndex + 2) % 4)}
           compact={isCompact}
+          ultraCompact={isFirstPersonMobile}
           cumulativeScore={roundsPlayed > 0 ? cumulativeScores[(myIndex + 2) % 4] : undefined}
         />
       </div>
@@ -100,6 +100,7 @@ export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTile
           hasDiscardedGold={otherPlayers[2]?.hasDiscardedGold}
           isDisconnected={disconnectedPlayers?.has((myIndex + 3) % 4)}
           compact={isCompact}
+          ultraCompact={isFirstPersonMobile}
           cumulativeScore={roundsPlayed > 0 ? cumulativeScores[(myIndex + 3) % 4] : undefined}
         />
       </div>
@@ -135,6 +136,7 @@ export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTile
           hasDiscardedGold={otherPlayers[0]?.hasDiscardedGold}
           isDisconnected={disconnectedPlayers?.has((myIndex + 1) % 4)}
           compact={isCompact}
+          ultraCompact={isFirstPersonMobile}
           cumulativeScore={roundsPlayed > 0 ? cumulativeScores[(myIndex + 1) % 4] : undefined}
         />
       </div>
@@ -167,6 +169,7 @@ export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTile
           lastDiscardedTileId={lastDiscardPlayerIndex === myIndex ? lastDiscardTileId : null}
           departingTileId={departingTileId}
           tenpaiTiles={state.tenpaiTiles}
+          firstPerson={isFirstPersonMobile}
           cumulativeScore={roundsPlayed > 0 ? cumulativeScores[myIndex] : undefined}
         />
       </div>
