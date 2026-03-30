@@ -5,7 +5,7 @@ import { isMuted, setMuted } from "../sounds";
 
 interface GameInfoProps {
   gold: GoldState | null;
-  wallRemaining: number;
+  wallRemaining?: number;
   dealerIndex: number;
   lianZhuangCount: number;
   myIndex: number;
@@ -13,7 +13,7 @@ interface GameInfoProps {
   playerNames: string[];
 }
 
-export function GameInfo({ gold, wallRemaining, dealerIndex, lianZhuangCount, myIndex, lastDiscard, playerNames }: GameInfoProps) {
+export function GameInfo({ gold, dealerIndex, lianZhuangCount, myIndex, lastDiscard, playerNames }: GameInfoProps) {
   const posLabel = (idx: number) => {
     const rel = (idx - myIndex + 4) % 4;
     return rel === 0 ? "我" : (playerNames[rel] || ["我", "右", "上", "左"][rel]);
@@ -50,7 +50,7 @@ export function GameInfo({ gold, wallRemaining, dealerIndex, lianZhuangCount, my
       )}
 
       <div style={{ fontSize: 12, color: "#8fbc8f" }}>
-        余{wallRemaining} | 庄:{posLabel(dealerIndex)} | 连庄:{lianZhuangCount}
+        庄:{posLabel(dealerIndex)} | 连庄:{lianZhuangCount}
       </div>
       <MuteButton />
     </div>
