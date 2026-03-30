@@ -303,6 +303,8 @@ export function Game({ initialGameState, onLeave }: GameProps) {
     ? (actions.canHu || actions.canPeng || actions.canMingGang || actions.chiOptions.length > 0) && !actions.canDiscard
     : false;
 
+  const isCompactMain = window.innerHeight <= 500;
+
   const handleAction = (action: GameAction) => {
     socket.emit("playerAction", action);
     setSelectedTileId(null);
@@ -555,7 +557,9 @@ export function Game({ initialGameState, onLeave }: GameProps) {
       )}
       {/* Toast notifications */}
       <div style={{
-        position: "fixed", top: 16, left: "50%", transform: "translateX(-50%)",
+        position: "fixed",
+        ...(isCompactMain ? { bottom: 60 } : { top: 16 }),
+        left: "50%", transform: "translateX(-50%)",
         zIndex: 9000, display: "flex", flexDirection: "column", gap: 8, alignItems: "center",
         pointerEvents: "none",
       }}>
@@ -608,39 +612,68 @@ export function Game({ initialGameState, onLeave }: GameProps) {
         <ClaimOverlay actions={actions} gameState={gameState} onAction={handleAction} />
       )}
       <TileCounter gameState={gameState} />
-      {/* Leave button */}
-      {onLeave && (
-        <button
-          onClick={() => setShowLeaveConfirm(true)}
-          aria-label="Leave game"
-          style={{
-            position: "fixed",
-            bottom: 56,
-            right: 12,
-            width: 36,
-            height: 36,
-            minHeight: 36,
-            borderRadius: "50%",
-            background: "rgba(15,30,25,0.85)",
-            border: "1px solid rgba(184,134,11,0.4)",
-            color: "#ff5252",
-            fontSize: 18,
-            fontWeight: 700,
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            cursor: "pointer",
-            zIndex: 20,
-            padding: 0,
-          }}
-        >
-          ✕
-        </button>
+      {/* Help & Leave buttons — compact: top-right row; normal: bottom-right stacked */}
+      {isCompactMain ? (
+        <div style={{ position: 'fixed', top: 8, right: 8, display: 'flex', gap: 4, zIndex: 20 }}>
+          <button
+            onClick={() => { setTutorialCondensed(false); setShowTutorial(true); }}
+            aria-label="How to play"
+            style={{
+              width: 36, height: 36, minHeight: 36, borderRadius: "50%",
+              background: "rgba(15,30,25,0.85)", border: "1px solid rgba(184,134,11,0.4)",
+              color: "#8fbc8f", fontSize: 18, fontWeight: 700,
+              display: "flex", alignItems: "center", justifyContent: "center",
+              cursor: "pointer", padding: 0,
+            }}
+          >?</button>
+          {onLeave && (
+            <button
+              onClick={() => setShowLeaveConfirm(true)}
+              aria-label="Leave game"
+              style={{
+                width: 36, height: 36, minHeight: 36, borderRadius: "50%",
+                background: "rgba(15,30,25,0.85)", border: "1px solid rgba(184,134,11,0.4)",
+                color: "#ff5252", fontSize: 18, fontWeight: 700,
+                display: "flex", alignItems: "center", justifyContent: "center",
+                cursor: "pointer", padding: 0,
+              }}
+            >✕</button>
+          )}
+        </div>
+      ) : (
+        <>
+          {onLeave && (
+            <button
+              onClick={() => setShowLeaveConfirm(true)}
+              aria-label="Leave game"
+              style={{
+                position: "fixed", bottom: 56, right: 12,
+                width: 36, height: 36, minHeight: 36, borderRadius: "50%",
+                background: "rgba(15,30,25,0.85)", border: "1px solid rgba(184,134,11,0.4)",
+                color: "#ff5252", fontSize: 18, fontWeight: 700,
+                display: "flex", alignItems: "center", justifyContent: "center",
+                cursor: "pointer", zIndex: 20, padding: 0,
+              }}
+            >✕</button>
+          )}
+          <button
+            onClick={() => { setTutorialCondensed(false); setShowTutorial(true); }}
+            aria-label="How to play"
+            style={{
+              position: "fixed", bottom: 12, right: 12,
+              width: 36, height: 36, minHeight: 36, borderRadius: "50%",
+              background: "rgba(15,30,25,0.85)", border: "1px solid rgba(184,134,11,0.4)",
+              color: "#8fbc8f", fontSize: 18, fontWeight: 700,
+              display: "flex", alignItems: "center", justifyContent: "center",
+              cursor: "pointer", zIndex: 20, padding: 0,
+            }}
+          >?</button>
+        </>
       )}
       {/* Leave confirmation modal */}
       {showLeaveConfirm && (
         <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50 }}>
-          <div style={{ background: 'rgba(15,30,25,0.97)', border: '2px solid rgba(184,134,11,0.4)', borderRadius: 12, padding: '24px', maxWidth: 360, textAlign: 'center' }}>
+          <div style={{ background: 'rgba(15,30,25,0.97)', border: '2px solid rgba(184,134,11,0.4)', borderRadius: 12, padding: '24px', maxWidth: 360, textAlign: 'center', maxHeight: 'calc(100dvh - 40px)', overflowY: 'auto' }}>
             <p style={{ fontSize: 18, marginBottom: 8 }}>确定要退出吗？</p>
             <p style={{ fontSize: 13, color: '#8fbc8f', marginBottom: 0 }}>退出后本局将由机器人代打</p>
             <div style={{ display: 'flex', gap: 12, justifyContent: 'center', marginTop: 16 }}>
@@ -650,33 +683,6 @@ export function Game({ initialGameState, onLeave }: GameProps) {
           </div>
         </div>
       )}
-      {/* Help button */}
-      <button
-        onClick={() => { setTutorialCondensed(false); setShowTutorial(true); }}
-        aria-label="How to play"
-        style={{
-          position: "fixed",
-          bottom: 12,
-          right: 12,
-          width: 36,
-          height: 36,
-          minHeight: 36,
-          borderRadius: "50%",
-          background: "rgba(15,30,25,0.85)",
-          border: "1px solid rgba(184,134,11,0.4)",
-          color: "#8fbc8f",
-          fontSize: 18,
-          fontWeight: 700,
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          cursor: "pointer",
-          zIndex: 20,
-          padding: 0,
-        }}
-      >
-        ?
-      </button>
       <TutorialModal
         open={showTutorial}
         onClose={() => setShowTutorial(false)}

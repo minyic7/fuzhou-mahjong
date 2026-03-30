@@ -219,6 +219,7 @@ export function TutorialModal({ open, onClose, condensed }: TutorialModalProps) 
 
   if (!open) return null;
 
+  const isCompact = window.innerHeight <= 500;
   const slide = slides[currentSlide];
   const isFirst = currentSlide === 0;
   const isLast = currentSlide === slides.length - 1;
@@ -249,10 +250,10 @@ export function TutorialModal({ open, onClose, condensed }: TutorialModalProps) 
           background: "rgba(15,30,25,0.97)",
           border: "2px solid rgba(184,134,11,0.4)",
           borderRadius: 12,
-          padding: "20px 24px",
+          padding: isCompact ? "12px 16px" : "20px 24px",
           maxWidth: 480,
           width: "100%",
-          maxHeight: "85vh",
+          maxHeight: isCompact ? "95dvh" : "85vh",
           overflowY: "auto",
           position: "relative",
           animation: "overlayScaleIn 0.25s ease-out",
@@ -293,13 +294,13 @@ export function TutorialModal({ open, onClose, condensed }: TutorialModalProps) 
         </div>
 
         {/* Navigation */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 20 }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: isCompact ? 12 : 20 }}>
           <button
             onClick={goPrev}
             disabled={isFirst}
             style={{
-              padding: "8px 18px",
-              fontSize: 14,
+              padding: isCompact ? "6px 12px" : "8px 18px",
+              fontSize: isCompact ? 13 : 14,
               background: isFirst ? "transparent" : "#1a5c3a",
               border: isFirst ? "1px solid transparent" : "1px solid #2e7d50",
               minHeight: 36,
@@ -334,8 +335,8 @@ export function TutorialModal({ open, onClose, condensed }: TutorialModalProps) 
             <button
               onClick={onClose}
               style={{
-                padding: "8px 18px",
-                fontSize: 14,
+                padding: isCompact ? "6px 12px" : "8px 18px",
+                fontSize: isCompact ? 13 : 14,
                 background: "#1a5c3a",
                 border: "1px solid #d4a017",
                 color: "#ffd700",
@@ -348,8 +349,8 @@ export function TutorialModal({ open, onClose, condensed }: TutorialModalProps) 
             <button
               onClick={goNext}
               style={{
-                padding: "8px 18px",
-                fontSize: 14,
+                padding: isCompact ? "6px 12px" : "8px 18px",
+                fontSize: isCompact ? 13 : 14,
                 minHeight: 36,
               }}
             >
