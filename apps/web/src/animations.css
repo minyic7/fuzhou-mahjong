@@ -18,6 +18,7 @@
  *   overlayScaleOut         → inline style        (ClaimOverlay: exit modal + chi picker)
  *   tileDeparting           → .tile-departing      (PlayerArea: discarded tile exit)
  *   discardFlyToPool        → inline style         (GameTable: discard fly overlay)
+ *   phoneRotate             → .phone-rotate-icon  (Game: portrait overlay)
  *   pageFadeIn              → .page-transition    (index: page entrance)
  *   spin                    → .spinner            (index: loading spinner)
  */
@@ -38,9 +39,14 @@
 }
 
 /* Portrait rotate phone animation */
-@keyframes rotatePhone {
+@keyframes phoneRotate {
   0%, 100% { transform: rotate(0deg); }
-  50% { transform: rotate(90deg); }
+  40%, 60% { transform: rotate(90deg); }
+}
+
+.phone-rotate-icon {
+  animation: phoneRotate 2.5s ease-in-out infinite;
+  display: inline-block;
 }
 
 /* Tile draw-in animation (new draw slides into hand) */
