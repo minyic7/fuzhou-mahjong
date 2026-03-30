@@ -356,7 +356,12 @@
   100% { transform: translate(120px, 0) scale(0.8); opacity: 0; filter: drop-shadow(0 0 4px rgba(255,215,0,0.4)); }
 }
 
-/* Pool-to-player claim fly animations (chi/peng/gang) */
+/* Pool-to-player claim fly animations (chi/peng/gang)
+ * Audit (ticket #190, 2026-03-30): verified at compact (≤500px height) and
+ * first-person (≤500px height + ≤900px width) breakpoints.
+ * Overlay is position:absolute inside .game-table which has overflow:visible,
+ * so the 60px translations are never clipped.  meld-new (.meldEntrance) is
+ * applied in all three PlayerArea layout paths (ultraCompact / compact / normal). */
 @keyframes claimFlyBottom {
   0% { transform: translate(0, -60px) scale(0.8); opacity: 1; }
   100% { transform: translate(0, 0) scale(1); opacity: 0; }
