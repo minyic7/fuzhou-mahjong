@@ -55,6 +55,9 @@ export function useSwipeGesture({
       ref.locked = true;
     }
 
+    // Prevent iOS scroll while actively swiping
+    e.preventDefault();
+
     // Only track upward movement (negative deltaY)
     if (deltaY < 0) {
       setSwipingTileId(ref.tileId);
