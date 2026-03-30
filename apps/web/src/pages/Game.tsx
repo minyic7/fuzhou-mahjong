@@ -658,8 +658,8 @@ export function Game({ initialGameState, onLeave }: GameProps) {
       )}
       {/* Leave confirmation modal */}
       {showLeaveConfirm && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50 }}>
-          <div style={{ background: 'rgba(15,30,25,0.97)', border: '2px solid rgba(184,134,11,0.4)', borderRadius: 12, padding: '24px', maxWidth: 360, textAlign: 'center', maxHeight: 'calc(100dvh - 40px)', overflowY: 'auto' }}>
+        <div className="confirm-modal-backdrop">
+          <div className="confirm-modal">
             <p style={{ fontSize: 18, marginBottom: 8 }}>确定要退出吗？</p>
             <p style={{ fontSize: 13, color: '#8fbc8f', marginBottom: 0 }}>退出后本局将由机器人代打</p>
             <div style={{ display: 'flex', gap: 12, justifyContent: 'center', marginTop: 16 }}>

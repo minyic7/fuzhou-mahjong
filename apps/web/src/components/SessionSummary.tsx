@@ -57,7 +57,7 @@ export function SessionSummary({ data, onClose }: SessionSummaryProps) {
       animation: "pageFadeIn 0.3s ease-out",
     }}>
       <div style={{
-        background: "linear-gradient(135deg, #1a1a2e 0%, #16213e 100%)",
+        background: "linear-gradient(135deg, var(--color-bg-dark) 0%, var(--color-bg-medium) 100%)",
         border: "1px solid rgba(255,215,0,0.3)",
         borderRadius: 12,
         padding: "24px 28px",
@@ -65,18 +65,18 @@ export function SessionSummary({ data, onClose }: SessionSummaryProps) {
         width: "90vw",
         maxHeight: "90dvh",
         overflowY: "auto",
-        color: "#eee",
+        color: "var(--color-text-primary)",
       }}>
-        <h2 style={{ textAlign: "center", fontSize: 22, marginBottom: 4, color: "#ffd700" }}>
+        <h2 style={{ textAlign: "center", fontSize: 22, marginBottom: 4, color: "var(--color-gold-bright)" }}>
           本场总结 / Session Summary
         </h2>
-        <div style={{ textAlign: "center", fontSize: 13, color: "#8fbc8f", marginBottom: 16 }}>
+        <div style={{ textAlign: "center", fontSize: 13, color: "var(--color-text-secondary)", marginBottom: 16 }}>
           共 {roundsPlayed} 局
         </div>
 
         {/* Final Rankings */}
         <div style={{ marginBottom: 16 }}>
-          <div style={{ fontSize: 13, color: "#aaa", marginBottom: 6 }}>最终排名 / Final Rankings</div>
+          <div style={{ fontSize: 13, color: "var(--color-text-secondary)", marginBottom: 6 }}>最终排名 / Final Rankings</div>
           {rankings.map((p, rank) => (
             <div key={p.i} className="session-rank-row" style={{
               display: "flex", justifyContent: "space-between", alignItems: "center",
@@ -90,7 +90,7 @@ export function SessionSummary({ data, onClose }: SessionSummaryProps) {
               </span>
               <span style={{
                 fontWeight: "bold", fontSize: rank === 0 ? 18 : 14,
-                color: p.score > 0 ? "#ffd700" : p.score < 0 ? "#f44336" : "#aaa",
+                color: p.score > 0 ? "var(--color-gold-bright)" : p.score < 0 ? "var(--color-error)" : "var(--color-text-secondary)",
               }}>
                 {p.score > 0 ? "+" : ""}{p.score}
               </span>
@@ -104,7 +104,7 @@ export function SessionSummary({ data, onClose }: SessionSummaryProps) {
             marginBottom: 16, padding: 10,
             background: "rgba(255,255,255,0.04)", borderRadius: 6,
           }}>
-            <div style={{ fontSize: 13, color: "#aaa", marginBottom: 6 }}>数据亮点 / Highlights</div>
+            <div style={{ fontSize: 13, color: "var(--color-text-secondary)", marginBottom: 6 }}>数据亮点 / Highlights</div>
             {mostWins > 0 && (
               <div style={{ fontSize: 13, color: "#e8d5a3", marginBottom: 4 }}>
                 🏆 最多胜场: {playerNames[mostWinsIdx]} ({mostWins}胡)
@@ -121,7 +121,7 @@ export function SessionSummary({ data, onClose }: SessionSummaryProps) {
         {/* Per-round history */}
         {roundHistory.length > 0 && (
           <div style={{ marginBottom: 16 }}>
-            <div style={{ fontSize: 13, color: "#aaa", marginBottom: 6 }}>每局记录 / Round History</div>
+            <div style={{ fontSize: 13, color: "var(--color-text-secondary)", marginBottom: 6 }}>每局记录 / Round History</div>
             <div style={{ maxHeight: 160, overflowY: "auto" }}>
               {roundHistory.map((round, ri) => (
                 <div key={ri} style={{
@@ -129,14 +129,15 @@ export function SessionSummary({ data, onClose }: SessionSummaryProps) {
                   background: "rgba(255,255,255,0.03)", borderRadius: 4,
                   display: "flex", justifyContent: "space-between", alignItems: "center",
                 }}>
-                  <span style={{ color: "#8fbc8f" }}>
+                  <span style={{ color: "var(--color-text-secondary)" }}>
                     第{ri + 1}局: {winTypeNames[round.winType] || round.winType}
                   </span>
-                  <span style={{ color: "#ccc" }}>
+                  <span style={{ color: "var(--color-text-primary)" }}>
                     {round.scores.map((s, i) => (
                       <span key={i} style={{
                         marginLeft: 8,
-                        color: s > 0 ? "#4caf50" : s < 0 ? "#f44336" : "#666",
+                        color: s > 0 ? "var(--color-success)" : s < 0 ? "var(--color-error)" : "var(--color-text-secondary)",
+                        opacity: s === 0 ? 0.6 : 1,
                       }}>
                         {s > 0 ? "+" : ""}{s}
                       </span>
@@ -152,7 +153,7 @@ export function SessionSummary({ data, onClose }: SessionSummaryProps) {
           onClick={onClose}
           style={{
             width: "100%", padding: "12px 0", fontSize: 16,
-            background: "#0f3460", color: "#eee",
+            background: "var(--color-bg-button)", color: "var(--color-text-primary)",
             border: "1px solid rgba(255,215,0,0.3)",
             borderRadius: 6, cursor: "pointer",
           }}
