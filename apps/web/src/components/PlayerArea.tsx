@@ -242,7 +242,7 @@ export function PlayerArea({
       style={{
         background: isCurrentTurn ? "rgba(255,255,255,0.08)" : undefined,
         border: isCurrentTurn ? "2px solid var(--color-gold-bright)" : undefined,
-        overflow: "visible",
+        overflow: "hidden",
         opacity: isDisconnected ? 0.5 : 1,
         transition: "opacity 0.3s ease",
       }}
@@ -280,7 +280,7 @@ export function PlayerArea({
       <div style={{
         display: "flex", flexWrap: "nowrap", gap: firstPerson ? "var(--fp-hand-gap)" : 1, marginBottom: 4, alignItems: "flex-end",
         justifyContent: isMe ? "center" : undefined,
-        paddingTop: isMe ? "var(--hand-padding-top)" : 0, overflow: "visible", position: "relative",
+        paddingTop: isMe ? "var(--hand-padding-top)" : 0, overflow: "hidden", position: "relative",
         ...(firstPerson ? { "--tile-w": "var(--fp-tile-w)", "--tile-h": "var(--fp-tile-h)" } as React.CSSProperties : {}),
       }}>
         {isMe && hand ? (
