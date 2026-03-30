@@ -67,8 +67,8 @@ export function useLongPress(gold: GoldState | null) {
         position: "fixed",
         left: Math.min(tooltip.x - 40, window.innerWidth - 120),
         top: Math.max(tooltip.y - 100, 10),
-        background: "#1a1a2e",
-        border: isGold ? "2px solid #ffd700" : "1px solid #555",
+        background: "var(--color-bg-dark)",
+        border: isGold ? "2px solid var(--color-gold-bright)" : "1px solid var(--color-text-secondary)",
         borderRadius: 8,
         padding: 12,
         zIndex: 200,
@@ -77,7 +77,7 @@ export function useLongPress(gold: GoldState | null) {
         pointerEvents: "none",
       }}>
         <div style={{ fontSize: 28, marginBottom: 4 }}>{name}</div>
-        {isGold && <div style={{ fontSize: 12, color: "#ffd700" }}>金牌 (百搭)</div>}
+        {isGold && <div style={{ fontSize: 12, color: "var(--color-gold-bright)" }}>金牌 (百搭)</div>}
         {!isSuitedTile(tile.tile) && <div style={{ fontSize: 12, color: "#aab4a0" }}>花牌</div>}
       </div>
     );

@@ -29,7 +29,7 @@ export function ConnectionStatus({ connectionState, reconnectAttempt, timeoutMs,
       position: "fixed",
       inset: 0,
       zIndex: 10000,
-      background: "rgba(10, 46, 26, 0.95)",
+      background: "var(--overlay-bg)",
       display: "flex",
       flexDirection: "column",
       alignItems: "center",
@@ -38,11 +38,11 @@ export function ConnectionStatus({ connectionState, reconnectAttempt, timeoutMs,
     }}>
       <div className="spinner" style={{ width: 40, height: 40, borderWidth: 4 }} />
 
-      <div style={{ fontSize: 20, color: "#e8d5a3", fontWeight: "bold" }}>
+      <div style={{ fontSize: 20, color: "var(--color-text-warm)", fontWeight: "bold" }}>
         {connectionState === "reconnecting" ? "重新连接中... / Reconnecting..." : "连接已断开 / Disconnected"}
       </div>
 
-      <div style={{ fontSize: 16, color: "#8fbc8f" }}>
+      <div style={{ fontSize: 16, color: "var(--color-text-secondary)" }}>
         {remaining > 0
           ? `${remaining}s 内重连可恢复游戏 / ${remaining}s to reconnect`
           : "超时 / Timed out"
@@ -66,7 +66,7 @@ export function ConnectionStatus({ connectionState, reconnectAttempt, timeoutMs,
         <div style={{
           width: `${(1 - progress) * 100}%`,
           height: "100%",
-          background: remaining > 10 ? "#4caf50" : remaining > 5 ? "#ff9800" : "#f44336",
+          background: remaining > 10 ? "var(--color-success)" : remaining > 5 ? "var(--color-accent-orange)" : "var(--color-error)",
           borderRadius: 3,
           transition: "width 1s linear, background 0.5s ease",
         }} />

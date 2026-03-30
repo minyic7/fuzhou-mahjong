@@ -108,12 +108,12 @@ export function SessionSummary({ data, onClose }: SessionSummaryProps) {
           }}>
             <div style={{ fontSize: 13, color: "var(--color-text-secondary)", marginBottom: 6 }}>数据亮点 / Highlights</div>
             {mostWins > 0 && (
-              <div style={{ fontSize: 13, color: "#e8d5a3", marginBottom: 4 }}>
+              <div style={{ fontSize: 13, color: "var(--color-text-warm)", marginBottom: 4 }}>
                 🏆 最多胜场: {playerNames[mostWinsIdx]} ({mostWins}胡)
               </div>
             )}
             {highestRoundScore > 0 && (
-              <div style={{ fontSize: 13, color: "#e8d5a3" }}>
+              <div style={{ fontSize: 13, color: "var(--color-text-warm)" }}>
                 🎯 单局最高: {playerNames[highestRoundPlayer]} (+{highestRoundScore})
               </div>
             )}

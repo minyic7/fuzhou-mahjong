@@ -147,6 +147,17 @@ body {
 
   /* Wall progress bar width */
   --wall-progress-w: 80px;
+
+  /* Lobby heading fonts */
+  --lobby-title-font: 1.5rem;
+  --lobby-subtitle-font: 1rem;
+
+  /* Seat layout sizing */
+  --seat-gap: 10px;
+  --seat-card-padding: 12px 10px;
+  --seat-card-min-height: 70px;
+  --table-center-padding: 20px 12px;
+  --table-center-min-height: 100px;
 }
 
 /* BREAKPOINTS.TABLET_WIDTH */
@@ -179,6 +190,11 @@ body {
     --discard-cols: 7;
     --hand-new-tile-margin: 8px;
     --hand-padding-top: 14px;
+    --seat-gap: 6px;
+    --seat-card-padding: 8px 6px;
+    --seat-card-min-height: 56px;
+    --table-center-padding: 14px 8px;
+    --table-center-min-height: 80px;
   }
 }
 
@@ -231,6 +247,13 @@ body {
     --fp-opponent-tile-w: 18px;
     --fp-opponent-tile-h: 26px;
     --fp-hand-gap: 2px;
+    --lobby-title-font: 24px;
+    --lobby-subtitle-font: 13px;
+    --seat-gap: 6px;
+    --seat-card-padding: 6px 4px;
+    --seat-card-min-height: 48px;
+    --table-center-padding: 10px 8px;
+    --table-center-min-height: 70px;
   }
 }
 
@@ -272,8 +295,8 @@ body {
   .lobby-page, .room-page {
     padding: 12px 20px;
   }
-  .lobby-page h1 { font-size: 24px; margin-bottom: 0; }
-  .lobby-page h2 { font-size: 13px; }
+  .lobby-page h1 { font-size: var(--lobby-title-font); margin-bottom: 0; }
+  .lobby-page h2 { font-size: var(--lobby-subtitle-font); }
   .lobby-page input, .lobby-page button,
   .room-page input, .room-page button {
     min-height: 44px;
@@ -286,16 +309,16 @@ body {
 
   /* Tighter seat layout for landscape mobile */
   .seat-layout {
-    gap: 6px;
+    gap: var(--seat-gap);
     max-width: 360px;
   }
   .seat-card {
-    padding: 6px 4px;
-    min-height: 48px;
+    padding: var(--seat-card-padding);
+    min-height: var(--seat-card-min-height);
   }
   .table-center {
-    padding: 10px 8px;
-    min-height: 70px;
+    padding: var(--table-center-padding);
+    min-height: var(--table-center-min-height);
   }
 }
 
@@ -474,7 +497,7 @@ button.lobby-create-btn:hover:not(:disabled) {
     ". bottom .";
   grid-template-columns: 1fr 1.6fr 1fr;
   grid-template-rows: auto 1fr auto;
-  gap: 10px;
+  gap: var(--seat-gap);
   max-width: 400px;
   margin: 0 auto;
 }
@@ -487,8 +510,8 @@ button.lobby-create-btn:hover:not(:disabled) {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 20px 12px;
-  min-height: 100px;
+  padding: var(--table-center-padding);
+  min-height: var(--table-center-min-height);
   box-shadow: inset 0 0 15px rgba(0,0,0,0.2), 0 2px 8px rgba(0,0,0,0.3);
 }
 
@@ -502,10 +525,10 @@ button.lobby-create-btn:hover:not(:disabled) {
   background: rgba(13, 51, 32, 0.6);
   border: 1px solid var(--color-gold-border);
   border-radius: var(--radius-md);
-  padding: 12px 10px;
+  padding: var(--seat-card-padding);
   text-align: center;
   width: 100%;
-  min-height: 70px;
+  min-height: var(--seat-card-min-height);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -525,6 +548,7 @@ button.lobby-create-btn:hover:not(:disabled) {
 }
 
 /* ─── Responsive: Lobby & Room ─── */
+/* BREAKPOINTS.TABLET_WIDTH (min-width) */
 @media (min-width: 768px) {
   .room-card-list {
     display: grid;
@@ -538,6 +562,7 @@ button.lobby-create-btn:hover:not(:disabled) {
   }
 }
 
+/* Desktop large — no matching BREAKPOINTS constant */
 @media (min-width: 1440px) {
   .lobby-page, .room-page {
     padding: 60px 40px;
@@ -556,17 +581,17 @@ button.lobby-create-btn:hover:not(:disabled) {
 /* BREAKPOINTS.PHONE_WIDTH */
 @media (max-width: 480px) {
   .seat-layout {
-    gap: 6px;
+    gap: var(--seat-gap);
   }
 
   .seat-card {
-    padding: 8px 6px;
-    min-height: 56px;
+    padding: var(--seat-card-padding);
+    min-height: var(--seat-card-min-height);
   }
 
   .table-center {
-    padding: 14px 8px;
-    min-height: 80px;
+    padding: var(--table-center-padding);
+    min-height: var(--table-center-min-height);
   }
 }
 
@@ -602,7 +627,8 @@ button.lobby-create-btn:hover:not(:disabled) {
   font-size: 13px;
 }
 
-@media (max-width: 600px) {
+/* BREAKPOINTS.PHONE_WIDTH */
+@media (max-width: 480px) {
   body {
     font-size: 14px;
   }
