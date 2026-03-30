@@ -154,14 +154,14 @@ function SeatCard({ seat, score }: { seat: { index: number; player: { name: stri
           {score != null && (
             <div style={{
               fontSize: 12, fontWeight: "bold", marginTop: 2,
-              color: score > 0 ? "#ffd700" : score < 0 ? "#f44336" : "#8fbc8f",
+              color: score > 0 ? "var(--color-text-gold)" : score < 0 ? "var(--color-error)" : "var(--color-text-secondary)",
             }}>
               {score > 0 ? "+" : ""}{score}
             </div>
           )}
         </>
       ) : (
-        <div style={{ fontSize: 13, color: "rgba(143,188,143,0.5)" }}>空位 / Empty</div>
+        <div style={{ fontSize: 13, opacity: 0.5, color: "var(--color-text-secondary)" }}>空位 / Empty</div>
       )}
     </div>
   );
