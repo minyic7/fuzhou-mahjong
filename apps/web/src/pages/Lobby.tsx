@@ -11,6 +11,7 @@ export function Lobby({ onJoined }: LobbyProps) {
   const [roomCode, setRoomCode] = useState("");
   const [error, setError] = useState("");
   const [rooms, setRooms] = useState<RoomListItem[]>([]);
+  const [quickStarting, setQuickStarting] = useState(false);
 
   useEffect(() => {
     socket.emit("listRooms");
@@ -29,6 +30,13 @@ export function Lobby({ onJoined }: LobbyProps) {
       socket.off("roomList", onRoomList);
     };
   }, [onJoined]);
+
+  const handleQuickStart = () => {
+    if (!name.trim()) return;
+    setError("");
+    setQuickStarting(true);
+    socket.emit("quickStart", name.trim());
+  };
 
   const handleCreate = () => {
     if (!name.trim()) return;
@@ -63,6 +71,18 @@ export function Lobby({ onJoined }: LobbyProps) {
       </div>
 
       <button
+        onClick={handleQuickStart}
+        disabled={!name.trim() || quickStarting}
+        className="lobby-create-btn"
+        style={{ width: "100%", padding: "16px 12px", fontSize: 20, fontWeight: 700, border: "2px solid rgba(212, 160, 23, 0.8)", background: "linear-gradient(135deg, #1a5c3a 0%, #2a6f4a 100%)", boxShadow: "0 0 12px rgba(212, 160, 23, 0.3)" }}
+      >
+        {quickStarting ? "启动中... / Starting..." : "⚡ 快速开始 / Quick Start"}
+      </button>
+      <p style={{ color: "#8fbc8f", fontSize: 13, textAlign: "center", marginTop: -12 }}>
+        一键开局，自动匹配 3 个机器人
+      </p>
+
+      <button
         onClick={handleCreate}
         disabled={!name.trim()}
         className="lobby-create-btn"
@@ -71,7 +91,7 @@ export function Lobby({ onJoined }: LobbyProps) {
         创建房间 / Create Room
       </button>
       <p style={{ color: "#8fbc8f", fontSize: 13, textAlign: "center", marginTop: -12 }}>
-        一个人也能玩！创建房间后可添加机器人凑满 4 人
+        创建房间后可邀请朋友或添加机器人
       </p>
 
       <hr />
