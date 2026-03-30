@@ -110,9 +110,9 @@ export function PlayerArea({
           gap: "var(--compact-gap, 6px)",
           padding: "var(--compact-padding, 2px 8px)",
           background: isCurrentTurn ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.3)",
-          border: isCurrentTurn ? "2px solid #ffd700" : undefined,
+          border: isCurrentTurn ? "2px solid var(--color-gold-bright)" : undefined,
           borderRadius: 4,
-          borderLeft: isCurrentTurn ? "3px solid #ffd700" : "3px solid transparent",
+          borderLeft: isCurrentTurn ? "3px solid var(--color-gold-bright)" : "3px solid transparent",
           opacity: isDisconnected ? 0.5 : 1,
           overflow: "hidden",
           minHeight: 0,
@@ -122,10 +122,10 @@ export function PlayerArea({
         <span style={{ fontSize: "var(--compact-label-font, 12px)", fontWeight: "bold", color: "#e8d5a3", whiteSpace: "nowrap", flexShrink: 0 }}>
           {label}
         </span>
-        {isDealer && <span style={{ fontSize: 9, background: "#b71c1c", color: "#ffd700", padding: "0 4px", borderRadius: 3, fontWeight: "bold", flexShrink: 0 }}>庄</span>}
+        {isDealer && <span style={{ fontSize: 9, background: "#b71c1c", color: "var(--color-gold-bright)", padding: "0 4px", borderRadius: 3, fontWeight: "bold", flexShrink: 0 }}>庄</span>}
         {isDisconnected && <span style={{ fontSize: 9, background: "#ff5722", color: "#fff", padding: "0 4px", borderRadius: 3, fontWeight: "bold", flexShrink: 0 }}>断线</span>}
-        {hasDiscardedGold && <span style={{ fontSize: 9, background: "#c41e3a", color: "#fff", padding: "0 4px", borderRadius: 3, fontWeight: "bold", flexShrink: 0 }}>弃金</span>}
-        {isCurrentTurn && <span className="your-turn-prompt" style={{ fontSize: 9, background: "rgba(255,215,0,0.2)", color: "#ffd700", padding: "0 4px", borderRadius: 3, border: "1px solid #ffd700", flexShrink: 0 }}>出牌</span>}
+        {hasDiscardedGold && <span style={{ fontSize: 9, background: "var(--color-action-hu)", color: "#fff", padding: "0 4px", borderRadius: 3, fontWeight: "bold", flexShrink: 0 }}>弃金</span>}
+        {isCurrentTurn && <span className="your-turn-prompt" style={{ fontSize: 9, background: "rgba(255,215,0,0.2)", color: "var(--color-gold-bright)", padding: "0 4px", borderRadius: 3, border: "1px solid var(--color-gold-bright)", flexShrink: 0 }}>出牌</span>}
 
         {/* Hand count */}
         <span style={{ fontSize: "var(--compact-info-font, 11px)", color: "#8fbc8f", flexShrink: 0 }}>{handCount ?? 0}张</span>
@@ -166,7 +166,7 @@ export function PlayerArea({
         {cumulativeScore != null && (
           <span className="cumulative-score-badge" style={{
             fontSize: "var(--compact-info-font, 11px)", fontWeight: "bold",
-            color: cumulativeScore > 0 ? "#ffd700" : cumulativeScore < 0 ? "#f44336" : "#8fbc8f",
+            color: cumulativeScore > 0 ? "var(--color-gold-bright)" : cumulativeScore < 0 ? "#f44336" : "var(--color-text-secondary)",
             padding: "1px 6px", borderRadius: 3, background: "rgba(0,0,0,0.3)",
           }}>
             {cumulativeScore > 0 ? "+" : ""}{cumulativeScore}
@@ -183,7 +183,7 @@ export function PlayerArea({
       className={`player-area-card${isCurrentTurn ? " current-turn" : ""}`}
       style={{
         background: isCurrentTurn ? "rgba(255,255,255,0.08)" : undefined,
-        border: isCurrentTurn ? "2px solid #ffd700" : undefined,
+        border: isCurrentTurn ? "2px solid var(--color-gold-bright)" : undefined,
         overflow: "visible",
         opacity: isDisconnected ? 0.5 : 1,
         transition: "opacity 0.3s ease",
@@ -195,22 +195,22 @@ export function PlayerArea({
         padding: "4px 10px",
         background: "rgba(0,0,0,0.3)",
         borderRadius: 4,
-        borderLeft: isCurrentTurn ? "3px solid #ffd700" : "3px solid transparent",
+        borderLeft: isCurrentTurn ? "3px solid var(--color-gold-bright)" : "3px solid transparent",
       }}>
         <span style={{ fontSize: "var(--label-font)", fontWeight: "bold", color: "#e8d5a3" }}>
           {label}
         </span>
-        {isDealer && <span style={{ fontSize: 10, background: "#b71c1c", color: "#ffd700", padding: "1px 5px", borderRadius: 3, fontWeight: "bold" }}>庄</span>}
+        {isDealer && <span style={{ fontSize: 10, background: "#b71c1c", color: "var(--color-gold-bright)", padding: "1px 5px", borderRadius: 3, fontWeight: "bold" }}>庄</span>}
         {isDisconnected && <span style={{ fontSize: 10, background: "#ff5722", color: "#fff", padding: "1px 5px", borderRadius: 3, fontWeight: "bold", animation: "disconnectPulse 2s ease-in-out infinite" }}>断线</span>}
-        {hasDiscardedGold && <span style={{ fontSize: 10, background: "#c41e3a", color: "#fff", padding: "1px 5px", borderRadius: 3, fontWeight: "bold" }}>弃金</span>}
-        {isCurrentTurn && <span className="your-turn-prompt" style={{ fontSize: 10, background: "rgba(255,215,0,0.2)", color: "#ffd700", padding: "1px 5px", borderRadius: 3, border: "1px solid #ffd700" }}>出牌</span>}
+        {hasDiscardedGold && <span style={{ fontSize: 10, background: "var(--color-action-hu)", color: "#fff", padding: "1px 5px", borderRadius: 3, fontWeight: "bold" }}>弃金</span>}
+        {isCurrentTurn && <span className="your-turn-prompt" style={{ fontSize: 10, background: "rgba(255,215,0,0.2)", color: "var(--color-gold-bright)", padding: "1px 5px", borderRadius: 3, border: "1px solid var(--color-gold-bright)" }}>出牌</span>}
         <span style={{ fontSize: 11, color: "#8fbc8f", marginLeft: "auto" }}>
           🌸{flowers.length}
         </span>
         {cumulativeScore != null && (
           <span className="cumulative-score-badge" style={{
             fontSize: 11, fontWeight: "bold",
-            color: cumulativeScore > 0 ? "#ffd700" : cumulativeScore < 0 ? "#f44336" : "#8fbc8f",
+            color: cumulativeScore > 0 ? "var(--color-gold-bright)" : cumulativeScore < 0 ? "#f44336" : "var(--color-text-secondary)",
             padding: "1px 6px", borderRadius: 3, background: "rgba(0,0,0,0.3)",
           }}>
             {cumulativeScore > 0 ? "+" : ""}{cumulativeScore}
