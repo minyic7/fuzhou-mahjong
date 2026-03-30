@@ -31,7 +31,7 @@ export function GameInfo({ gold, dealerIndex, lianZhuangCount, myIndex, lastDisc
     }}>
       <div style={{ marginBottom: 8 }}>
         <span style={{ color: "#aaa", fontSize: 12 }}>金牌: </span>
-        {gold && <TileView tile={gold.indicatorTile} faceUp gold={null} small />}
+        {gold && <TileView tile={gold.indicatorTile} faceUp gold={null} small className="gold-indicator-glow" />}
       </div>
 
       {lastDiscard && (

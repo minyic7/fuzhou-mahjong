@@ -85,12 +85,10 @@ export function PlayerArea({
     <>
     <Tooltip />
     <div
-      className={isCurrentTurn ? "current-turn" : ""}
+      className={`player-area-card${isCurrentTurn ? " current-turn" : ""}`}
       style={{
-        padding: 8,
-        background: isCurrentTurn ? "rgba(255,255,255,0.08)" : "transparent",
-        borderRadius: 8,
-        border: isCurrentTurn ? "2px solid #ffd700" : "1px solid transparent",
+        background: isCurrentTurn ? "rgba(255,255,255,0.08)" : undefined,
+        border: isCurrentTurn ? "2px solid #ffd700" : undefined,
         overflow: "visible",
         opacity: isDisconnected ? 0.5 : 1,
         transition: "opacity 0.3s ease",
