@@ -280,7 +280,7 @@ export function PlayerArea({
       <div style={{
         display: "flex", flexWrap: "nowrap", gap: firstPerson ? "var(--fp-hand-gap)" : 1, marginBottom: 4, alignItems: "flex-end",
         justifyContent: isMe ? "center" : undefined,
-        paddingTop: isMe ? "var(--hand-padding-top)" : 0, overflow: "visible", position: "relative",
+        paddingTop: isMe ? "var(--hand-padding-top)" : 0, position: "relative", maxWidth: "100%",
         ...(firstPerson ? { "--tile-w": "var(--fp-tile-w)", "--tile-h": "var(--fp-tile-h)" } as React.CSSProperties : {}),
       }}>
         {isMe && hand ? (
@@ -302,6 +302,8 @@ export function PlayerArea({
               onTouchEnd={(e) => { swipe.onTouchEnd(); }}
               style={{
                 display: "inline-flex",
+                flexShrink: 1,
+                minWidth: 0,
                 marginLeft: lastDrawnTileId === t.id ? "var(--hand-new-tile-margin)" : 0,
                 position: "relative",
                 transform: tileSwipeOffset < 0 ? `translateY(${tileSwipeOffset}px)` : undefined,
