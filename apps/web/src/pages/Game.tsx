@@ -359,20 +359,23 @@ export function Game({ initialGameState, onLeave }: GameProps) {
     setPendingClaim(false);
   };
 
-  if (gameOver) {
-    const handleNextRound = () => {
-      socket.emit("nextRound");
-      setGameOver(null);
-      setActions(null);
-      setSelectedTileId(null);
-    };
+  // Game-over helper functions (used in modal overlay below)
+  const handleNextRound = () => {
+    socket.emit("nextRound");
+    setGameOver(null);
+    setActions(null);
+    setSelectedTileId(null);
+  };
 
-    const winTypeNames: Record<string, string> = {
-      normal: "普通胡", tianHu: "天胡 30x", grabGold: "抢金 30x",
-      pingHu0: "平胡(无花) 30x", pingHu1: "平胡(一花) 15x",
-      threeGoldDown: "三金倒 40x", goldSparrow: "金雀 60x", goldDragon: "金龙 120x",
-      duiDuiHu: "对对胡", qingYiSe: "清一色", draw: "流局",
-    };
+  const winTypeNames: Record<string, string> = {
+    normal: "普通胡", tianHu: "天胡 30x", grabGold: "抢金 30x",
+    pingHu0: "平胡(无花) 30x", pingHu1: "平胡(一花) 15x",
+    threeGoldDown: "三金倒 40x", goldSparrow: "金雀 60x", goldDragon: "金龙 120x",
+    duiDuiHu: "对对胡", qingYiSe: "清一色", draw: "流局",
+  };
+
+  if (gameOver && false) {
+    // DISABLED: game-over is now rendered as modal overlay instead of replacing the game view
 
     const getPlayerName = (idx: number) => {
       if (!gameState) return `玩家${idx}`;
@@ -719,6 +722,102 @@ export function Game({ initialGameState, onLeave }: GameProps) {
         onClose={() => setShowTutorial(false)}
         condensed={tutorialCondensed}
       />
+      {/* Game-over modal overlay — shows on top of the game table */}
+      {gameOver && (
+        <div style={{
+          position: "fixed", inset: 0, zIndex: 100,
+          background: "rgba(0,0,0,0.7)",
+          display: "flex", alignItems: "center", justifyContent: "center",
+          animation: "overlayFadeIn 0.3s ease-out",
+        }}>
+          <div style={{
+            background: "var(--overlay-bg)",
+            border: "2px solid var(--color-gold-border-hover)",
+            borderRadius: "var(--radius-lg)",
+            padding: "clamp(16px, 3vh, 32px)",
+            maxWidth: 480, width: "90vw",
+            maxHeight: "90dvh", overflowY: "auto",
+            textAlign: "center",
+            animation: "overlayScaleIn 0.3s ease-out",
+          }}>
+            <h2 style={{ fontSize: 24, marginBottom: 8 }}>
+              {gameOver.winnerId !== null
+                ? `🎉 ${(() => { if (!gameState) return ''; if (gameOver.winnerId === gameState.myIndex) return gameState.myName || '我'; const o = gameState.otherPlayers.find((_, i) => (gameState.myIndex + i + 1) % 4 === gameOver.winnerId); return o?.name || ''; })()} 胡了!`
+                : "流局 / Draw"}
+            </h2>
+            <p style={{ fontSize: 16, color: "var(--color-text-gold)", marginBottom: 12 }}>
+              {winTypeNames[gameOver.winType] || gameOver.winType}
+            </p>
+
+            {/* Score breakdown */}
+            {gameOver.breakdown && gameOver.winnerId !== null && (
+              <div className="score-breakdown">
+                <div style={{ fontSize: 12, color: "var(--color-text-secondary)", marginBottom: 4 }}>得分明细</div>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: "4px 12px", justifyContent: "center", fontSize: 13, color: "var(--color-text-primary)" }}>
+                  <span>花分: {gameOver.breakdown.flowerScore}</span>
+                  <span>金: {gameOver.breakdown.goldScore}</span>
+                  <span>连庄: {gameOver.breakdown.lianZhuangCount}</span>
+                  <span>特殊: {gameOver.breakdown.specialMultiplier}x</span>
+                </div>
+                <div style={{ fontSize: 14, color: "var(--color-text-gold)", marginTop: 4 }}>
+                  总分: {gameOver.breakdown.totalScore}
+                </div>
+              </div>
+            )}
+
+            {/* Round scores */}
+            <div style={{ marginBottom: 12 }}>
+              {gameOver.scores
+                .map((score, i) => ({ name: (gameOver.playerNames ?? [])[i] || `玩家${i}`, score, i }))
+                .sort((a, b) => b.score - a.score)
+                .map((p, rank) => (
+                  <div key={p.i} className={`score-row${p.score > 0 ? " positive" : p.score < 0 ? " negative" : ""}${rank === 0 && p.score > 0 ? " top-positive" : ""}`}
+                    style={{ animation: `scoreReveal 0.3s ease-out ${rank * 0.1}s both` }}>
+                    <span>{rank === 0 && p.score > 0 ? "🏆 " : `${rank + 1}. `}{p.name}</span>
+                    <span style={{ fontWeight: "bold", color: p.score > 0 ? "var(--color-success)" : p.score < 0 ? "var(--color-error)" : "var(--color-text-secondary)" }}>
+                      {p.score > 0 ? "+" : ""}{p.score}
+                    </span>
+                  </div>
+                ))}
+            </div>
+
+            {/* Actions */}
+            <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
+              <Button variant="gold" size="lg" onClick={handleNextRound} style={{ minHeight: 48 }}>
+                下一局 / Next Round
+              </Button>
+              {onLeave && (
+                <Button variant="secondary" onClick={() => {
+                  const cum = gameOver.cumulative;
+                  if (cum && cum.roundsPlayed > 0) {
+                    setSessionSummary({
+                      playerNames: gameOver.playerNames ?? [],
+                      cumulativeScores: cum.scores,
+                      roundsPlayed: cum.roundsPlayed,
+                      roundHistory,
+                    });
+                  } else {
+                    socket.emit("leaveRoom");
+                    onLeave();
+                  }
+                }} style={{ minHeight: 48 }}>
+                  离开 / Leave
+                </Button>
+              )}
+            </div>
+          </div>
+          {sessionSummary && (
+            <SessionSummary
+              data={sessionSummary}
+              onClose={() => {
+                setSessionSummary(null);
+                socket.emit("leaveRoom");
+                onLeave?.();
+              }}
+            />
+          )}
+        </div>
+      )}
     </div>
   );
 }
