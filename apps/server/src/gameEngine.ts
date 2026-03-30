@@ -1189,9 +1189,14 @@ export function emitOrBotAction(
     // Guard against infinite recursion from stale re-triggers
     if (depth > 3) {
       const tag = `[Bot:${game.roomId}:p${playerIndex}:t${game.state.currentTurn}]`;
-      console.error(`${tag} Recursion depth limit exceeded (depth=${depth}) — forcing emergency discard`);
-      const player = game.state.players[playerIndex];
-      handlePlayerAction(io, game.roomId, emergencyDiscard(player.hand, playerIndex, game.state.gold), playerIndex);
+      console.error(`${tag} Recursion depth limit exceeded (depth=${depth})`);
+      const window = activeWindows.get(game.roomId);
+      if (window) {
+        handlePlayerAction(io, game.roomId, { type: ActionType.Pass, playerIndex }, playerIndex);
+      } else {
+        const player = game.state.players[playerIndex];
+        handlePlayerAction(io, game.roomId, emergencyDiscard(player.hand, playerIndex, game.state.gold), playerIndex);
+      }
       return;
     }
     const version = nextBotVersion(game.roomId, playerIndex);
@@ -1328,6 +1333,7 @@ export function emitOrBotAction(
           throw new Error(`Bot action ${botAction.type} was rejected by handlePlayerAction`);
         }
       } catch (err) {
+        clearTimeout(safetyTimer);
         console.error(`${tag} Bot callback unhandled error:`, err);
         // Fallback: try pass first, then discard if pass not allowed
         console.warn(`${tag} Entering fallback chain (canPass=${actions.canPass}) ts=${Date.now()}`);
