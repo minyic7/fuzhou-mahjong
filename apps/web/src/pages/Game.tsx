@@ -562,6 +562,33 @@ export function Game({ initialGameState, onLeave }: GameProps) {
               {winTypeNames[go.winType] || go.winType}
             </p>
 
+            {/* Winning hand tiles */}
+            {go.winnerId !== null && go.allHands?.[go.winnerId] && (() => {
+              const winnerHand = go.allHands[go.winnerId!];
+              const tileStyle = { width: "var(--fp-opponent-tile-w)", height: "var(--fp-opponent-tile-h)" };
+              return (
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 2, justifyContent: "center", marginBottom: "clamp(6px, 2dvh, 12px)" }}>
+                  {winnerHand.melds.map((m, mi) => (
+                    <div key={`m${mi}`} style={{ display: "flex", gap: 1 }}>
+                      {m.tiles.map((t, ti) => (
+                        <TileView key={t.id} tile={t} faceUp={m.type !== MeldType.AnGang} small gold={gameState?.gold} style={tileStyle} />
+                      ))}
+                    </div>
+                  ))}
+                  {winnerHand.hand.map(t => (
+                    <TileView key={t.id} tile={t} faceUp small gold={gameState?.gold} style={tileStyle} />
+                  ))}
+                  {winnerHand.flowers.length > 0 && (
+                    <div style={{ display: "flex", gap: 1, marginLeft: 4 }}>
+                      {winnerHand.flowers.map(t => (
+                        <TileView key={t.id} tile={t} faceUp small style={tileStyle} />
+                      ))}
+                    </div>
+                  )}
+                </div>
+              );
+            })()}
+
             {/* Score breakdown */}
             {go.breakdown && go.winnerId !== null && (
               <div className="score-breakdown">
