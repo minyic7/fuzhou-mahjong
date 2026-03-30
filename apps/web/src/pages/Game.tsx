@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { socket } from "../socket";
-import { GameTable } from "../components/GameTable";
+import { GameTable, type DrawAnimationState, type DrawAnimationSeat } from "../components/GameTable";
 import { ClaimOverlay } from "../components/ClaimOverlay";
 import { CenterAction, useCenterAction } from "../components/CenterAction";
 import { sounds, setMuted, isMuted } from "../sounds";
@@ -71,6 +71,8 @@ export function Game({ initialGameState, onLeave }: GameProps) {
   };
   const [showTutorial, setShowTutorial] = useState(false);
   const [tutorialCondensed, setTutorialCondensed] = useState(false);
+  const [drawAnimation, setDrawAnimation] = useState<DrawAnimationState | null>(null);
+  const drawAnimKeyRef = useRef(0);
 
   // First-game auto-show tutorial
   useEffect(() => {
@@ -109,6 +111,23 @@ export function Game({ initialGameState, onLeave }: GameProps) {
       // Detect draw: my hand grew without a new meld
       if (prev && state.myHand.length > prev.myHand.length && state.myMelds.length === prev.myMelds.length) {
         sounds.draw();
+      }
+
+      // Detect wall draw/supplement for fly animation
+      if (prev) {
+        const drawDelta = state.wallDrawCount - prev.wallDrawCount;
+        const suppDelta = state.wallSupplementCount - prev.wallSupplementCount;
+        if (drawDelta > 0 || suppDelta > 0) {
+          const isSupplement = suppDelta > 0;
+          // Determine which seat drew: currentTurn is the player who just drew
+          const relIdx = (state.currentTurn - state.myIndex + 4) % 4;
+          const seatMap: DrawAnimationSeat[] = ["bottom", "right", "top", "left"];
+          const seat = seatMap[relIdx];
+          const key = ++drawAnimKeyRef.current;
+          setDrawAnimation({ seat, isSupplement, key });
+          const duration = seat === "bottom" ? 300 : 200;
+          setTimeout(() => setDrawAnimation((cur) => cur?.key === key ? null : cur), duration);
+        }
       }
 
       // Detect new meld: total melds increased
@@ -497,6 +516,7 @@ export function Game({ initialGameState, onLeave }: GameProps) {
         }}
         onBackgroundClick={() => setSelectedTileId(null)}
         disconnectedPlayers={disconnectedPlayers}
+        drawAnimation={drawAnimation}
       />
       {isClaimWindow && actions && (
         <ClaimOverlay actions={actions} gameState={gameState} onAction={handleAction} />
