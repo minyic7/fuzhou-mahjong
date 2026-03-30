@@ -3,6 +3,7 @@ import { PlayerArea } from "./PlayerArea";
 import { GameInfo } from "./GameInfo";
 import { TileWall } from "./TileWall";
 import { TILE_BACK_URL } from "../tileSvg";
+import { useIsCompactLandscape } from "../hooks/useIsMobile";
 
 export type DrawAnimationSeat = "bottom" | "top" | "left" | "right";
 
@@ -33,6 +34,7 @@ interface GameTableProps {
 }
 
 export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTileId, claimableTileIds, canDiscard, onDiscard, canHu, onHu, canDraw, onDraw, kongTileIds, onAnGang, onBuGang, onBackgroundClick, disconnectedPlayers, drawAnimation }: GameTableProps) {
+  const isCompact = useIsCompactLandscape();
   const { myHand, myFlowers, myMelds, myDiscards, myName, otherPlayers, currentTurn, myIndex, gold, dealerIndex, lianZhuangCount, wallRemaining, myHasDiscardedGold } = state;
   const lastDiscardTileId = state.lastDiscard?.tile.id ?? null;
   const lastDiscardPlayerIndex = state.lastDiscard?.playerIndex ?? -1;
@@ -76,6 +78,7 @@ export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTile
           lastDiscardedTileId={lastDiscardPlayerIndex === (myIndex + 2) % 4 ? lastDiscardTileId : null}
           hasDiscardedGold={otherPlayers[1]?.hasDiscardedGold}
           isDisconnected={disconnectedPlayers?.has((myIndex + 2) % 4)}
+          compact={isCompact}
         />
       </div>
 
@@ -94,6 +97,7 @@ export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTile
           lastDiscardedTileId={lastDiscardPlayerIndex === (myIndex + 3) % 4 ? lastDiscardTileId : null}
           hasDiscardedGold={otherPlayers[2]?.hasDiscardedGold}
           isDisconnected={disconnectedPlayers?.has((myIndex + 3) % 4)}
+          compact={isCompact}
         />
       </div>
 
@@ -126,6 +130,7 @@ export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTile
           lastDiscardedTileId={lastDiscardPlayerIndex === (myIndex + 1) % 4 ? lastDiscardTileId : null}
           hasDiscardedGold={otherPlayers[0]?.hasDiscardedGold}
           isDisconnected={disconnectedPlayers?.has((myIndex + 1) % 4)}
+          compact={isCompact}
         />
       </div>
 
