@@ -313,7 +313,7 @@
 /* Hand-to-pool discard fly animation */
 @keyframes discardFlyToPool {
   0% { transform: translate(0, 0) scale(1); opacity: 1; }
-  100% { transform: translate(0, -80px) scale(0.7); opacity: 0; }
+  100% { transform: translate(0, max(-80px, -10vh)) scale(0.7); opacity: 0; }
 }
 
 /* Wall-to-hand draw fly animations */
