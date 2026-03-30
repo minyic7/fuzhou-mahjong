@@ -235,6 +235,18 @@
   100% { opacity: 1; transform: scale(1); }
 }
 
+/* Gold indicator flip reveal (plays once when gold tile first appears) */
+@keyframes goldFlipReveal {
+  0% { transform: rotateY(180deg); }
+  100% { transform: rotateY(0deg); }
+}
+
+.gold-flip-reveal {
+  animation: goldFlipReveal 0.6s ease-out;
+  transform-style: preserve-3d;
+  backface-visibility: hidden;
+}
+
 /* Gold indicator shimmer */
 @keyframes goldShimmer {
   0%, 100% { box-shadow: 0 0 8px rgba(255,215,0,0.4); }
