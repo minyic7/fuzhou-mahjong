@@ -5,7 +5,8 @@ import { ClaimOverlay } from "../components/ClaimOverlay";
 import { CenterAction, useCenterAction } from "../components/CenterAction";
 import { sounds, setMuted, isMuted } from "../sounds";
 import { TileCounter } from "../components/TileCounter";
-import { ActionType } from "@fuzhou-mahjong/shared";
+import { TileView } from "../components/Tile";
+import { ActionType, MeldType } from "@fuzhou-mahjong/shared";
 import type { ClientGameState, GameOverResult, AvailableActions, GameAction } from "@fuzhou-mahjong/shared";
 
 const MUTE_KEY = "fuzhou-mahjong-muted";
@@ -323,6 +324,58 @@ export function Game({ initialGameState, onLeave }: GameProps) {
               ))}
           </div>
         )}
+        {/* All player hands */}
+        {gameOver.allHands && gameOver.allHands.length > 0 && (
+          <div style={{ marginBottom: 20, textAlign: "left" }}>
+            <div style={{ fontSize: 12, color: "#aaa", marginBottom: 8, textAlign: "center" }}>
+              所有玩家手牌 / All Hands
+            </div>
+            {gameOver.allHands.map((playerHand, idx) => {
+              const isWinner = idx === gameOver.winnerId;
+              const name = (gameOver.playerNames ?? [])[idx] || getPlayerName(idx);
+              return (
+                <div key={idx} style={{
+                  marginBottom: 8, padding: "8px 12px", borderRadius: 6,
+                  background: isWinner ? "rgba(255,215,0,0.1)" : "rgba(255,255,255,0.03)",
+                  border: isWinner ? "1px solid rgba(255,215,0,0.4)" : "1px solid rgba(255,255,255,0.08)",
+                }}>
+                  <div style={{ fontSize: 13, fontWeight: isWinner ? "bold" : "normal", color: isWinner ? "#ffd700" : "#ccc", marginBottom: 4 }}>
+                    {isWinner ? "🏆 " : ""}{name}
+                  </div>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: 4, alignItems: "flex-end" }}>
+                    {/* Hand tiles */}
+                    {playerHand.hand.map((t) => (
+                      <TileView key={t.id} tile={t} faceUp gold={gameState?.gold} small />
+                    ))}
+                    {/* Melds */}
+                    {playerHand.melds.length > 0 && (
+                      <>
+                        <div style={{ width: 4 }} />
+                        {playerHand.melds.map((m, mi) => (
+                          <div key={`meld-${mi}`} style={{ display: "flex", gap: 0 }}>
+                            {m.tiles.map((t, ti) => (
+                              <TileView key={ti} tile={t} faceUp={m.type !== MeldType.AnGang} gold={gameState?.gold} small />
+                            ))}
+                          </div>
+                        ))}
+                      </>
+                    )}
+                    {/* Flowers */}
+                    {playerHand.flowers.length > 0 && (
+                      <>
+                        <div style={{ width: 4 }} />
+                        {playerHand.flowers.map((t) => (
+                          <TileView key={t.id} tile={t} faceUp gold={gameState?.gold} small />
+                        ))}
+                      </>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        )}
+
         <button
           onClick={handleNextRound}
           style={{ padding: "12px 32px", fontSize: 18, background: "#0f3460", color: "#eee", border: "none", borderRadius: 6, cursor: "pointer" }}
