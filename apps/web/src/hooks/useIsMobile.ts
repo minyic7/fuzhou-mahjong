@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 
 export const BREAKPOINTS = {
-  COMPACT_HEIGHT: 500,
+  COMPACT_HEIGHT: 550,
   SMALL_PHONE_HEIGHT: 390,
   TABLET_WIDTH: 768,
   PHONE_WIDTH: 480,
@@ -22,11 +22,11 @@ export function useIsCompactLandscape(): boolean {
 
 export function useIsFirstPersonMobile(): boolean {
   const [isFP, setIsFP] = useState(
-    () => window.innerHeight <= BREAKPOINTS.COMPACT_HEIGHT && window.innerWidth <= 900
+    () => window.innerHeight <= BREAKPOINTS.COMPACT_HEIGHT && window.innerWidth <= 1024
   );
   useEffect(() => {
     const onResize = () =>
-      setIsFP(window.innerHeight <= BREAKPOINTS.COMPACT_HEIGHT && window.innerWidth <= 900);
+      setIsFP(window.innerHeight <= BREAKPOINTS.COMPACT_HEIGHT && window.innerWidth <= 1024);
     window.addEventListener("resize", onResize);
     return () => window.removeEventListener("resize", onResize);
   }, []);

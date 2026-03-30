@@ -223,7 +223,7 @@ body {
 }
 
 /* BREAKPOINTS.COMPACT_HEIGHT */
-@media (orientation: landscape) and (max-height: 500px) {
+@media (orientation: landscape) and (max-height: 550px) {
   :root {
     --tile-w: 36px;
     --tile-h: 54px;
@@ -257,6 +257,22 @@ body {
     --seat-card-min-height: 48px;
     --table-center-padding: 10px 8px;
     --table-center-min-height: 70px;
+  }
+}
+
+/* Intermediate compact tier: 501–550px height */
+@media (orientation: landscape) and (max-height: 550px) and (min-height: 501px) {
+  :root {
+    --tile-w: 30px;
+    --tile-h: 44px;
+    --tile-font: 10px;
+    --tile-suit-font: 7px;
+    --wall-tw: 8px;
+    --wall-th: 11px;
+    --fp-tile-w: 32px;
+    --fp-tile-h: 48px;
+    --fp-opponent-tile-w: 18px;
+    --fp-opponent-tile-h: 26px;
   }
 }
 
@@ -296,7 +312,7 @@ body {
 }
 
 /* Landscape compact layout for lobby/room — BREAKPOINTS.COMPACT_HEIGHT */
-@media (orientation: landscape) and (max-height: 500px) {
+@media (orientation: landscape) and (max-height: 550px) {
   .lobby-page, .room-page {
     padding: 12px 20px;
   }
