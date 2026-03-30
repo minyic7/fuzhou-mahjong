@@ -186,6 +186,16 @@ body {
   }
 }
 
+@media (orientation: landscape) and (max-height: 390px) {
+  :root {
+    --game-gap: 1px;
+    --game-padding: 1px;
+  }
+  .game-table {
+    grid-template-columns: 50px 1fr 50px;
+  }
+}
+
 /* Landscape compact layout for lobby/room */
 @media (orientation: landscape) and (max-height: 500px) {
   .lobby-page, .room-page {
@@ -534,6 +544,13 @@ button.lobby-create-btn:hover:not(:disabled) {
 }
 .chi-picker-scroll::-webkit-scrollbar {
   display: none; /* Chrome/Safari */
+}
+
+/* Compact opponent — constrain width and truncate overflow */
+.compact-opponent {
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* Compact opponent discards — hide scrollbar */
