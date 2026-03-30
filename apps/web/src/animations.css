@@ -198,6 +198,16 @@
   animation: tileHighlight 0.8s ease-in-out infinite;
 }
 
+/* Gold discard warning pulse */
+@keyframes goldWarningPulse {
+  0%, 100% { box-shadow: 0 2px 8px rgba(196,30,58,0.5); transform: scale(1); }
+  50% { box-shadow: 0 2px 16px rgba(196,30,58,0.9), 0 0 24px rgba(255,0,0,0.4); transform: scale(1.05); }
+}
+
+.gold-warning-pulse {
+  animation: goldWarningPulse 0.8s ease-in-out infinite;
+}
+
 /* Discard bubble fade-in */
 @keyframes bubbleFadeIn {
   0% { opacity: 0; transform: translateX(-50%) translateY(4px); }

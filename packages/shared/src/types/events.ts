@@ -20,6 +20,7 @@ export interface OtherPlayerView {
   melds: Meld[];
   handCount: number;
   discards: TileInstance[];
+  hasDiscardedGold: boolean;
 }
 
 export interface ClientGameState {
@@ -39,6 +40,7 @@ export interface ClientGameState {
   lastDiscard: { tile: TileInstance; playerIndex: number } | null;
   tenpaiTiles: import('../types/tile.js').SuitedTile[];
   lastDrawnTileId: number | null;
+  myHasDiscardedGold: boolean;
 }
 
 // ─── Actions ─────────────────────────────────────────────────────

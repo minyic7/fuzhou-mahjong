@@ -117,6 +117,7 @@ export class ServerGameState {
         melds: p.melds,
         handCount: p.hand.length,
         discards: p.discards,
+        hasDiscardedGold: p.hasDiscardedGold,
       });
     }
 
@@ -137,6 +138,7 @@ export class ServerGameState {
       lastDiscard: state.lastDiscard,
       tenpaiTiles: findTenpaiTiles(myPlayer.hand, myPlayer.melds, state.gold),
       lastDrawnTileId: this.lastDrawnTileIds[playerIndex],
+      myHasDiscardedGold: myPlayer.hasDiscardedGold,
     };
   }
 

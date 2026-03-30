@@ -22,7 +22,7 @@ interface GameTableProps {
 }
 
 export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTileId, claimableTileIds, canDiscard, onDiscard, canHu, onHu, canDraw, onDraw, kongTileIds, onAnGang, onBuGang, onBackgroundClick }: GameTableProps) {
-  const { myHand, myFlowers, myMelds, myDiscards, myName, otherPlayers, currentTurn, myIndex, gold, dealerIndex, lianZhuangCount, wallRemaining } = state;
+  const { myHand, myFlowers, myMelds, myDiscards, myName, otherPlayers, currentTurn, myIndex, gold, dealerIndex, lianZhuangCount, wallRemaining, myHasDiscardedGold } = state;
   const lastDiscardTileId = state.lastDiscard?.tile.id ?? null;
   const lastDiscardPlayerIndex = state.lastDiscard?.playerIndex ?? -1;
   const botLabel = (name: string, isBot?: boolean) => isBot ? `${name} 🤖` : name;
@@ -63,6 +63,7 @@ export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTile
           gold={gold}
           label={labels[2]}
           lastDiscardedTileId={lastDiscardPlayerIndex === (myIndex + 2) % 4 ? lastDiscardTileId : null}
+          hasDiscardedGold={otherPlayers[1]?.hasDiscardedGold}
         />
       </div>
 
@@ -79,6 +80,7 @@ export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTile
           gold={gold}
           label={labels[3]}
           lastDiscardedTileId={lastDiscardPlayerIndex === (myIndex + 3) % 4 ? lastDiscardTileId : null}
+          hasDiscardedGold={otherPlayers[2]?.hasDiscardedGold}
         />
       </div>
 
@@ -109,6 +111,7 @@ export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTile
           gold={gold}
           label={labels[1]}
           lastDiscardedTileId={lastDiscardPlayerIndex === (myIndex + 1) % 4 ? lastDiscardTileId : null}
+          hasDiscardedGold={otherPlayers[0]?.hasDiscardedGold}
         />
       </div>
 
@@ -135,6 +138,7 @@ export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTile
           kongTileIds={kongTileIds}
           onAnGang={onAnGang}
           onBuGang={onBuGang}
+          hasDiscardedGold={myHasDiscardedGold}
           lastDrawnTileId={(state as any).lastDrawnTileId}
           lastDiscardedTileId={lastDiscardPlayerIndex === myIndex ? lastDiscardTileId : null}
           tenpaiTiles={(state as any).tenpaiTiles}

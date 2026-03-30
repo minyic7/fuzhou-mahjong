@@ -28,6 +28,7 @@ interface PlayerAreaProps {
   kongTileIds?: Set<number>;
   onAnGang?: (tileInstanceId: number) => void;
   onBuGang?: (tileInstanceId: number) => void;
+  hasDiscardedGold?: boolean;
 }
 
 const BUBBLE_BTN = {
@@ -41,7 +42,7 @@ export function PlayerArea({
   isMe, hand, handCount, melds, flowers, discards,
   isCurrentTurn, isDealer, gold, selectedTileId, onTileClick, label,
   claimableTileIds, onTileDoubleClick, lastDrawnTileId, lastDiscardedTileId, tenpaiTiles,
-  canDiscard, onDiscard, canHu, onHu, kongTileIds, onAnGang, onBuGang,
+  canDiscard, onDiscard, canHu, onHu, kongTileIds, onAnGang, onBuGang, hasDiscardedGold,
 }: PlayerAreaProps) {
   const { onTouchStart, onTouchEnd, onMouseEnter, onMouseLeave, Tooltip } = useLongPress(gold);
 
@@ -70,6 +71,7 @@ export function PlayerArea({
           {label}
         </span>
         {isDealer && <span style={{ fontSize: 10, background: "#b71c1c", color: "#ffd700", padding: "1px 5px", borderRadius: 3, fontWeight: "bold" }}>庄</span>}
+        {hasDiscardedGold && <span style={{ fontSize: 10, background: "#c41e3a", color: "#fff", padding: "1px 5px", borderRadius: 3, fontWeight: "bold" }}>弃金</span>}
         {isCurrentTurn && <span style={{ fontSize: 10, background: "rgba(255,215,0,0.2)", color: "#ffd700", padding: "1px 5px", borderRadius: 3, border: "1px solid #ffd700" }}>出牌</span>}
         <span style={{ fontSize: 11, color: "#8fbc8f", marginLeft: "auto" }}>
           🌸{flowers.length}
@@ -83,6 +85,7 @@ export function PlayerArea({
             const isSelected = selectedTileId === t.id;
             const isKong = kongTileIds?.has(t.id);
             const showBubble = isSelected && (canDiscard || canHu || isKong);
+            const isGoldTile = !!(gold && t.tile.kind === "suited" && t.tile.suit === gold.wildTile.suit && t.tile.value === gold.wildTile.value);
             const isAnGang = !!(isKong && onAnGang);
             const isBuGang = !!(isKong && onBuGang);
             return (
@@ -121,10 +124,16 @@ export function PlayerArea({
                   )}
                   {canDiscard && (
                     <button
-                      style={{ ...BUBBLE_BTN, background: "#00b894", color: "#fff", boxShadow: "0 2px 8px rgba(0,184,148,0.5)" }}
+                      className={isGoldTile ? "gold-warning-pulse" : undefined}
+                      style={{
+                        ...BUBBLE_BTN,
+                        background: isGoldTile ? "#c41e3a" : "#00b894",
+                        color: "#fff",
+                        boxShadow: isGoldTile ? "0 2px 8px rgba(196,30,58,0.5)" : "0 2px 8px rgba(0,184,148,0.5)",
+                      }}
                       onClick={(e) => { e.stopPropagation(); onDiscard?.(t.id); }}
                     >
-                      出牌
+                      {isGoldTile ? "弃金!" : "出牌"}
                     </button>
                   )}
                   {isAnGang && (
