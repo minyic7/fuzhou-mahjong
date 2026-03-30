@@ -61,7 +61,7 @@ interface SlideContent {
 function TileRow({ tiles, label }: { tiles: TileInstance[]; label?: string }) {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 4, flexWrap: "wrap" }}>
-      {label && <span style={{ color: "#8fbc8f", fontSize: 13, minWidth: 28 }}>{label}</span>}
+      {label && <span style={{ color: "var(--color-text-secondary)", fontSize: 13, minWidth: 28 }}>{label}</span>}
       {tiles.map((t) => (
         <TileView key={t.id} tile={t} small />
       ))}
@@ -75,7 +75,7 @@ const ALL_SLIDES: SlideContent[] = [
     titleEn: "Tile Types",
     content: (
       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-        <p style={{ color: "#ccc", fontSize: 14 }}>
+        <p style={{ color: "var(--color-text-muted)", fontSize: 14 }}>
           三种花色 (suits)，每种 1-9，各 4 张:
         </p>
         <TileRow tiles={DEMO_WAN} label="万" />
@@ -89,23 +89,23 @@ const ALL_SLIDES: SlideContent[] = [
     titleEn: "Gold Tiles",
     content: (
       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-        <p style={{ color: "#ccc", fontSize: 14 }}>
+        <p style={{ color: "var(--color-text-muted)", fontSize: 14 }}>
           翻金牌确定百搭牌。金牌指示牌的下一张为百搭 (wild)。
         </p>
         <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap" }}>
           <div style={{ textAlign: "center" }}>
-            <div style={{ color: "#8fbc8f", fontSize: 12, marginBottom: 4 }}>指示牌</div>
+            <div style={{ color: "var(--color-text-secondary)", fontSize: 12, marginBottom: 4 }}>指示牌</div>
             <TileView tile={DEMO_GOLD_INDICATOR} small />
           </div>
-          <span style={{ color: "#ffd700", fontSize: 20 }}>&rarr;</span>
+          <span style={{ color: "var(--color-gold-bright)", fontSize: 20 }}>&rarr;</span>
           <div style={{ textAlign: "center" }}>
-            <div style={{ color: "#ffd700", fontSize: 12, marginBottom: 4 }}>金牌 (wild)</div>
-            <div style={{ border: "2px solid #ffd700", borderRadius: 6, display: "inline-block", padding: 2 }}>
+            <div style={{ color: "var(--color-gold-bright)", fontSize: 12, marginBottom: 4 }}>金牌 (wild)</div>
+            <div style={{ border: "2px solid var(--color-gold-bright)", borderRadius: 6, display: "inline-block", padding: 2 }}>
               <TileView tile={DEMO_GOLD_TILE} small />
             </div>
           </div>
         </div>
-        <p style={{ color: "#ff8a80", fontSize: 13 }}>
+        <p style={{ color: "var(--color-error)", fontSize: 13 }}>
           打出金牌会受罚! 慎重出牌。
         </p>
       </div>
@@ -116,11 +116,11 @@ const ALL_SLIDES: SlideContent[] = [
     titleEn: "Flowers",
     content: (
       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-        <p style={{ color: "#ccc", fontSize: 14 }}>
+        <p style={{ color: "var(--color-text-muted)", fontSize: 14 }}>
           花牌自动收集，计入花分。集齐 4 张同类花牌 = 花杠，额外加分。
         </p>
         <TileRow tiles={DEMO_FLOWERS} />
-        <p style={{ color: "#8fbc8f", fontSize: 13 }}>
+        <p style={{ color: "var(--color-text-secondary)", fontSize: 13 }}>
           共 36 张花牌: 春夏秋冬、梅兰竹菊、东南西北、中发白 (各 2 张)
         </p>
       </div>
@@ -132,22 +132,22 @@ const ALL_SLIDES: SlideContent[] = [
     content: (
       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
         <div>
-          <span style={{ color: "#4caf50", fontWeight: 700 }}>吃 (Chi)</span>
-          <span style={{ color: "#ccc", fontSize: 14 }}> — 取上家弃牌组成顺子</span>
+          <span style={{ color: "var(--color-action-chi)", fontWeight: 700 }}>吃 (Chi)</span>
+          <span style={{ color: "var(--color-text-muted)", fontSize: 14 }}> — 取上家弃牌组成顺子</span>
           <div style={{ marginTop: 4 }}><TileRow tiles={DEMO_SEQUENCE} /></div>
         </div>
         <div>
-          <span style={{ color: "#2196f3", fontWeight: 700 }}>碰 (Peng)</span>
-          <span style={{ color: "#ccc", fontSize: 14 }}> — 取弃牌组成刻子</span>
+          <span style={{ color: "var(--color-action-peng)", fontWeight: 700 }}>碰 (Peng)</span>
+          <span style={{ color: "var(--color-text-muted)", fontSize: 14 }}> — 取弃牌组成刻子</span>
           <div style={{ marginTop: 4 }}><TileRow tiles={DEMO_TRIPLET} /></div>
         </div>
         <div>
-          <span style={{ color: "#ff9800", fontWeight: 700 }}>杠 (Gang)</span>
-          <span style={{ color: "#ccc", fontSize: 14 }}> — 四张相同牌组成杠</span>
+          <span style={{ color: "var(--color-action-gang)", fontWeight: 700 }}>杠 (Gang)</span>
+          <span style={{ color: "var(--color-text-muted)", fontSize: 14 }}> — 四张相同牌组成杠</span>
         </div>
         <div>
-          <span style={{ color: "#f44336", fontWeight: 700 }}>胡 (Hu)</span>
-          <span style={{ color: "#ccc", fontSize: 14 }}> — 赢!</span>
+          <span style={{ color: "var(--color-action-hu)", fontWeight: 700 }}>胡 (Hu)</span>
+          <span style={{ color: "var(--color-text-muted)", fontSize: 14 }}> — 赢!</span>
         </div>
       </div>
     ),
@@ -157,17 +157,17 @@ const ALL_SLIDES: SlideContent[] = [
     titleEn: "Winning",
     content: (
       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-        <p style={{ color: "#ccc", fontSize: 14 }}>
+        <p style={{ color: "var(--color-text-muted)", fontSize: 14 }}>
           组成 4 组 (顺子/刻子/杠) + 1 对将牌即可胡牌。
         </p>
         <div style={{ display: "flex", alignItems: "center", gap: 6, flexWrap: "wrap" }}>
           <TileRow tiles={DEMO_SEQUENCE} />
-          <span style={{ color: "#8fbc8f" }}>+</span>
+          <span style={{ color: "var(--color-text-secondary)" }}>+</span>
           <TileRow tiles={DEMO_TRIPLET} />
-          <span style={{ color: "#8fbc8f" }}>+ ... +</span>
+          <span style={{ color: "var(--color-text-secondary)" }}>+ ... +</span>
           <TileRow tiles={DEMO_PAIR} />
         </div>
-        <p style={{ color: "#ffd700", fontSize: 13 }}>
+        <p style={{ color: "var(--color-gold-bright)", fontSize: 13 }}>
           特殊牌型有额外倍数: 对对胡、清一色、金雀、金龙等。
         </p>
       </div>
@@ -178,7 +178,7 @@ const ALL_SLIDES: SlideContent[] = [
     titleEn: "Scoring Basics",
     content: (
       <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-        <p style={{ color: "#ccc", fontSize: 14 }}>
+        <p style={{ color: "var(--color-text-muted)", fontSize: 14 }}>
           基本公式:
         </p>
         <div style={{
@@ -188,14 +188,14 @@ const ALL_SLIDES: SlideContent[] = [
           padding: "10px 14px",
           textAlign: "center",
         }}>
-          <span style={{ color: "#ffd700", fontSize: 16, fontWeight: 700 }}>
+          <span style={{ color: "var(--color-gold-bright)", fontSize: 16, fontWeight: 700 }}>
             (花分 + 连庄 + 5) x 2
           </span>
         </div>
-        <p style={{ color: "#ccc", fontSize: 14 }}>
+        <p style={{ color: "var(--color-text-muted)", fontSize: 14 }}>
           自摸 (self-draw) = 三家各付全额，总计 3x。
         </p>
-        <p style={{ color: "#8fbc8f", fontSize: 13 }}>
+        <p style={{ color: "var(--color-text-secondary)", fontSize: 13 }}>
           金牌加倍。特殊牌型有独立倍率。
         </p>
       </div>
@@ -248,8 +248,8 @@ export function TutorialModal({ open, onClose, condensed }: TutorialModalProps) 
         className="tutorial-modal"
         onClick={(e) => e.stopPropagation()}
         style={{
-          background: "rgba(15,30,25,0.97)",
-          border: "2px solid rgba(184,134,11,0.4)",
+          background: "var(--overlay-bg)",
+          border: "2px solid var(--color-gold-border-hover)",
           borderRadius: 12,
           padding: isCompact ? "12px 16px" : "20px 24px",
           maxWidth: 480,
@@ -270,7 +270,7 @@ export function TutorialModal({ open, onClose, condensed }: TutorialModalProps) 
             right: 8,
             background: "transparent",
             border: "none",
-            color: "#8fbc8f",
+            color: "var(--color-text-secondary)",
             fontSize: 22,
             cursor: "pointer",
             padding: "4px 8px",
@@ -283,10 +283,10 @@ export function TutorialModal({ open, onClose, condensed }: TutorialModalProps) 
 
         {/* Slide title */}
         <div style={{ marginBottom: 16 }}>
-          <h3 style={{ color: "#d4a017", fontSize: 20, marginBottom: 2 }}>
+          <h3 style={{ color: "var(--color-text-gold)", fontSize: 20, marginBottom: 2 }}>
             {slide.title}
           </h3>
-          <span style={{ color: "#8fbc8f", fontSize: 13 }}>{slide.titleEn}</span>
+          <span style={{ color: "var(--color-text-secondary)", fontSize: 13 }}>{slide.titleEn}</span>
         </div>
 
         {/* Slide content */}
@@ -302,8 +302,8 @@ export function TutorialModal({ open, onClose, condensed }: TutorialModalProps) 
             style={{
               padding: isCompact ? "6px 12px" : "8px 18px",
               fontSize: isCompact ? 13 : 14,
-              background: isFirst ? "transparent" : "#1a5c3a",
-              border: isFirst ? "1px solid transparent" : "1px solid #2e7d50",
+              background: isFirst ? "transparent" : "var(--color-bg-button)",
+              border: isFirst ? "1px solid transparent" : "1px solid var(--color-bg-button-hover)",
               minHeight: 44,
             }}
           >
@@ -336,7 +336,7 @@ export function TutorialModal({ open, onClose, condensed }: TutorialModalProps) 
                   width: 10,
                   height: 10,
                   borderRadius: "50%",
-                  background: i === currentSlide ? "#d4a017" : "rgba(184,134,11,0.25)",
+                  background: i === currentSlide ? "var(--color-text-gold)" : "var(--color-gold-border)",
                   display: "block",
                   transition: "background 0.2s",
                 }} />
@@ -350,9 +350,9 @@ export function TutorialModal({ open, onClose, condensed }: TutorialModalProps) 
               style={{
                 padding: isCompact ? "6px 12px" : "8px 18px",
                 fontSize: isCompact ? 13 : 14,
-                background: "#1a5c3a",
-                border: "1px solid #d4a017",
-                color: "#ffd700",
+                background: "var(--color-bg-button)",
+                border: "1px solid var(--color-text-gold)",
+                color: "var(--color-gold-bright)",
                 minHeight: 44,
               }}
             >
