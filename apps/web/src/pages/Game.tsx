@@ -6,8 +6,7 @@ import { CenterAction, useCenterAction } from "../components/CenterAction";
 import { sounds, setMuted, isMuted } from "../sounds";
 import { TileCounter } from "../components/TileCounter";
 import { TutorialModal } from "../components/TutorialModal";
-import { BREAKPOINTS } from "../hooks/useIsMobile";
-import { useWindowSize } from "../hooks/useWindowSize";
+import { useIsCompactLandscape } from "../hooks/useIsMobile";
 import { TileView } from "../components/Tile";
 import { SessionSummary, type SessionData } from "../components/SessionSummary";
 import { Button } from "../components/Button";
@@ -78,7 +77,7 @@ export function Game({ initialGameState, onLeave }: GameProps) {
   const [departingTile, setDepartingTile] = useState<TileInstance | null>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [muted, setMutedState] = useState(isMuted);
-  const [isPortrait, setIsPortrait] = useState(() => window.matchMedia("(orientation: portrait)").matches && window.innerWidth <= 768);
+  const [isPortrait, setIsPortrait] = useState(() => window.matchMedia("(orientation: portrait) and (max-width: 768px)").matches);
 
   useEffect(() => {
     const mq = window.matchMedia("(orientation: portrait) and (max-width: 768px)");
@@ -360,8 +359,7 @@ export function Game({ initialGameState, onLeave }: GameProps) {
     if (isClaimWindow) setSettingsOpen(false);
   }, [isClaimWindow]);
 
-  const { height: windowHeight } = useWindowSize();
-  const isCompactMain = windowHeight <= BREAKPOINTS.COMPACT_HEIGHT;
+  const isCompactMain = useIsCompactLandscape();
 
   const handleAction = (action: GameAction) => {
     socket.emit("playerAction", action);
