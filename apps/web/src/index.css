@@ -496,3 +496,12 @@ button.lobby-create-btn:hover:not(:disabled) {
 .chi-picker-scroll::-webkit-scrollbar {
   display: none; /* Chrome/Safari */
 }
+
+/* Compact opponent discards — hide scrollbar */
+.compact-discards {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE/Edge */
+}
+.compact-discards::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}
