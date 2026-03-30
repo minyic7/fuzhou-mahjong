@@ -18,9 +18,10 @@ interface GameTableProps {
   kongTileIds?: Set<number>;
   onAnGang?: (tileInstanceId: number) => void;
   onBuGang?: (tileInstanceId: number) => void;
+  onBackgroundClick?: () => void;
 }
 
-export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTileId, claimableTileIds, canDiscard, onDiscard, canHu, onHu, canDraw, onDraw, kongTileIds, onAnGang, onBuGang }: GameTableProps) {
+export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTileId, claimableTileIds, canDiscard, onDiscard, canHu, onHu, canDraw, onDraw, kongTileIds, onAnGang, onBuGang, onBackgroundClick }: GameTableProps) {
   const { myHand, myFlowers, myMelds, myDiscards, myName, otherPlayers, currentTurn, myIndex, gold, dealerIndex, lianZhuangCount, wallRemaining } = state;
   const botLabel = (name: string, isBot?: boolean) => isBot ? `${name} 🤖` : name;
   const labels = [
@@ -31,7 +32,7 @@ export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTile
   ];
 
   return (
-    <div className="game-table" style={{
+    <div className="game-table" onClick={(e) => { if (e.target === e.currentTarget) onBackgroundClick?.(); }} style={{
       display: "grid",
       gridTemplateAreas: `
         ". top ."

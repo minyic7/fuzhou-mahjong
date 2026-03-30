@@ -126,6 +126,15 @@ export function Game({ initialGameState, onLeave }: GameProps) {
     };
   }, []);
 
+  // Escape key dismisses tile selection (and thus the discard bubble)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setSelectedTileId(null);
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, []);
+
   const getClaimableTileIds = (a: AvailableActions | null): Set<number> => {
     const ids = new Set<number>();
     if (!a) return ids;
@@ -317,6 +326,7 @@ export function Game({ initialGameState, onLeave }: GameProps) {
           const tile = gameState.myHand.find(t => t.id === tileInstanceId);
           if (tile) handleAction({ type: ActionType.BuGang, playerIndex: gameState.myIndex, tile });
         }}
+        onBackgroundClick={() => setSelectedTileId(null)}
       />
       {isClaimWindow && actions && (
         <ClaimOverlay actions={actions} gameState={gameState} onAction={handleAction} />

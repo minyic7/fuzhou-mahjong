@@ -109,15 +109,19 @@ export function ClaimOverlay({ actions, gameState, onAction }: ClaimOverlayProps
             </button>
           )}
 
-          {actions.canPass && (
+        </div>
+
+        {/* Pass button on separate row */}
+        {actions.canPass && (
+          <div style={{ borderTop: "1px solid rgba(255,255,255,0.1)", paddingTop: 8, width: "100%" , textAlign: "center" }}>
             <button
-              style={{ ...BTN.base, ...BTN.pass }}
+              style={{ ...BTN.base, ...BTN.pass, fontSize: 14, padding: "8px 20px", minHeight: 40 }}
               onClick={() => onAction({ type: ActionType.Pass, playerIndex: myIndex })}
             >
               过
             </button>
-          )}
-        </div>
+          </div>
+        )}
 
         {/* Chi picker */}
         {showChiPicker && gameState.lastDiscard && (
