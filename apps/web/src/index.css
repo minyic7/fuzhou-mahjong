@@ -286,14 +286,14 @@ body {
 /* BREAKPOINTS.TINY_WIDTH */
 @media (max-width: 360px) {
   :root {
-    --tile-w: 28px;
+    --tile-w: 30px;
     --tile-h: 40px;
-    --tile-font: 12px;
-    --tile-suit-font: 8px;
+    --tile-font: 13px;
+    --tile-suit-font: 9px;
     --wall-tw: 7px;
     --wall-th: 10px;
 
-    --game-gap: 2px;
+    --game-gap: 3px;
     --game-padding: 2px;
     --game-perspective: 600px;
     --btn-font: 14px;
@@ -382,7 +382,7 @@ body {
     --tile-font: max(10px, 2.6dvh);
     --tile-suit-font: max(7px, 1.8dvh);
     --tile-suit-font-sm: max(5px, 1.3dvh);
-    --wall-tw: max(7px, 1.8dvh);
+    --wall-tw: max(9px, 1.8dvh);
     --wall-th: max(10px, 2.6dvh);
     --overlay-padding-y: max(4px, 1dvh);
     --overlay-padding-x: max(6px, 1.5dvh);
@@ -1018,7 +1018,7 @@ button.lobby-create-btn:active:not(:disabled) {
 
 /* Shared confirmation modal */
 .confirm-modal-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; z-index: var(--z-confirm-modal); }
-.confirm-modal { background: var(--overlay-bg); border: 2px solid var(--color-gold-border-hover); border-radius: var(--radius-lg); padding: 24px; max-width: min(360px, 90vw); text-align: center; max-height: calc(100dvh - 40px); overflow-y: auto; }
+.confirm-modal { background: var(--overlay-bg); border: 2px solid var(--color-gold-border-hover); border-radius: var(--radius-lg); padding: 24px; max-width: min(360px, calc(100vw - 24px)); text-align: center; max-height: calc(100dvh - 40px); overflow-y: auto; }
 .confirm-modal-title { font-size: 18px; margin-bottom: 8px; }
 .confirm-modal-subtitle { font-size: 13px; color: var(--color-text-secondary); margin-bottom: 0; }
 .confirm-modal-actions { display: flex; gap: 12px; justify-content: center; margin-top: 16px; }
