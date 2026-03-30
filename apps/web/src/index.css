@@ -172,8 +172,8 @@ hr {
   box-shadow: 0 4px 16px rgba(0,0,0,0.4);
 }
 
-.lobby-create-btn:hover:not(:disabled) {
-  border-color: rgba(184, 134, 11, 0.7) !important;
+button.lobby-create-btn:hover:not(:disabled) {
+  border-color: rgba(184, 134, 11, 0.7);
   box-shadow: 0 0 12px rgba(184, 134, 11, 0.2);
 }
 
@@ -245,6 +245,23 @@ hr {
   .seat-layout {
     gap: 14px;
     max-width: 440px;
+  }
+}
+
+@media (min-width: 1440px) {
+  .lobby-page, .room-page {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 60px 40px;
+  }
+
+  .seat-layout {
+    gap: 18px;
+    max-width: 480px;
+  }
+
+  .room-card-list {
+    gap: 18px;
   }
 }
 

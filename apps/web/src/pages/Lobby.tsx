@@ -105,7 +105,7 @@ export function Lobby({ onJoined }: LobbyProps) {
                 <button
                   onClick={() => handleJoin(room.roomId)}
                   disabled={!name.trim() || room.playerCount >= room.maxPlayers}
-                  style={{ padding: "8px 20px", fontSize: 14 }}
+                  style={{ padding: "12px 20px", fontSize: 14 }}
                 >
                   加入 / Join
                 </button>
