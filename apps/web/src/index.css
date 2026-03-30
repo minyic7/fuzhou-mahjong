@@ -187,6 +187,10 @@ body {
     --hand-new-tile-margin: 6px;
     --hand-padding-top: 8px;
     --tile-margin: 2px;
+    --compact-gap: 6px;
+    --compact-padding: 2px 8px;
+    --compact-label-font: 12px;
+    --compact-info-font: 11px;
   }
 }
 
@@ -209,6 +213,10 @@ body {
     --hand-padding-top: 4px;
     --hand-new-tile-margin: 4px;
     --tile-margin: 2px;
+    --compact-gap: 4px;
+    --compact-padding: 2px 4px;
+    --compact-label-font: 10px;
+    --compact-info-font: 9px;
   }
   .game-table {
     grid-template-columns: 50px 1fr 50px;
