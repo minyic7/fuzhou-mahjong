@@ -11,8 +11,8 @@ interface ClaimOverlayProps {
 
 const BTN = {
   base: {
-    padding: "12px 24px", fontSize: 18, fontWeight: "bold" as const,
-    borderRadius: 8, border: "none", minHeight: 48, minWidth: 48,
+    padding: "var(--btn-padding)", fontSize: "var(--btn-font)", fontWeight: "bold" as const,
+    borderRadius: 8, border: "none", minHeight: "var(--btn-min-size)", minWidth: "var(--btn-min-size)",
     cursor: "pointer",
   },
   hu: { background: "#c41e3a", color: "#fff" },
@@ -48,7 +48,7 @@ export function ClaimOverlay({ actions, gameState, onAction }: ClaimOverlayProps
         background: "rgba(15,30,25,0.95)",
         border: "2px solid #ffa500",
         borderRadius: 12,
-        padding: "20px 24px",
+        padding: "var(--overlay-padding-y) var(--overlay-padding-x)",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
@@ -56,7 +56,7 @@ export function ClaimOverlay({ actions, gameState, onAction }: ClaimOverlayProps
         maxWidth: "90vw",
         animation: "overlayScaleIn 0.2s ease-out",
       }}>
-        <div style={{ color: "#ffa500", fontWeight: "bold", fontSize: 16, marginBottom: 4 }}>
+        <div style={{ color: "#ffa500", fontWeight: "bold", fontSize: "var(--btn-font)", marginBottom: 4 }}>
           可以操作！请选择
         </div>
 
@@ -122,7 +122,7 @@ export function ClaimOverlay({ actions, gameState, onAction }: ClaimOverlayProps
         {actions.canPass && (
           <div style={{ borderTop: "1px solid rgba(255,255,255,0.1)", paddingTop: 8, width: "100%" , textAlign: "center" }}>
             <button
-              style={{ ...BTN.base, ...BTN.pass, fontSize: 14, padding: "8px 20px", minHeight: 40 }}
+              style={{ ...BTN.base, ...BTN.pass }}
               onClick={() => onAction({ type: ActionType.Pass, playerIndex: myIndex })}
             >
               过
@@ -137,7 +137,7 @@ export function ClaimOverlay({ actions, gameState, onAction }: ClaimOverlayProps
             padding: "8px 0",
             width: "100%",
           }}>
-            <div style={{ textAlign: "center", fontSize: 13, color: "#aaa", marginBottom: 8 }}>
+            <div style={{ textAlign: "center", fontSize: "var(--label-font)", color: "#aaa", marginBottom: 8 }}>
               选择吃牌组合
             </div>
             <div className="chi-picker-scroll" style={{
@@ -193,8 +193,6 @@ export function ClaimOverlay({ actions, gameState, onAction }: ClaimOverlayProps
                 style={{
                   ...BTN.base,
                   ...BTN.pass,
-                  fontSize: 14,
-                  padding: "10px 20px",
                   minHeight: 56,
                   scrollSnapAlign: "start",
                   flexShrink: 0,
