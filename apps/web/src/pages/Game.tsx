@@ -477,7 +477,7 @@ export function Game({ initialGameState, onLeave }: GameProps) {
         >⚙</button>
         {settingsOpen && (
           <div style={{
-            position: 'absolute', top: 48, right: 0, zIndex: 45,
+            position: 'absolute', top: 'calc(48px + env(safe-area-inset-top, 0px))', right: 0, zIndex: 45,
             background: 'var(--overlay-bg)', border: '1px solid var(--color-gold-border-hover)',
             borderRadius: 'var(--radius-md)', padding: 4, minWidth: 160,
             display: 'flex', flexDirection: 'column', gap: 2,
