@@ -189,7 +189,7 @@ export function ClaimOverlay({ actions, gameState, onAction }: ClaimOverlayProps
               scrollSnapType: "x mandatory",
               WebkitOverflowScrolling: "touch",
               justifyContent: actions.chiOptions.length <= 2 ? "center" : undefined,
-              maxHeight: isUltraCompact ? "45dvh" : "60dvh",
+              maxHeight: isUltraCompact ? "min(45dvh, calc(100dvh - 160px))" : "60dvh",
               overflowY: "auto",
             }}>
               {actions.chiOptions.map((combo, i) => (
