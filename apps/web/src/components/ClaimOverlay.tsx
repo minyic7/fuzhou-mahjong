@@ -95,7 +95,7 @@ export function ClaimOverlay({ actions, gameState, onAction }: ClaimOverlayProps
           {isCompact ? "选择" : "可以操作！请选择"}
         </div>
 
-        <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: isUltraCompact ? 4 : 10 }}>
+        <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: isUltraCompact ? 8 : 10 }}>
           {actions.canHu && (
             <button
               style={{ ...BTN.base, ...BTN.hu }}
