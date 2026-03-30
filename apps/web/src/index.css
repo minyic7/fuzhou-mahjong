@@ -22,6 +22,25 @@ body {
   min-height: 0;
 }
 
+/* Portrait rotate overlay — shown on mobile in portrait orientation */
+.portrait-rotate-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: #0a2e1a;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 20px;
+}
+
+@media (orientation: portrait) and (max-width: 768px) {
+  .portrait-rotate-overlay {
+    display: flex;
+  }
+}
+
 #root {
   display: flex;
   flex-direction: column;

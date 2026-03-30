@@ -1,3 +1,9 @@
+/* Portrait rotate phone animation */
+@keyframes rotatePhone {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(90deg); }
+}
+
 /* Tile discard animation */
 @keyframes discardFly {
   0% { transform: scale(1); opacity: 1; }
