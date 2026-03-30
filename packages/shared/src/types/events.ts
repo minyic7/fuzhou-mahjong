@@ -106,6 +106,7 @@ export interface ClientEvents {
   nextRound: () => void;
   addBot: () => void;
   removeBot: () => void;
+  quickStart: (playerName: string) => void;
 }
 
 export interface ServerEvents {

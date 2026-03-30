@@ -110,6 +110,45 @@ export function registerRoomHandlers(io: GameServer, socket: GameSocket): void {
     }
   });
 
+  socket.on("quickStart", (playerName: string) => {
+    try {
+      leaveCurrentRoom(io, socket);
+
+      const room = createRoom();
+      const player = room.addPlayer(socket.id, playerName);
+      registerPlayerRoom(player.playerId, room.id);
+      socket.join(room.id);
+
+      socket.emit("playerIdAssigned", player.playerId);
+
+      // Add 3 bots
+      for (let i = 0; i < 3; i++) {
+        room.addBot();
+      }
+
+      // Start game
+      room.gameStarted = true;
+      broadcastRoomList(io);
+      console.log(`Quick start: room ${room.id} created by ${playerName} with 3 bots`);
+
+      const socketIds = room.players.map((p) => p.socketId ?? `bot-${p.playerId}`);
+      const playerNames = room.players.map((p) => p.name);
+      const botIndices = room.players.map((p, i) => p.isBot ? i : -1).filter((i) => i >= 0);
+      const game = createGame(room.id, socketIds, playerNames, botIndices);
+
+      for (let i = 0; i < 4; i++) {
+        if (!game.isBot(i) && room.players[i].socketId) {
+          io.to(room.players[i].socketId!).emit("gameStarted", game.getClientGameState(i));
+        }
+      }
+
+      triggerDealerAction(io, game, room);
+    } catch (err) {
+      console.error("quickStart error:", err);
+      socket.emit("error", "Failed to quick start game");
+    }
+  });
+
   socket.on("leaveRoom", () => {
     leaveCurrentRoom(io, socket);
     broadcastRoomList(io);
