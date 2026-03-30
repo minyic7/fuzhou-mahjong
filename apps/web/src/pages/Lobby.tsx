@@ -35,10 +35,10 @@ export function Lobby({ onJoined }: LobbyProps) {
   }, [onJoined]);
 
   const handleQuickStart = () => {
-    if (!name.trim()) return;
+    const playerName = name.trim() || `玩家${Math.floor(1000 + Math.random() * 9000)}`;
     setError("");
     setQuickStarting(true);
-    socket.emit("quickStart", name.trim());
+    socket.emit("quickStart", playerName);
   };
 
   const handleCreate = () => {
@@ -78,7 +78,7 @@ export function Lobby({ onJoined }: LobbyProps) {
         variant="gold"
         size="lg"
         onClick={handleQuickStart}
-        disabled={!name.trim() || quickStarting}
+        disabled={quickStarting}
         className="lobby-create-btn"
         style={{ width: "100%", background: "linear-gradient(135deg, var(--color-bg-button) 0%, #2a6f4a 100%)", border: "2px solid rgba(212, 160, 23, 0.8)", boxShadow: "0 0 12px rgba(212, 160, 23, 0.3)" }}
       >
