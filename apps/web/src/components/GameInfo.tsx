@@ -15,7 +15,7 @@ interface GameInfoProps {
 
 export function GameInfo({ gold, dealerIndex, lianZhuangCount, myIndex, lastDiscard, playerNames }: GameInfoProps) {
   const [goldFlip, setGoldFlip] = useState(false);
-  const prevGoldRef = useRef<string | null>(null);
+  const prevGoldRef = useRef<number | null>(null);
 
   useEffect(() => {
     if (gold) {

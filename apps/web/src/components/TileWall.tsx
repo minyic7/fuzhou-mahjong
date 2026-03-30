@@ -177,7 +177,7 @@ export function TileWall({ wallRemaining, wallDrawCount, wallSupplementCount, go
   const drawIndex = useMemo(() => findDrawStackIndex(sides), [sides]);
 
   const [goldFlip, setGoldFlip] = useState(false);
-  const prevGoldRef = useRef<string | null>(null);
+  const prevGoldRef = useRef<number | null>(null);
 
   useEffect(() => {
     if (gold) {
