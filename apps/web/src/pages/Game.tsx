@@ -605,7 +605,7 @@ export function Game({ initialGameState, onLeave }: GameProps) {
             onClick={() => { setTutorialCondensed(false); setShowTutorial(true); }}
             aria-label="How to play"
             style={{
-              width: 36, height: 36, minHeight: 36, borderRadius: "50%",
+              width: 44, height: 44, minHeight: 44, borderRadius: "50%",
               background: "rgba(15,30,25,0.85)", border: "1px solid rgba(184,134,11,0.4)",
               color: "#8fbc8f", fontSize: 18, fontWeight: 700,
               display: "flex", alignItems: "center", justifyContent: "center",
@@ -617,7 +617,7 @@ export function Game({ initialGameState, onLeave }: GameProps) {
               onClick={() => setShowLeaveConfirm(true)}
               aria-label="Leave game"
               style={{
-                width: 36, height: 36, minHeight: 36, borderRadius: "50%",
+                width: 44, height: 44, minHeight: 44, borderRadius: "50%",
                 background: "rgba(15,30,25,0.85)", border: "1px solid rgba(184,134,11,0.4)",
                 color: "#ff5252", fontSize: 18, fontWeight: 700,
                 display: "flex", alignItems: "center", justifyContent: "center",
@@ -634,7 +634,7 @@ export function Game({ initialGameState, onLeave }: GameProps) {
               aria-label="Leave game"
               style={{
                 position: "fixed", bottom: 56, right: 12,
-                width: 36, height: 36, minHeight: 36, borderRadius: "50%",
+                width: 44, height: 44, minHeight: 44, borderRadius: "50%",
                 background: "rgba(15,30,25,0.85)", border: "1px solid rgba(184,134,11,0.4)",
                 color: "#ff5252", fontSize: 18, fontWeight: 700,
                 display: "flex", alignItems: "center", justifyContent: "center",
@@ -647,7 +647,7 @@ export function Game({ initialGameState, onLeave }: GameProps) {
             aria-label="How to play"
             style={{
               position: "fixed", bottom: 12, right: 12,
-              width: 36, height: 36, minHeight: 36, borderRadius: "50%",
+              width: 44, height: 44, minHeight: 44, borderRadius: "50%",
               background: "rgba(15,30,25,0.85)", border: "1px solid rgba(184,134,11,0.4)",
               color: "#8fbc8f", fontSize: 18, fontWeight: 700,
               display: "flex", alignItems: "center", justifyContent: "center",

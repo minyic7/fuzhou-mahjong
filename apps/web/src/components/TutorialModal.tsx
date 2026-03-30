@@ -303,31 +303,43 @@ export function TutorialModal({ open, onClose, condensed }: TutorialModalProps) 
               fontSize: isCompact ? 13 : 14,
               background: isFirst ? "transparent" : "#1a5c3a",
               border: isFirst ? "1px solid transparent" : "1px solid #2e7d50",
-              minHeight: 36,
+              minHeight: 44,
             }}
           >
             上一页
           </button>
 
           {/* Dot indicators */}
-          <div style={{ display: "flex", gap: 6 }}>
+          <div style={{ display: "flex", gap: 0 }}>
             {slides.map((_, i) => (
               <button
                 key={i}
                 onClick={() => setCurrentSlide(i)}
                 aria-label={`Slide ${i + 1}`}
                 style={{
-                  width: 10,
-                  height: 10,
+                  width: 44,
+                  height: 44,
                   borderRadius: "50%",
-                  background: i === currentSlide ? "#d4a017" : "rgba(184,134,11,0.25)",
+                  background: "transparent",
                   border: "none",
                   padding: 0,
                   minHeight: "auto",
                   cursor: "pointer",
                   transition: "background 0.2s",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
                 }}
-              />
+              >
+                <span style={{
+                  width: 10,
+                  height: 10,
+                  borderRadius: "50%",
+                  background: i === currentSlide ? "#d4a017" : "rgba(184,134,11,0.25)",
+                  display: "block",
+                  transition: "background 0.2s",
+                }} />
+              </button>
             ))}
           </div>
 
@@ -340,7 +352,7 @@ export function TutorialModal({ open, onClose, condensed }: TutorialModalProps) 
                 background: "#1a5c3a",
                 border: "1px solid #d4a017",
                 color: "#ffd700",
-                minHeight: 36,
+                minHeight: 44,
               }}
             >
               知道了
@@ -351,7 +363,7 @@ export function TutorialModal({ open, onClose, condensed }: TutorialModalProps) 
               style={{
                 padding: isCompact ? "6px 12px" : "8px 18px",
                 fontSize: isCompact ? 13 : 14,
-                minHeight: 36,
+                minHeight: 44,
               }}
             >
               下一页
