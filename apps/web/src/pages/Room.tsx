@@ -46,7 +46,8 @@ export function Room({ initialRoomState }: RoomProps) {
   });
 
   return (
-    <div className="room-page" style={{ maxWidth: 480, margin: "0 auto", padding: "40px 20px" }}>
+    <div className="room-page" style={{ display: "flex", justifyContent: "center", padding: "40px 20px" }}>
+    <div style={{ maxWidth: 480, width: "100%" }}>
       <h2 style={{ textAlign: "center", color: "var(--color-text-secondary)", fontSize: 15, fontWeight: 400, marginBottom: 20 }}>房间 / Room</h2>
 
       {/* Mahjong table seat layout */}
@@ -114,6 +115,7 @@ export function Room({ initialRoomState }: RoomProps) {
           离开 / Leave
         </Button>
       </div>
+    </div>
     </div>
   );
 }
