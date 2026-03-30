@@ -24,7 +24,27 @@ const BTN = {
 
 export function ClaimOverlay({ actions, gameState, onAction }: ClaimOverlayProps) {
   const [showChiPicker, setShowChiPicker] = useState(false);
+  const [exiting, setExiting] = useState(false);
+  const [exitingChi, setExitingChi] = useState(false);
   const myIndex = gameState.myIndex;
+
+  const handleAction = (action: GameAction) => {
+    setExiting(true);
+    setTimeout(() => onAction(action), 180);
+  };
+
+  const handleShowChiPicker = () => {
+    setShowChiPicker(true);
+    setExitingChi(false);
+  };
+
+  const handleHideChiPicker = () => {
+    setExitingChi(true);
+    setTimeout(() => {
+      setShowChiPicker(false);
+      setExitingChi(false);
+    }, 150);
+  };
 
   return (
     <div
@@ -36,11 +56,11 @@ export function ClaimOverlay({ actions, gameState, onAction }: ClaimOverlayProps
         alignItems: "center",
         justifyContent: "center",
         zIndex: 40,
-        animation: "overlayFadeIn 0.2s ease-out",
+        animation: exiting ? "overlayFadeOut 0.18s ease-in forwards" : "overlayFadeIn 0.2s ease-out",
       }}
       onClick={(e) => {
         if (e.target === e.currentTarget && showChiPicker) {
-          setShowChiPicker(false);
+          handleHideChiPicker();
         }
       }}
     >
@@ -56,7 +76,7 @@ export function ClaimOverlay({ actions, gameState, onAction }: ClaimOverlayProps
         maxWidth: "90vw",
         maxHeight: "90dvh",
         overflowY: "auto",
-        animation: "overlayScaleIn 0.2s ease-out",
+        animation: exiting ? "overlayScaleOut 0.18s ease-in forwards" : "overlayScaleIn 0.2s ease-out",
       }}>
         <div style={{ color: "#ffa500", fontWeight: "bold", fontSize: "var(--btn-font)", marginBottom: 4 }}>
           可以操作！请选择
@@ -66,7 +86,7 @@ export function ClaimOverlay({ actions, gameState, onAction }: ClaimOverlayProps
           {actions.canHu && (
             <button
               style={{ ...BTN.base, ...BTN.hu }}
-              onClick={() => onAction({ type: ActionType.Hu, playerIndex: myIndex })}
+              onClick={() => handleAction({ type: ActionType.Hu, playerIndex: myIndex })}
             >
               胡!
             </button>
@@ -75,7 +95,7 @@ export function ClaimOverlay({ actions, gameState, onAction }: ClaimOverlayProps
           {actions.canMingGang && gameState.lastDiscard && (
             <button
               style={{ ...BTN.base, ...BTN.gang }}
-              onClick={() => onAction({
+              onClick={() => handleAction({
                 type: ActionType.MingGang,
                 playerIndex: myIndex,
                 targetTile: gameState.lastDiscard!.tile,
@@ -88,7 +108,7 @@ export function ClaimOverlay({ actions, gameState, onAction }: ClaimOverlayProps
           {actions.canPeng && gameState.lastDiscard && (
             <button
               style={{ ...BTN.base, ...BTN.peng }}
-              onClick={() => onAction({
+              onClick={() => handleAction({
                 type: ActionType.Peng,
                 playerIndex: myIndex,
                 targetTile: gameState.lastDiscard!.tile,
@@ -103,14 +123,14 @@ export function ClaimOverlay({ actions, gameState, onAction }: ClaimOverlayProps
               style={{ ...BTN.base, ...BTN.chi }}
               onClick={() => {
                 if (actions.chiOptions.length === 1 && gameState.lastDiscard) {
-                  onAction({
+                  handleAction({
                     type: ActionType.Chi,
                     playerIndex: myIndex,
                     tiles: actions.chiOptions[0] as [TileInstance, TileInstance],
                     targetTile: gameState.lastDiscard.tile,
                   });
                 } else {
-                  setShowChiPicker(true);
+                  handleShowChiPicker();
                 }
               }}
             >
@@ -125,7 +145,7 @@ export function ClaimOverlay({ actions, gameState, onAction }: ClaimOverlayProps
           <div style={{ borderTop: "1px solid rgba(255,255,255,0.1)", paddingTop: 8, width: "100%" , textAlign: "center" }}>
             <button
               style={{ ...BTN.base, ...BTN.pass }}
-              onClick={() => onAction({ type: ActionType.Pass, playerIndex: myIndex })}
+              onClick={() => handleAction({ type: ActionType.Pass, playerIndex: myIndex })}
             >
               过
             </button>
@@ -138,6 +158,7 @@ export function ClaimOverlay({ actions, gameState, onAction }: ClaimOverlayProps
             borderTop: "1px solid rgba(255,255,255,0.1)",
             padding: "8px 0",
             width: "100%",
+            animation: exitingChi ? "overlayScaleOut 0.15s ease-in forwards" : "overlayScaleIn 0.15s ease-out",
           }}>
             <div style={{ textAlign: "center", fontSize: "var(--label-font)", color: "#aaa", marginBottom: 8 }}>
               选择吃牌组合
@@ -168,13 +189,12 @@ export function ClaimOverlay({ actions, gameState, onAction }: ClaimOverlayProps
                     border: "2px solid rgba(46,139,87,0.6)",
                   }}
                   onClick={() => {
-                    onAction({
+                    handleAction({
                       type: ActionType.Chi,
                       playerIndex: myIndex,
                       tiles: combo as [TileInstance, TileInstance],
                       targetTile: gameState.lastDiscard!.tile,
                     });
-                    setShowChiPicker(false);
                   }}
                 >
                   {combo.map((t) => (
@@ -199,7 +219,7 @@ export function ClaimOverlay({ actions, gameState, onAction }: ClaimOverlayProps
                   scrollSnapAlign: "start",
                   flexShrink: 0,
                 }}
-                onClick={() => setShowChiPicker(false)}
+                onClick={() => handleHideChiPicker()}
               >
                 取消
               </button>
