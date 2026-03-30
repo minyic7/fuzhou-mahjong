@@ -88,12 +88,16 @@ export function App() {
     );
   }
 
-  switch (view) {
-    case "lobby":
-      return <Lobby onJoined={(roomState) => { setInitialRoomState(roomState); setView("room"); }} />;
-    case "room":
-      return <Room initialRoomState={initialRoomState} />;
-    case "game":
-      return <Game initialGameState={initialGameState} onLeave={() => { localStorage.removeItem(PLAYER_ID_KEY); setInitialGameState(null); setView("lobby"); }} />;
-  }
+  const content = (() => {
+    switch (view) {
+      case "lobby":
+        return <Lobby onJoined={(roomState) => { setInitialRoomState(roomState); setView("room"); }} />;
+      case "room":
+        return <Room initialRoomState={initialRoomState} />;
+      case "game":
+        return <Game initialGameState={initialGameState} onLeave={() => { localStorage.removeItem(PLAYER_ID_KEY); setInitialGameState(null); setView("lobby"); }} />;
+    }
+  })();
+
+  return <div key={view} className="page-transition" style={{ display: "flex", flexDirection: "column", flex: 1 }}>{content}</div>;
 }

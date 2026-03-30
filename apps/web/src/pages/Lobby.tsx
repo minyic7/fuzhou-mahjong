@@ -46,92 +46,93 @@ export function Lobby({ onJoined }: LobbyProps) {
   };
 
   return (
-    <div className="lobby-page" style={{ maxWidth: 500, margin: "0 auto", padding: 20, display: "flex", flexDirection: "column", gap: 16 }}>
-      <h1>福州麻将</h1>
-      <h2>Fuzhou Mahjong</h2>
+    <div className="lobby-page" style={{ maxWidth: 560, margin: "0 auto", padding: "40px 20px", display: "flex", flexDirection: "column", gap: 20 }}>
+      <div style={{ textAlign: "center", marginBottom: 8 }}>
+        <h1 style={{ fontSize: 36, color: "#eee", marginBottom: 4 }}>福州麻将</h1>
+        <h2 style={{ fontSize: 16, color: "#8fbc8f", fontWeight: 400 }}>Fuzhou Mahjong</h2>
+      </div>
 
-      <div style={{ marginBottom: 20 }}>
+      <div>
         <input
           type="text"
           placeholder="你的名字 / Your name"
           value={name}
           onChange={(e) => setName(e.target.value)}
-          style={{ width: "100%", padding: 8, fontSize: 16, boxSizing: "border-box" }}
+          style={{ width: "100%", padding: "10px 12px", fontSize: 16, boxSizing: "border-box" }}
         />
       </div>
 
-      <div style={{ marginBottom: 20 }}>
-        <button
-          onClick={handleCreate}
-          disabled={!name.trim()}
-          style={{ width: "100%", padding: 12, fontSize: 16 }}
-        >
-          创建房间 / Create Room
-        </button>
-        <p style={{ color: "#aab4a0", fontSize: 13, marginTop: 8, textAlign: "center" }}>
-          一个人也能玩！创建房间后可添加机器人凑满 4 人
-        </p>
-      </div>
+      <button
+        onClick={handleCreate}
+        disabled={!name.trim()}
+        className="lobby-create-btn"
+        style={{ width: "100%", padding: "14px 12px", fontSize: 18, fontWeight: 600, border: "2px solid rgba(184, 134, 11, 0.4)", background: "#1a5c3a" }}
+      >
+        创建房间 / Create Room
+      </button>
+      <p style={{ color: "#8fbc8f", fontSize: 13, textAlign: "center", marginTop: -12 }}>
+        一个人也能玩！创建房间后可添加机器人凑满 4 人
+      </p>
 
       <hr />
 
-      <h3>可用房间 / Available Rooms</h3>
+      <h3 style={{ color: "#d4a017", fontSize: 15, letterSpacing: 1 }}>可用房间 / Available Rooms</h3>
       {rooms.length === 0 ? (
-        <p style={{ color: "#aab4a0" }}>暂无房间 / No rooms available</p>
+        <p style={{ color: "#8fbc8f", textAlign: "center", padding: "20px 0" }}>暂无房间 / No rooms available</p>
       ) : (
-        <table style={{ width: "100%", borderCollapse: "collapse", marginBottom: 20 }}>
-          <thead>
-            <tr style={{ borderBottom: "2px solid #ccc", textAlign: "left" }}>
-              <th style={{ padding: "8px 4px" }}>房间号 / Room</th>
-              <th style={{ padding: "8px 4px" }}>玩家 / Players</th>
-              <th style={{ padding: "8px 4px" }}></th>
-            </tr>
-          </thead>
-          <tbody>
-            {rooms.map((room) => (
-              <tr key={room.roomId} style={{ borderBottom: "1px solid #eee" }}>
-                <td style={{ padding: "8px 4px", fontFamily: "monospace", fontWeight: "bold" }}>
+        <div className="room-card-list">
+          {rooms.map((room) => (
+            <div key={room.roomId} className="room-card">
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <span style={{ fontFamily: "monospace", fontSize: 22, fontWeight: "bold", color: "#eee", letterSpacing: 4 }}>
                   {room.roomId}
-                </td>
-                <td style={{ padding: "8px 4px" }}>
-                  {room.players.join(", ")} ({room.playerCount}/{room.maxPlayers})
-                </td>
-                <td style={{ padding: "8px 4px" }}>
-                  <button
-                    onClick={() => handleJoin(room.roomId)}
-                    disabled={!name.trim()}
-                    style={{ padding: "4px 12px" }}
-                  >
-                    加入 / Join
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                </span>
+                <span className="room-status-badge" style={{ background: room.playerCount >= room.maxPlayers ? "rgba(255,82,82,0.2)" : "rgba(46,125,80,0.3)", color: room.playerCount >= room.maxPlayers ? "#ff8a80" : "#8fbc8f", border: `1px solid ${room.playerCount >= room.maxPlayers ? "rgba(255,82,82,0.3)" : "rgba(46,125,80,0.5)"}`, padding: "2px 10px", borderRadius: 12, fontSize: 12 }}>
+                  {room.playerCount >= room.maxPlayers ? "已满 / Full" : "等待中 / Waiting"}
+                </span>
+              </div>
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 10 }}>
+                <div>
+                  <div style={{ display: "flex", gap: 6, marginBottom: 4 }}>
+                    {Array.from({ length: room.maxPlayers }).map((_, i) => (
+                      <span key={i} style={{ width: 10, height: 10, borderRadius: "50%", background: i < room.playerCount ? "#2e7d50" : "rgba(184, 134, 11, 0.15)", border: "1px solid rgba(184, 134, 11, 0.3)", display: "inline-block" }} />
+                    ))}
+                  </div>
+                  <span style={{ color: "#8fbc8f", fontSize: 13 }}>
+                    {room.players.join(", ")}
+                  </span>
+                </div>
+                <button
+                  onClick={() => handleJoin(room.roomId)}
+                  disabled={!name.trim() || room.playerCount >= room.maxPlayers}
+                  style={{ padding: "12px 20px", fontSize: 14 }}
+                >
+                  加入 / Join
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
       )}
 
       <hr />
 
-      <h3>手动加入 / Join by Code</h3>
-      <div style={{ marginBottom: 10 }}>
+      <h3 style={{ color: "#d4a017", fontSize: 15, letterSpacing: 1 }}>手动加入 / Join by Code</h3>
+      <div style={{ display: "flex", gap: 10 }}>
         <input
           type="text"
           placeholder="房间号 / Room Code"
           value={roomCode}
           onChange={(e) => setRoomCode(e.target.value.toUpperCase())}
           maxLength={4}
-          style={{ width: "100%", padding: 8, fontSize: 16, textTransform: "uppercase", boxSizing: "border-box" }}
+          style={{ flex: 1, padding: "10px 12px", fontSize: 16, textTransform: "uppercase", letterSpacing: 4, textAlign: "center" }}
         />
-      </div>
-
-      <div>
         <button
           onClick={() => handleJoin(roomCode.trim())}
           disabled={!name.trim() || !roomCode.trim()}
-          style={{ width: "100%", padding: 12, fontSize: 16 }}
+          style={{ padding: "10px 24px", fontSize: 16 }}
         >
-          加入房间 / Join Room
+          加入 / Join
         </button>
       </div>
 
