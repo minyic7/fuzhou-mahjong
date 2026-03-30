@@ -276,7 +276,7 @@ export function TutorialModal({ open, onClose, condensed }: TutorialModalProps) 
             fontSize: 22,
             cursor: "pointer",
             padding: "4px 8px",
-            minHeight: "auto",
+            minHeight: 44,
             lineHeight: 1,
           }}
         >
