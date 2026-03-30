@@ -6,6 +6,7 @@ import { CenterAction, useCenterAction } from "../components/CenterAction";
 import { sounds } from "../sounds";
 import { TileCounter } from "../components/TileCounter";
 import { TutorialModal } from "../components/TutorialModal";
+import { BREAKPOINTS } from "../hooks/useIsMobile";
 import { TileView } from "../components/Tile";
 import { SessionSummary, type SessionData } from "../components/SessionSummary";
 import { Button } from "../components/Button";
@@ -313,7 +314,7 @@ export function Game({ initialGameState, onLeave }: GameProps) {
     ? (actions.canHu || actions.canPeng || actions.canMingGang || actions.chiOptions.length > 0) && !actions.canDiscard
     : false;
 
-  const isCompactMain = window.innerHeight <= 500;
+  const isCompactMain = window.innerHeight <= BREAKPOINTS.COMPACT_HEIGHT;
 
   const handleAction = (action: GameAction) => {
     socket.emit("playerAction", action);
@@ -345,7 +346,7 @@ export function Game({ initialGameState, onLeave }: GameProps) {
     };
 
     const [showAllHands, setShowAllHands] = useState(false);
-    const isCompact = window.innerHeight <= 500;
+    const isCompact = window.innerHeight <= BREAKPOINTS.COMPACT_HEIGHT;
 
     const isWin = gameOver.winnerId !== null;
     const confettiColors = ["#ff6b6b", "#ffd700", "#4caf50", "#2196f3", "#ff9800", "#e91e63"];
