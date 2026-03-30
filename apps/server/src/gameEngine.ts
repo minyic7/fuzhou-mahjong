@@ -1062,9 +1062,12 @@ export function emitOrBotAction(
       const currentV = getBotVersion(game.roomId, playerIndex);
       if (currentV !== version) {
         console.log(`${tag} Safety timer STALE — bailing (had=${version}, now=${currentV}) ts=${Date.now()}`);
-        // Check if game is stuck after bailing
-        if (game.state.phase === GamePhase.Playing && game.isBot(game.state.currentTurn)) {
-          console.warn(`${tag} Game may be stuck after stale bail — re-checking (currentTurn=${game.state.currentTurn}, phase=${game.state.phase}) ts=${Date.now()}`);
+        // Re-trigger if game is stuck and current turn is a bot with no active window
+        if (game.state.phase === GamePhase.Playing && game.isBot(game.state.currentTurn) && !activeWindows.has(game.roomId)) {
+          const currentPlayer = game.state.currentTurn;
+          const currentActions = getPostDrawActions(game, currentPlayer, false);
+          console.warn(`${tag} Re-triggering bot action for p${currentPlayer} ts=${Date.now()}`);
+          emitOrBotAction(io, game, currentPlayer, currentActions);
         }
         return;
       }
@@ -1093,9 +1096,12 @@ export function emitOrBotAction(
       if (currentV !== version) {
         console.log(`${tag} STALE — bailing (had=${version}, now=${currentV}) ts=${Date.now()}`);
         clearTimeout(safetyTimer);
-        // Check if game is stuck after bailing
-        if (game.state.phase === GamePhase.Playing && game.isBot(game.state.currentTurn)) {
-          console.warn(`${tag} Game may be stuck after stale bail — re-checking (currentTurn=${game.state.currentTurn}, phase=${game.state.phase}) ts=${Date.now()}`);
+        // Re-trigger if game is stuck and current turn is a bot with no active window
+        if (game.state.phase === GamePhase.Playing && game.isBot(game.state.currentTurn) && !activeWindows.has(game.roomId)) {
+          const currentPlayer = game.state.currentTurn;
+          const currentActions = getPostDrawActions(game, currentPlayer, false);
+          console.warn(`${tag} Re-triggering bot action for p${currentPlayer} ts=${Date.now()}`);
+          emitOrBotAction(io, game, currentPlayer, currentActions);
         }
         return;
       }
