@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useSocket } from "./hooks/useSocket";
 import { socket } from "./socket";
-import type { RoomState, ClientGameState } from "@fuzhou-mahjong/shared";
+import type { RoomState, ClientGameState, CumulativeData } from "@fuzhou-mahjong/shared";
 import { Lobby } from "./pages/Lobby";
 import { Room } from "./pages/Room";
 import { Game } from "./pages/Game";
@@ -18,6 +18,7 @@ export function App() {
   const [disconnectedAt, setDisconnectedAt] = useState<number | null>(null);
   const [initialRoomState, setInitialRoomState] = useState<RoomState | null>(null);
   const [initialGameState, setInitialGameState] = useState<ClientGameState | null>(null);
+  const [sessionScores, setSessionScores] = useState<CumulativeData | null>(null);
 
   // Store playerId when assigned
   useEffect(() => {
@@ -57,6 +58,9 @@ export function App() {
   useEffect(() => {
     const handler = (state: ClientGameState) => {
       setInitialGameState(state);
+      if (state.roundsPlayed > 0) {
+        setSessionScores({ scores: state.cumulativeScores, roundsPlayed: state.roundsPlayed });
+      }
       setReconnecting(false);
       setDisconnectedAt(null);
       setView("game");
@@ -99,9 +103,9 @@ export function App() {
       case "lobby":
         return <Lobby onJoined={(roomState) => { setInitialRoomState(roomState); setView("room"); }} />;
       case "room":
-        return <Room initialRoomState={initialRoomState} />;
+        return <Room initialRoomState={initialRoomState} sessionScores={sessionScores} />;
       case "game":
-        return <Game initialGameState={initialGameState} onLeave={() => { localStorage.removeItem(PLAYER_ID_KEY); setInitialGameState(null); setView("lobby"); }} />;
+        return <Game initialGameState={initialGameState} onLeave={() => { localStorage.removeItem(PLAYER_ID_KEY); setInitialGameState(null); setSessionScores(null); setView("lobby"); }} />;
     }
   })();
 

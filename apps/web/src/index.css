@@ -76,6 +76,15 @@ body {
   --color-error-bg: rgba(255, 82, 82, 0.15);
   --color-focus: #4fc3f7;
   --color-separator: rgba(184, 134, 11, 0.2);
+  --color-text-warm: #e8d5a3;
+  --color-gold-bright: #ffd700;
+  --color-draw-action: #6a5acd;
+  --overlay-bg: rgba(15, 30, 25, 0.97);
+  --color-action-hu: #c41e3a;
+  --color-action-chi: #2e8b57;
+  --color-action-peng: #1e6ec4;
+  --color-action-gang: #d4760a;
+  --color-action-discard: #00b894;
 
   /* Consistent border-radius */
   --radius-sm: 4px;
@@ -86,6 +95,7 @@ body {
   --tile-h: 60px;
   --tile-font: 18px;
   --tile-suit-font: 11px;
+  --tile-suit-font-sm: 8px;
   --tile-w-sm: calc(var(--tile-w) * 0.68);
   --tile-h-sm: calc(var(--tile-h) * 0.67);
   --tile-font-sm: calc(var(--tile-font) * 0.72);

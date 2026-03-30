@@ -19,7 +19,7 @@ export function useCenterAction() {
   const [display, setDisplay] = useState<ActionDisplay | null>(null);
 
   const showDiscard = (tile: TileInstance, playerName: string) => {
-    setDisplay({ tiles: [tile], label: `${playerName} 打`, color: "#e8d5a3", id: ++actionId });
+    setDisplay({ tiles: [tile], label: `${playerName} 打`, color: "var(--color-text-warm)", id: ++actionId });
   };
 
   const showClaim = (tiles: TileInstance[], type: string, playerName: string) => {

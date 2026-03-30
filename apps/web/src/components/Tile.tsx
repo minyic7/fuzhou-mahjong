@@ -50,7 +50,7 @@ export function TileView({ tile, faceUp = true, selected, claimable, onClick, on
   const w = small ? "var(--tile-w-sm)" : "var(--tile-w)";
   const h = small ? "var(--tile-h-sm)" : "var(--tile-h)";
   const fontSize = small ? "var(--tile-font-sm)" : "var(--tile-font)";
-  const suitSize = small ? "var(--tile-suit-font)" : "var(--tile-suit-font)";
+  const suitSize = small ? "var(--tile-suit-font-sm, 8px)" : "var(--tile-suit-font)";
   const isGold = gold && isSuitedTile(tile.tile) && isGoldTile(tile, gold);
 
   if (!faceUp) {
@@ -102,11 +102,11 @@ export function TileView({ tile, faceUp = true, selected, claimable, onClick, on
         border: selected
           ? "2px solid #ff8f00"
           : isGold
-          ? "2px solid #ffd700"
+          ? "2px solid var(--color-gold-bright)"
           : claimable
           ? "2px solid #00e676"
           : "1px solid #bbb",
-        borderRadius: 5,
+        borderRadius: "var(--radius-sm)",
         borderBottom: selected ? "2px solid #ff8f00" : "3px solid #a09880",
         borderRight: selected ? "2px solid #ff8f00" : "2px solid #b0a890",
         display: "inline-flex",

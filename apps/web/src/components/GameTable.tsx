@@ -35,7 +35,7 @@ interface GameTableProps {
 
 export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTileId, claimableTileIds, canDiscard, onDiscard, canHu, onHu, canDraw, onDraw, kongTileIds, onAnGang, onBuGang, onBackgroundClick, disconnectedPlayers, drawAnimation }: GameTableProps) {
   const isCompact = useIsCompactLandscape();
-  const { myHand, myFlowers, myMelds, myDiscards, myName, otherPlayers, currentTurn, myIndex, gold, dealerIndex, lianZhuangCount, wallRemaining, myHasDiscardedGold } = state;
+  const { myHand, myFlowers, myMelds, myDiscards, myName, otherPlayers, currentTurn, myIndex, gold, dealerIndex, lianZhuangCount, wallRemaining, myHasDiscardedGold, cumulativeScores, roundsPlayed } = state;
   const lastDiscardTileId = state.lastDiscard?.tile.id ?? null;
   const lastDiscardPlayerIndex = state.lastDiscard?.playerIndex ?? -1;
   const botLabel = (name: string, isBot?: boolean) => isBot ? `${name} 🤖` : name;
@@ -79,6 +79,7 @@ export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTile
           hasDiscardedGold={otherPlayers[1]?.hasDiscardedGold}
           isDisconnected={disconnectedPlayers?.has((myIndex + 2) % 4)}
           compact={isCompact}
+          cumulativeScore={roundsPlayed > 0 ? cumulativeScores[(myIndex + 2) % 4] : undefined}
         />
       </div>
 
@@ -98,6 +99,7 @@ export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTile
           hasDiscardedGold={otherPlayers[2]?.hasDiscardedGold}
           isDisconnected={disconnectedPlayers?.has((myIndex + 3) % 4)}
           compact={isCompact}
+          cumulativeScore={roundsPlayed > 0 ? cumulativeScores[(myIndex + 3) % 4] : undefined}
         />
       </div>
 
@@ -132,6 +134,7 @@ export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTile
           hasDiscardedGold={otherPlayers[0]?.hasDiscardedGold}
           isDisconnected={disconnectedPlayers?.has((myIndex + 1) % 4)}
           compact={isCompact}
+          cumulativeScore={roundsPlayed > 0 ? cumulativeScores[(myIndex + 1) % 4] : undefined}
         />
       </div>
 
@@ -162,6 +165,7 @@ export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTile
           lastDrawnTileId={(state as any).lastDrawnTileId}
           lastDiscardedTileId={lastDiscardPlayerIndex === myIndex ? lastDiscardTileId : null}
           tenpaiTiles={(state as any).tenpaiTiles}
+          cumulativeScore={roundsPlayed > 0 ? cumulativeScores[myIndex] : undefined}
         />
       </div>
 

@@ -38,7 +38,7 @@ export function ConnectionStatus({ connectionState, reconnectAttempt, timeoutMs,
     }}>
       <div className="spinner" style={{ width: 40, height: 40, borderWidth: 4 }} />
 
-      <div style={{ fontSize: 20, color: "#e8d5a3", fontWeight: "bold" }}>
+      <div style={{ fontSize: 20, color: "var(--color-text-warm)", fontWeight: "bold" }}>
         {connectionState === "reconnecting" ? "重新连接中... / Reconnecting..." : "连接已断开 / Disconnected"}
       </div>
 

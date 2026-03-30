@@ -15,10 +15,10 @@ const BTN = {
     borderRadius: 8, border: "none", minHeight: "var(--btn-min-size)", minWidth: "var(--btn-min-size)",
     cursor: "pointer",
   },
-  hu: { background: "#c41e3a", color: "#fff" },
-  peng: { background: "#1e6ec4", color: "#fff" },
-  gang: { background: "#d4760a", color: "#fff" },
-  chi: { background: "#2e8b57", color: "#fff" },
+  hu: { background: "var(--color-action-hu)", color: "#fff" },
+  peng: { background: "var(--color-action-peng)", color: "#fff" },
+  gang: { background: "var(--color-action-gang)", color: "#fff" },
+  chi: { background: "var(--color-action-chi)", color: "#fff" },
   pass: { background: "#444", color: "#ccc" },
 };
 
@@ -45,8 +45,8 @@ export function ClaimOverlay({ actions, gameState, onAction }: ClaimOverlayProps
       }}
     >
       <div style={{
-        background: "rgba(15,30,25,0.95)",
-        border: "2px solid #ffa500",
+        background: "var(--overlay-bg)",
+        border: "2px solid var(--color-gold-border-hover)",
         borderRadius: 12,
         padding: "var(--overlay-padding-y) var(--overlay-padding-x)",
         display: "flex",
@@ -164,7 +164,7 @@ export function ClaimOverlay({ actions, gameState, onAction }: ClaimOverlayProps
                     minHeight: 56,
                     scrollSnapAlign: "start",
                     flexShrink: 0,
-                    borderRadius: 10,
+                    borderRadius: "var(--radius-lg)",
                     border: "2px solid rgba(46,139,87,0.6)",
                   }}
                   onClick={() => {

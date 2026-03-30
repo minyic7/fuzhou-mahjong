@@ -93,7 +93,7 @@ export function TileCounter({ gameState }: TileCounterProps) {
           fontSize: 12,
           background: expanded ? "rgba(255,215,0,0.1)" : "rgba(0,0,0,0.3)",
           border: `1px solid ${expanded ? "rgba(255,215,0,0.4)" : "rgba(184,134,11,0.3)"}`,
-          color: "#e8d5a3",
+          color: "var(--color-text-warm)",
           borderRadius: 4,
           minHeight: "auto",
           cursor: "pointer",

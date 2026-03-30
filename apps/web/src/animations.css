@@ -309,6 +309,23 @@
   100% { transform: translate(120px, 0) scale(0.8); opacity: 0; filter: brightness(1); }
 }
 
+/* Score flash animation */
+@keyframes scoreFlash {
+  0% { opacity: 0; transform: translateY(4px) scale(0.9); }
+  30% { opacity: 1; transform: translateY(0) scale(1.1); }
+  100% { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+/* Session summary rank row entrance */
+@keyframes sessionRankRow {
+  0% { opacity: 0; transform: translateX(-12px); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+
+.session-rank-row {
+  animation: sessionRankRow 0.3s ease-out both;
+}
+
 /* Tutorial slide transition */
 @keyframes tutorialSlideIn {
   0% { opacity: 0; transform: translateX(16px); }

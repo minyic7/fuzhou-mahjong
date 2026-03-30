@@ -152,7 +152,7 @@ function WallSegment({ side, stacks, drawStack, canDraw, onDraw }: {
                   padding: "6px 16px",
                   fontSize: 14,
                   fontWeight: "bold",
-                  background: "#6a5acd",
+                  background: "var(--color-draw-action)",
                   color: "#fff",
                   border: "none",
                   borderRadius: 6,
@@ -202,7 +202,7 @@ export function TileWall({ wallRemaining, wallDrawCount, wallSupplementCount, go
       }}>
         {gold && (
           <div style={{ display: "flex", alignItems: "center", gap: 4 }}>
-            <span style={{ fontSize: 10, color: "#ffd700" }}>金</span>
+            <span style={{ fontSize: 10, color: "var(--color-gold-bright)" }}>金</span>
             <TileView tile={gold.indicatorTile} faceUp gold={null} small className={goldFlip ? "gold-flip-reveal" : undefined} />
           </div>
         )}
@@ -222,7 +222,7 @@ export function TileWall({ wallRemaining, wallDrawCount, wallSupplementCount, go
             onClick={onDraw}
             style={{
               padding: "4px 12px", fontSize: 12, fontWeight: "bold",
-              background: "#6a5acd", color: "#fff", border: "none",
+              background: "var(--color-draw-action)", color: "#fff", border: "none",
               borderRadius: 4, minHeight: 44, minWidth: 44,
               boxShadow: "0 0 12px rgba(106,90,205,0.6)",
             }}
@@ -266,7 +266,7 @@ export function TileWall({ wallRemaining, wallDrawCount, wallSupplementCount, go
       }}>
         {gold && (
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-            <div style={{ fontSize: 10, color: "#ffd700", marginBottom: 2 }}>金</div>
+            <div style={{ fontSize: 10, color: "var(--color-gold-bright)", marginBottom: 2 }}>金</div>
             <TileView tile={gold.indicatorTile} faceUp gold={null} small className={goldFlip ? "gold-flip-reveal" : undefined} />
           </div>
         )}
