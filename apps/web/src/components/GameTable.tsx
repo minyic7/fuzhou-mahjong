@@ -32,10 +32,11 @@ interface GameTableProps {
   onBackgroundClick?: () => void;
   disconnectedPlayers?: Set<number>;
   drawAnimation?: DrawAnimationState | null;
+  claimAnimation?: { seat: DrawAnimationSeat; key: number } | null;
   departingTileId?: number | null;
 }
 
-export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTileId, claimableTileIds, canDiscard, onDiscard, canHu, onHu, canDraw, onDraw, kongTileIds, onAnGang, onBuGang, onBackgroundClick, disconnectedPlayers, drawAnimation, departingTileId }: GameTableProps) {
+export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTileId, claimableTileIds, canDiscard, onDiscard, canHu, onHu, canDraw, onDraw, kongTileIds, onAnGang, onBuGang, onBackgroundClick, disconnectedPlayers, drawAnimation, claimAnimation, departingTileId }: GameTableProps) {
   const isCompact = useIsCompactLandscape();
   const isFirstPersonMobile = useIsFirstPersonMobile();
 
@@ -241,6 +242,36 @@ export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTile
               boxShadow: drawAnimation.isSupplement
                 ? "0 0 8px rgba(255,215,0,0.6)"
                 : "0 1px 4px rgba(0,0,0,0.4)",
+            }}
+            draggable={false}
+          />
+        </div>
+      )}
+
+      {/* Claim fly animation overlay — tile travels from pool toward claiming player */}
+      {claimAnimation && (
+        <div
+          key={claimAnimation.key}
+          style={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            marginTop: -8,
+            marginLeft: -6,
+            pointerEvents: "none",
+            zIndex: 20,
+            animation: `claimFly${claimAnimation.seat.charAt(0).toUpperCase() + claimAnimation.seat.slice(1)} 0.3s ease-out forwards`,
+          }}
+        >
+          <img
+            src={TILE_BACK_URL}
+            alt=""
+            style={{
+              width: "var(--wall-tw)",
+              height: "var(--wall-th)",
+              display: "block",
+              borderRadius: 2,
+              boxShadow: "0 1px 4px rgba(0,0,0,0.4)",
             }}
             draggable={false}
           />
