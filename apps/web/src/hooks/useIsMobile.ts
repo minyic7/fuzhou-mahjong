@@ -12,9 +12,18 @@ export function useIsCompactLandscape(): boolean {
   const [isCompact, setIsCompact] = useState(() => window.innerHeight <= BREAKPOINTS.COMPACT_HEIGHT);
 
   useEffect(() => {
-    const onResize = () => setIsCompact(window.innerHeight <= BREAKPOINTS.COMPACT_HEIGHT);
+    let timeout: ReturnType<typeof setTimeout>;
+    const onResize = () => {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => {
+        setIsCompact(window.innerHeight <= BREAKPOINTS.COMPACT_HEIGHT);
+      }, 100);
+    };
     window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
+    return () => {
+      clearTimeout(timeout);
+      window.removeEventListener("resize", onResize);
+    };
   }, []);
 
   return isCompact;
@@ -25,10 +34,18 @@ export function useIsFirstPersonMobile(): boolean {
     () => window.innerHeight <= BREAKPOINTS.COMPACT_HEIGHT && window.innerWidth <= 1024
   );
   useEffect(() => {
-    const onResize = () =>
-      setIsFP(window.innerHeight <= BREAKPOINTS.COMPACT_HEIGHT && window.innerWidth <= 1024);
+    let timeout: ReturnType<typeof setTimeout>;
+    const onResize = () => {
+      clearTimeout(timeout);
+      timeout = setTimeout(() => {
+        setIsFP(window.innerHeight <= BREAKPOINTS.COMPACT_HEIGHT && window.innerWidth <= 1024);
+      }, 100);
+    };
     window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
+    return () => {
+      clearTimeout(timeout);
+      window.removeEventListener("resize", onResize);
+    };
   }, []);
   return isFP;
 }
