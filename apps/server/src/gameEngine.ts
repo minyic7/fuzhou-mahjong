@@ -122,6 +122,29 @@ class ActionWindow {
 
 const activeWindows = new Map<string, ActionWindow>();
 
+/** Monotonic counter per room to invalidate stale bot callbacks. */
+const botActionVersion = new Map<string, number>();
+
+function nextBotVersion(roomId: string): number {
+  const v = (botActionVersion.get(roomId) ?? 0) + 1;
+  botActionVersion.set(roomId, v);
+  return v;
+}
+
+function getBotVersion(roomId: string): number {
+  return botActionVersion.get(roomId) ?? 0;
+}
+
+/** Pick first non-gold tile to discard as emergency fallback. */
+function emergencyDiscard(
+  hand: TileInstance[],
+  playerIndex: number,
+  gold: import("@fuzhou-mahjong/shared").GoldState | null,
+): GameAction {
+  const tile = hand.find(t => !gold || !isGoldTile(t, gold)) ?? hand[0];
+  return { type: ActionType.Discard, playerIndex, tile };
+}
+
 export function handlePlayerAction(
   io: GameServer,
   socketIdOrRoomId: string,
@@ -881,11 +904,32 @@ function emitOrBotAction(
   actions: import("@fuzhou-mahjong/shared").AvailableActions,
   lastDiscardTile?: TileInstance,
 ): void {
+  const version = nextBotVersion(game.roomId);
+
   if (game.isBot(playerIndex)) {
+    const safetyTimer = setTimeout(() => {
+      // 5-second safety timeout: if bot callback hasn't fired, force discard
+      if (getBotVersion(game.roomId) !== version) return; // stale
+      if (game.state.phase !== GamePhase.Playing) return;
+      console.warn(`Bot ${playerIndex} safety timeout — forcing emergency discard`);
+      try {
+        const player = game.state.players[playerIndex];
+        handlePlayerAction(io, game.roomId, emergencyDiscard(player.hand, playerIndex, game.state.gold), playerIndex);
+      } catch (e) {
+        console.error(`Bot ${playerIndex} safety timeout fallback failed:`, e);
+      }
+    }, 5_000);
+
     setTimeout(() => {
+      // Stale check: if version has advanced, another action superseded this one
+      if (getBotVersion(game.roomId) !== version) {
+        clearTimeout(safetyTimer);
+        return;
+      }
       try {
         // Check if game state is still valid for this bot action
         if (game.state.phase !== GamePhase.Playing) {
+          clearTimeout(safetyTimer);
           console.warn(`Bot ${playerIndex} action skipped: game phase is ${game.state.phase}, attempting Pass fallback`);
           try {
             handlePlayerAction(io, game.roomId, { type: ActionType.Pass, playerIndex }, playerIndex);
@@ -905,14 +949,21 @@ function emitOrBotAction(
             .map(p => p.discards),
         };
         const botAction = decideBotAction(player.hand, player.melds, actions, playerIndex, game.state.gold, lastDiscardTile, botContext);
+        clearTimeout(safetyTimer);
         handlePlayerAction(io, game.roomId, botAction, playerIndex);
       } catch (err) {
+        clearTimeout(safetyTimer);
         console.error(`Bot ${playerIndex} action error:`, err);
-        // Fallback: try to pass to prevent game freeze
+        // Fallback: try pass first, then discard if pass not allowed
         try {
-          handlePlayerAction(io, game.roomId, { type: ActionType.Pass, playerIndex }, playerIndex);
+          if (actions.canPass) {
+            handlePlayerAction(io, game.roomId, { type: ActionType.Pass, playerIndex }, playerIndex);
+          } else {
+            const player = game.state.players[playerIndex];
+            handlePlayerAction(io, game.roomId, emergencyDiscard(player.hand, playerIndex, game.state.gold), playerIndex);
+          }
         } catch (fallbackErr) {
-          console.error(`Bot ${playerIndex} fallback pass also failed:`, fallbackErr);
+          console.error(`Bot ${playerIndex} fallback also failed:`, fallbackErr);
         }
       }
     }, 300 + Math.random() * 500);

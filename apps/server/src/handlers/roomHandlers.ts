@@ -307,10 +307,14 @@ function triggerDealerAction(io: GameServer, game: import("../gameState.js").Ser
         handlePlayerAction(io, game.roomId, botAction, dealerIdx);
       } catch (err) {
         console.error(`Dealer bot ${dealerIdx} action error:`, err);
+        // Fallback: discard first non-gold tile (dealer must discard, pass may not be valid)
         try {
-          handlePlayerAction(io, game.roomId, { type: ActionType.Pass, playerIndex: dealerIdx }, dealerIdx);
+          const player = game.state.players[dealerIdx];
+          const gold = game.state.gold;
+          const tile = player.hand.find(t => !gold || !isGoldTile(t, gold)) ?? player.hand[0];
+          handlePlayerAction(io, game.roomId, { type: ActionType.Discard, playerIndex: dealerIdx, tile }, dealerIdx);
         } catch (e) {
-          console.error(`Dealer bot ${dealerIdx} fallback also failed:`, e);
+          console.error(`Dealer bot ${dealerIdx} discard fallback also failed:`, e);
         }
       }
     }, 500);
