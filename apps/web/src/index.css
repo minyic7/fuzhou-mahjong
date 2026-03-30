@@ -75,6 +75,7 @@ body {
   --overlay-bg: rgba(15, 30, 25, 0.97);
   --color-text-primary: #eee;
   --color-text-secondary: #8fbc8f;
+  --color-text-muted: #ccc;
   --color-text-gold: #d4a017;
   --color-success: #4caf50;
   --color-text-warm: #e8d5a3;
