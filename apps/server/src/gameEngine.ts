@@ -130,11 +130,12 @@ const botWatchdogs = new Map<string, NodeJS.Timeout>();
 let lastIoRef: GameServer | null = null;
 
 function startBotWatchdog(roomId: string, playerIndex: number, io: GameServer): void {
-  clearBotWatchdog(roomId);
+  const key = roomId + ":" + playerIndex;
+  clearBotWatchdog(roomId, playerIndex);
   lastIoRef = io;
 
   const watchdog = setTimeout(() => {
-    botWatchdogs.delete(roomId);
+    botWatchdogs.delete(key);
     const game = getGame(roomId);
     if (!game || game.state.phase !== GamePhase.Playing) {
       console.log(`[Bot:${roomId}:p${playerIndex}:watchdog] Fired but game ended (phase=${game?.state.phase ?? "deleted"}) ts=${Date.now()}`);
@@ -176,14 +177,15 @@ function startBotWatchdog(roomId: string, playerIndex: number, io: GameServer): 
     }
   }, BOT_WATCHDOG_MS);
 
-  botWatchdogs.set(roomId, watchdog);
+  botWatchdogs.set(key, watchdog);
 }
 
-function clearBotWatchdog(roomId: string): void {
-  const existing = botWatchdogs.get(roomId);
+function clearBotWatchdog(roomId: string, playerIndex: number): void {
+  const key = roomId + ":" + playerIndex;
+  const existing = botWatchdogs.get(key);
   if (existing) {
     clearTimeout(existing);
-    botWatchdogs.delete(roomId);
+    botWatchdogs.delete(key);
   }
 }
 
@@ -205,7 +207,7 @@ function getBotVersion(roomId: string, playerIndex: number): number {
 // Clean up per-room state when a game is deleted
 setOnGameDeleted((roomId) => {
   botActionVersion.delete(roomId);
-  clearBotWatchdog(roomId);
+  for (let i = 0; i < 4; i++) clearBotWatchdog(roomId, i);
   const window = activeWindows.get(roomId);
   if (window) {
     window.cancel();
@@ -269,8 +271,8 @@ export function handlePlayerAction(
     if (playerIndex === -1) return;
   }
 
-  // Clear watchdog on any successful action processing for this room
-  clearBotWatchdog(room.id);
+  // Clear watchdog on any successful action processing for this player
+  clearBotWatchdog(room.id, playerIndex);
 
   // Check if there's an active action window
   const window = activeWindows.get(room.id);
