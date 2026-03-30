@@ -1313,8 +1313,11 @@ export function emitOrBotAction(
     // Snapshot the drawn tile ID at schedule time to avoid race conditions
     // where another player's action clears/changes it before the callback fires
     const snapshotDrawnTileId = game.lastDrawnTileIds[playerIndex];
+    // Capture whether an action window exists at schedule time — if it resolves
+    // before the callback fires, the bot's response is moot and should be skipped.
+    const isResponseContext = activeWindows.has(game.roomId);
 
-    console.log(`${tag} Scheduling action (version=${version}, delay=${Math.round(delay)}ms, phase=${game.state.phase}) ts=${Date.now()}`);
+    console.log(`${tag} Scheduling action (version=${version}, delay=${Math.round(delay)}ms, phase=${game.state.phase}, isResponseContext=${isResponseContext}) ts=${Date.now()}`);
 
     let mainTimer: NodeJS.Timeout | null = null;
     const safetyTimer = setTimeout(() => {
@@ -1462,6 +1465,12 @@ export function emitOrBotAction(
           console.log(`${tag} Bot already responded to action window, skipping ts=${Date.now()}`);
           return;
         }
+        // The action window existed when this callback was scheduled but has
+        // since resolved — the bot's response is no longer relevant.
+        if (!activeWindow && isResponseContext) {
+          console.log(`${tag} Action window resolved before bot callback fired — response is moot, skipping ts=${Date.now()}`);
+          return;
+        }
         const freshActions = activeWindow && lastDiscardTile
           ? getResponseActions(game, playerIndex, lastDiscardTile, activeWindow.getDiscarderIndex())
           : activeWindow
@@ -1478,14 +1487,22 @@ export function emitOrBotAction(
       } catch (err) {
         clearTimeout(safetyTimer);
         console.error(`${tag} Bot callback unhandled error:`, err);
+        // Re-derive actions from current game state for the fallback chain
+        const fallbackInFinal = isInFinalDraws(game.state.wall.length, game.state.wallTail.length, game.state.retainCount);
+        const fallbackWindow = activeWindows.get(game.roomId);
+        const fallbackActions = fallbackWindow && lastDiscardTile
+          ? getResponseActions(game, playerIndex, lastDiscardTile, fallbackWindow.getDiscarderIndex())
+          : fallbackWindow
+            ? actions
+            : getPostDrawActions(game, playerIndex, fallbackInFinal);
         // Fallback: try pass first, then discard if pass not allowed
-        console.warn(`${tag} Entering fallback chain (canPass=${actions.canPass}) ts=${Date.now()}`);
+        console.warn(`${tag} Entering fallback chain (canPass=${fallbackActions.canPass}) ts=${Date.now()}`);
         if (game.state.phase !== GamePhase.Playing) {
           console.warn(`${tag} Fallback skipped — game ended (phase=${game.state.phase})`);
           return;
         }
         try {
-          if (actions.canPass) {
+          if (fallbackActions.canPass) {
             handlePlayerAction(io, game.roomId, { type: ActionType.Pass, playerIndex }, playerIndex);
           } else {
             const player = game.state.players[playerIndex];
