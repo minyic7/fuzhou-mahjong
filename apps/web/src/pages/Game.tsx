@@ -7,6 +7,7 @@ import { sounds, setMuted, isMuted } from "../sounds";
 import { TileCounter } from "../components/TileCounter";
 import { TutorialModal } from "../components/TutorialModal";
 import { TileView } from "../components/Tile";
+import { Button } from "../components/Button";
 import { ActionType, MeldType } from "@fuzhou-mahjong/shared";
 import type { ClientGameState, GameOverResult, AvailableActions, GameAction, PlayerDisconnectedEvent, PlayerReconnectedEvent } from "@fuzhou-mahjong/shared";
 
@@ -73,6 +74,7 @@ export function Game({ initialGameState, onLeave }: GameProps) {
   const [tutorialCondensed, setTutorialCondensed] = useState(false);
   const [drawAnimation, setDrawAnimation] = useState<DrawAnimationState | null>(null);
   const drawAnimKeyRef = useRef(0);
+  const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
 
   // First-game auto-show tutorial
   useEffect(() => {
@@ -83,6 +85,17 @@ export function Game({ initialGameState, onLeave }: GameProps) {
       localStorage.setItem('tutorial-seen', '1');
     }
   }, []);
+
+  // Warn before browser close/back during active game
+  useEffect(() => {
+    if (gameOver) return;
+    const handler = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = '';
+    };
+    window.addEventListener('beforeunload', handler);
+    return () => window.removeEventListener('beforeunload', handler);
+  }, [gameOver]);
 
   const toggleMute = () => {
     const next = !soundMuted;
@@ -522,6 +535,48 @@ export function Game({ initialGameState, onLeave }: GameProps) {
         <ClaimOverlay actions={actions} gameState={gameState} onAction={handleAction} />
       )}
       <TileCounter gameState={gameState} />
+      {/* Leave button */}
+      {onLeave && (
+        <button
+          onClick={() => setShowLeaveConfirm(true)}
+          aria-label="Leave game"
+          style={{
+            position: "fixed",
+            bottom: 56,
+            right: 12,
+            width: 36,
+            height: 36,
+            minHeight: 36,
+            borderRadius: "50%",
+            background: "rgba(15,30,25,0.85)",
+            border: "1px solid rgba(184,134,11,0.4)",
+            color: "#ff5252",
+            fontSize: 18,
+            fontWeight: 700,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            cursor: "pointer",
+            zIndex: 20,
+            padding: 0,
+          }}
+        >
+          ✕
+        </button>
+      )}
+      {/* Leave confirmation modal */}
+      {showLeaveConfirm && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50 }}>
+          <div style={{ background: 'rgba(15,30,25,0.97)', border: '2px solid rgba(184,134,11,0.4)', borderRadius: 12, padding: '24px', maxWidth: 360, textAlign: 'center' }}>
+            <p style={{ fontSize: 18, marginBottom: 8 }}>确定要退出吗？</p>
+            <p style={{ fontSize: 13, color: '#8fbc8f', marginBottom: 0 }}>退出后本局将由机器人代打</p>
+            <div style={{ display: 'flex', gap: 12, justifyContent: 'center', marginTop: 16 }}>
+              <Button variant='secondary' onClick={() => setShowLeaveConfirm(false)}>取消</Button>
+              <Button variant='danger' onClick={() => { socket.emit('leaveRoom'); onLeave!(); }}>退出游戏</Button>
+            </div>
+          </div>
+        </div>
+      )}
       {/* Help button */}
       <button
         onClick={() => { setTutorialCondensed(false); setShowTutorial(true); }}
