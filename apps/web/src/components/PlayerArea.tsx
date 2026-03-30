@@ -63,6 +63,13 @@ export function PlayerArea({
   }, [claimActive, dismiss]);
   const isCompactLandscape = useIsCompactLandscape();
 
+  // Auto-scroll compact discards to the end when new tiles are added
+  const discardScrollRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = discardScrollRef.current;
+    if (el) el.scrollLeft = el.scrollWidth;
+  }, [discards.length]);
+
   // Double-tap detection for reliable mobile double-tap
   const lastTapRef = useRef<{ id: number; time: number } | null>(null);
   const handleTap = (t: TileInstance) => {
@@ -165,14 +172,13 @@ export function PlayerArea({
           </div>
         )}
         {discards.length > 0 && (
-          <div className="compact-discards" style={{ display: "flex", gap: 0, overflowX: "auto", overflowY: "hidden", minWidth: 0, alignItems: "center" }}>
-            {discards.slice(-6).map((d) => (
+          <div ref={discardScrollRef} className="compact-discards" style={{ display: "flex", gap: 0, overflowX: "auto", overflowY: "hidden", minWidth: 0, alignItems: "center", scrollSnapType: "x mandatory", WebkitOverflowScrolling: "touch" }}>
+            {discards.map((d) => (
               <TileView key={d.id} tile={d} faceUp gold={gold} small
-                style={{ width: "var(--fp-opponent-tile-w)", height: "var(--fp-opponent-tile-h)", fontSize: "var(--font-uc-tile)" }}
+                style={{ width: "var(--fp-opponent-tile-w)", height: "var(--fp-opponent-tile-h)", fontSize: "var(--font-uc-tile)", scrollSnapAlign: "start" }}
                 className={lastDiscardedTileId === d.id ? "discard-arrive last-discard" : undefined}
               />
             ))}
-            {discards.length > 6 && <span style={{ fontSize: "var(--font-overflow)", color: "var(--color-text-muted)" }}>+{discards.length - 6}</span>}
           </div>
         )}
       </div>
@@ -227,16 +233,19 @@ export function PlayerArea({
 
         {/* Discards (tiny, single row, scrollable) */}
         {discards.length > 0 && (
-          <div className="compact-discards" style={{
+          <div ref={discardScrollRef} className="compact-discards" style={{
             display: "flex",
             gap: 1,
             overflowX: "auto",
             overflowY: "hidden",
             flex: 1,
             minWidth: 0,
+            scrollSnapType: "x mandatory",
+            WebkitOverflowScrolling: "touch",
           }}>
             {discards.map((d) => (
               <TileView key={d.id} tile={d} faceUp gold={gold} small
+                style={{ scrollSnapAlign: "start" }}
                 className={lastDiscardedTileId === d.id ? "discard-arrive last-discard" : undefined}
               />
             ))}
@@ -472,7 +481,7 @@ export function PlayerArea({
 
       {/* Discards - always single row */}
       {discards.length > 0 && (
-        <div className="compact-discards" style={{
+        <div ref={discardScrollRef} className="compact-discards" style={{
           display: "flex",
           gap: 1,
           overflowX: "auto",
@@ -480,9 +489,12 @@ export function PlayerArea({
           padding: "var(--game-padding)",
           background: isMe ? "rgba(0,100,200,0.08)" : "rgba(255,255,255,0.03)",
           borderRadius: 4,
+          scrollSnapType: "x mandatory",
+          WebkitOverflowScrolling: "touch",
         }}>
           {discards.map((d) => (
             <TileView key={d.id} tile={d} faceUp gold={gold} small
+              style={{ scrollSnapAlign: "start" }}
               className={lastDiscardedTileId === d.id ? "discard-arrive last-discard" : undefined}
             />
           ))}
