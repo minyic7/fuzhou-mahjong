@@ -35,7 +35,7 @@ function RoundHistorySection({ roundHistory, playerNames, isCompact }: {
 }) {
   const [expanded, setExpanded] = useState(false);
   const showToggle = isCompact;
-  const contentMaxHeight = isCompact ? (expanded ? 240 : 0) : 160;
+  const contentMaxHeight = isCompact ? (expanded ? 120 : 0) : 160;
 
   return (
     <div style={{ marginBottom: "clamp(8px, 2.5vh, 16px)" }}>
@@ -138,7 +138,7 @@ export function SessionSummary({ data, onClose }: SessionSummaryProps) {
         padding: isCompact ? "clamp(8px, 2.5vh, 16px) clamp(12px, 3vh, 20px)" : "24px 28px",
         maxWidth: "min(440px, 90vw)",
         width: "90vw",
-        maxHeight: "90dvh",
+        maxHeight: "clamp(200px, 80dvh, 90vh)",
         overflowY: "auto",
         color: "var(--color-text-primary)",
       }}>
