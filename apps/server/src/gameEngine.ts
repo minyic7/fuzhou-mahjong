@@ -1012,6 +1012,22 @@ function getResponseActions(
     canHuFlag = winResult.isWin;
   }
 
+  // During final draws, only Hu is allowed — skip Peng/Chi/Gang
+  const inFinal = isInFinalDraws(state.wall.length, state.wallTail.length, state.retainCount);
+  if (inFinal) {
+    return {
+      canDraw: false,
+      canDiscard: false,
+      chiOptions: [],
+      canPeng: false,
+      canMingGang: false,
+      anGangOptions: [],
+      buGangOptions: [],
+      canHu: canHuFlag,
+      canPass: true,
+    };
+  }
+
   // Chi: only the next counterclockwise player can chi
   const isNextPlayer = ((discarderIndex + 1) % 4) === playerIndex;
   const chiOpts = isNextPlayer ? findChiCombinations(player.hand, discardTile, gold) : [];
