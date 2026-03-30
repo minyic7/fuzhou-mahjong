@@ -21,7 +21,7 @@ interface ClaimOverlayProps {
 const BTN = {
   base: {
     padding: "var(--btn-padding)", fontSize: "var(--btn-font)", fontWeight: "bold" as const,
-    borderRadius: 8, border: "none", minHeight: "var(--btn-min-size)", minWidth: "var(--btn-min-size)",
+    borderRadius: 8, border: "none", minHeight: "clamp(40px, 8dvh, 56px)", minWidth: "var(--btn-min-size)",
     cursor: "pointer",
   },
   hu: { background: "var(--color-action-hu)", color: "#fff" },
@@ -95,7 +95,7 @@ export function ClaimOverlay({ actions, gameState, onAction }: ClaimOverlayProps
           {isCompact ? "选择" : "可以操作！请选择"}
         </div>
 
-        <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: isUltraCompact ? 8 : 10 }}>
+        <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: isUltraCompact ? 6 : 10 }}>
           {actions.canHu && (
             <button
               style={{ ...BTN.base, ...BTN.hu }}

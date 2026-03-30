@@ -1127,3 +1127,10 @@ button.lobby-create-btn:active:not(:disabled) {
     padding: clamp(6px, 1.8dvh, 10px);
   }
 }
+
+/* Narrow landscape phones (≤390px width, e.g. iPhone SE landscape height as width) */
+@media (orientation: landscape) and (max-width: 390px) {
+  .confirm-modal {
+    padding: clamp(12px, 2dvh, 16px);
+  }
+}
