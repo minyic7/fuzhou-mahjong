@@ -9,9 +9,16 @@ interface GameTableProps {
   onTileDoubleClick?: (tile: TileInstance) => void;
   selectedTileId: number | null;
   claimableTileIds?: Set<number>;
+  canDiscard?: boolean;
+  onDiscard?: (tileInstanceId: number) => void;
+  canDraw?: boolean;
+  onDraw?: () => void;
+  kongTileIds?: Set<number>;
+  onAnGang?: (tileInstanceId: number) => void;
+  onBuGang?: (tileInstanceId: number) => void;
 }
 
-export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTileId, claimableTileIds }: GameTableProps) {
+export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTileId, claimableTileIds, canDiscard, onDiscard, canDraw, onDraw, kongTileIds, onAnGang, onBuGang }: GameTableProps) {
   const { myHand, myFlowers, myMelds, myDiscards, myName, otherPlayers, currentTurn, myIndex, gold, dealerIndex, lianZhuangCount, wallRemaining } = state;
   const botLabel = (name: string, isBot?: boolean) => isBot ? `${name} 🤖` : name;
   const labels = [
@@ -70,7 +77,7 @@ export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTile
 
       {/* Center - game info */}
       <div style={{ gridArea: "center", display: "flex", alignItems: "center", justifyContent: "center", position: "relative", zIndex: 1 }}>
-        <TileWall wallRemaining={wallRemaining} gold={gold} />
+        <TileWall wallRemaining={wallRemaining} gold={gold} canDraw={canDraw} onDraw={onDraw} />
         <GameInfo
           gold={null}
           wallRemaining={wallRemaining}
@@ -113,6 +120,11 @@ export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTile
           onTileDoubleClick={onTileDoubleClick}
           label={labels[0]}
           claimableTileIds={claimableTileIds}
+          canDiscard={canDiscard}
+          onDiscard={onDiscard}
+          kongTileIds={kongTileIds}
+          onAnGang={onAnGang}
+          onBuGang={onBuGang}
           lastDrawnTileId={(state as any).lastDrawnTileId}
           tenpaiTiles={(state as any).tenpaiTiles}
         />

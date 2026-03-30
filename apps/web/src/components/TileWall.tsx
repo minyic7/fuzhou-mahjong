@@ -5,9 +5,11 @@ import { TileView } from "./Tile";
 interface TileWallProps {
   wallRemaining: number;
   gold: GoldState | null;
+  canDraw?: boolean;
+  onDraw?: () => void;
 }
 
-export function TileWall({ wallRemaining, gold }: TileWallProps) {
+export function TileWall({ wallRemaining, gold, canDraw, onDraw }: TileWallProps) {
   const prevRef = useRef(wallRemaining);
   const [flash, setFlash] = useState(false);
 
@@ -127,8 +129,25 @@ export function TileWall({ wallRemaining, gold }: TileWallProps) {
         </div>
       </div>
 
-      {/* Direction labels */}
-      <div style={{ position: "absolute", top: 18, left: "50%", transform: "translateX(-50%)", fontSize: 9, color: "#8a9a8a" }}>摸牌 →</div>
+      {/* Direction labels / Draw button */}
+      {canDraw ? (
+        <button
+          className="draw-button-pulse"
+          onClick={onDraw}
+          style={{
+            position: "absolute", top: 18, left: "50%", transform: "translateX(-50%)",
+            padding: "6px 16px", fontSize: 14, fontWeight: "bold",
+            background: "#6a5acd", color: "#fff", border: "none", borderRadius: 6,
+            boxShadow: "0 0 12px rgba(106,90,205,0.6)",
+            whiteSpace: "nowrap", minHeight: 44, minWidth: 44,
+            zIndex: 10,
+          }}
+        >
+          摸牌
+        </button>
+      ) : (
+        <div style={{ position: "absolute", top: 18, left: "50%", transform: "translateX(-50%)", fontSize: 9, color: "#8a9a8a" }}>摸牌 →</div>
+      )}
       <div style={{ position: "absolute", bottom: 18, left: "50%", transform: "translateX(-50%)", fontSize: 9, color: "#8a9a8a" }}>← 补牌</div>
     </div>
   );

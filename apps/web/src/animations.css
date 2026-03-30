@@ -178,6 +178,33 @@
   animation: tileHighlight 0.8s ease-in-out infinite;
 }
 
+/* Discard bubble fade-in */
+@keyframes bubbleFadeIn {
+  0% { opacity: 0; transform: translateX(-50%) translateY(4px); }
+  100% { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+/* Draw button pulse */
+@keyframes drawPulse {
+  0%, 100% { box-shadow: 0 0 8px rgba(106,90,205,0.4); }
+  50% { box-shadow: 0 0 20px rgba(106,90,205,0.8); }
+}
+
+.draw-button-pulse {
+  animation: drawPulse 1.5s ease-in-out infinite;
+}
+
+/* Claim overlay animations */
+@keyframes overlayFadeIn {
+  0% { opacity: 0; }
+  100% { opacity: 1; }
+}
+
+@keyframes overlayScaleIn {
+  0% { opacity: 0; transform: scale(0.85); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
 /* Center action animations (discard fly / claim reveal) */
 @keyframes centerActionIn {
   0% { opacity: 0; transform: translate(-50%, -50%) scale(0.3); }

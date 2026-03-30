@@ -20,12 +20,18 @@ interface PlayerAreaProps {
   claimableTileIds?: Set<number>;
   lastDrawnTileId?: number | null;
   tenpaiTiles?: import("@fuzhou-mahjong/shared").SuitedTile[];
+  canDiscard?: boolean;
+  onDiscard?: (tileInstanceId: number) => void;
+  kongTileIds?: Set<number>;
+  onAnGang?: (tileInstanceId: number) => void;
+  onBuGang?: (tileInstanceId: number) => void;
 }
 
 export function PlayerArea({
   isMe, hand, handCount, melds, flowers, discards,
   isCurrentTurn, isDealer, gold, selectedTileId, onTileClick, label,
   claimableTileIds, onTileDoubleClick, lastDrawnTileId, tenpaiTiles,
+  canDiscard, onDiscard, kongTileIds, onAnGang, onBuGang,
 }: PlayerAreaProps) {
   const { onTouchStart, onTouchEnd, onMouseEnter, onMouseLeave, Tooltip } = useLongPress(gold);
 
@@ -63,7 +69,13 @@ export function PlayerArea({
       {/* Hand */}
       <div style={{ display: "flex", flexWrap: "wrap", gap: 1, marginBottom: 4, alignItems: "flex-end", paddingTop: isMe ? 18 : 0, overflow: "visible", position: "relative" }}>
         {isMe && hand ? (
-          hand.map((t, idx) => (
+          hand.map((t, idx) => {
+            const isSelected = selectedTileId === t.id;
+            const isKong = kongTileIds?.has(t.id);
+            const showBubble = isSelected && (canDiscard || isKong);
+            const isAnGang = !!(isKong && onAnGang);
+            const isBuGang = !!(isKong && onBuGang);
+            return (
             <div key={t.id} style={{
               display: "inline-flex",
               marginLeft: lastDrawnTileId === t.id ? 16 : 0,
@@ -75,12 +87,67 @@ export function PlayerArea({
                   fontSize: 10, color: "#4fc3f7", whiteSpace: "nowrap",
                 }}>新牌</div>
               )}
+              {/* Discard / Kong bubble */}
+              {showBubble && (
+                <div className="discard-bubble" style={{
+                  position: "absolute",
+                  bottom: "100%",
+                  left: "50%",
+                  transform: "translateX(-50%)",
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 4,
+                  marginBottom: 4,
+                  zIndex: 20,
+                  animation: "bubbleFadeIn 0.15s ease-out",
+                }}>
+                  {canDiscard && (
+                    <button
+                      style={{
+                        padding: "6px 12px", fontSize: 14, fontWeight: "bold",
+                        background: "#00b894", color: "#fff", border: "none", borderRadius: 6,
+                        boxShadow: "0 2px 8px rgba(0,184,148,0.5)",
+                        whiteSpace: "nowrap", minHeight: 44, minWidth: 44,
+                      }}
+                      onClick={(e) => { e.stopPropagation(); onDiscard?.(t.id); }}
+                    >
+                      出牌
+                    </button>
+                  )}
+                  {isAnGang && (
+                    <button
+                      style={{
+                        padding: "6px 12px", fontSize: 14, fontWeight: "bold",
+                        background: "#d4760a", color: "#fff", border: "none", borderRadius: 6,
+                        boxShadow: "0 2px 8px rgba(212,118,10,0.5)",
+                        whiteSpace: "nowrap", minHeight: 44, minWidth: 44,
+                      }}
+                      onClick={(e) => { e.stopPropagation(); onAnGang?.(t.id); }}
+                    >
+                      暗杠
+                    </button>
+                  )}
+                  {isBuGang && (
+                    <button
+                      style={{
+                        padding: "6px 12px", fontSize: 14, fontWeight: "bold",
+                        background: "#d4760a", color: "#fff", border: "none", borderRadius: 6,
+                        boxShadow: "0 2px 8px rgba(212,118,10,0.5)",
+                        whiteSpace: "nowrap", minHeight: 44, minWidth: 44,
+                      }}
+                      onClick={(e) => { e.stopPropagation(); onBuGang?.(t.id); }}
+                    >
+                      补杠
+                    </button>
+                  )}
+                </div>
+              )}
               <TileView
                 tile={t}
                 faceUp
                 gold={gold}
                 selected={selectedTileId === t.id}
-                claimable={claimableTileIds?.has(t.id)}
+                claimable={claimableTileIds?.has(t.id) || !!isKong}
                 className={lastDrawnTileId === t.id ? "tile-new" : undefined}
                 onTouchStart={(e) => onTouchStart(t, e)}
                 onTouchEnd={onTouchEnd}
@@ -90,7 +157,8 @@ export function PlayerArea({
                 onDoubleClick={() => onTileDoubleClick?.(t)}
               />
             </div>
-          ))
+            );
+          })
         ) : (
           Array.from({ length: handCount ?? 0 }).map((_, i) => (
             <TileView key={i} tile={{ id: -1, tile: { kind: "suited", suit: "wan" as any, value: 1 as any } }} faceUp={false} />

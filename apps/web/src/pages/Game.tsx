@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { socket } from "../socket";
 import { GameTable } from "../components/GameTable";
-import { ActionBar } from "../components/ActionBar";
+import { ClaimOverlay } from "../components/ClaimOverlay";
 import { CenterAction, useCenterAction } from "../components/CenterAction";
 import { sounds, setMuted, isMuted } from "../sounds";
 import { TileCounter } from "../components/TileCounter";
+import { ActionType } from "@fuzhou-mahjong/shared";
 import type { ClientGameState, GameOverResult, AvailableActions, GameAction } from "@fuzhou-mahjong/shared";
 
 const MUTE_KEY = "fuzhou-mahjong-muted";
@@ -144,6 +145,22 @@ export function Game({ initialGameState, onLeave }: GameProps) {
     return ids;
   };
 
+  const getKongTileIds = (a: AvailableActions | null): Set<number> => {
+    const ids = new Set<number>();
+    if (!a) return ids;
+    for (const combo of a.anGangOptions ?? []) {
+      for (const t of combo) ids.add(t.id);
+    }
+    for (const opt of a.buGangOptions ?? []) {
+      ids.add(opt.tile.id);
+    }
+    return ids;
+  };
+
+  const isClaimWindow = actions
+    ? (actions.canHu || actions.canPeng || actions.canMingGang || actions.chiOptions.length > 0) && !actions.canDiscard
+    : false;
+
   const handleAction = (action: GameAction) => {
     socket.emit("playerAction", action);
     setSelectedTileId(null);
@@ -277,18 +294,31 @@ export function Game({ initialGameState, onLeave }: GameProps) {
         onTileSelect={(tile) => setSelectedTileId(tile?.id ?? null)}
         onTileDoubleClick={(tile) => {
           if (actions?.canDiscard) {
-            handleAction({ type: "discard" as any, playerIndex: gameState.myIndex, tile });
+            handleAction({ type: ActionType.Discard, playerIndex: gameState.myIndex, tile });
           }
         }}
         selectedTileId={selectedTileId}
         claimableTileIds={getClaimableTileIds(actions)}
+        canDiscard={actions?.canDiscard ?? false}
+        onDiscard={(tileInstanceId) => {
+          const tile = gameState.myHand.find(t => t.id === tileInstanceId);
+          if (tile) handleAction({ type: ActionType.Discard, playerIndex: gameState.myIndex, tile });
+        }}
+        canDraw={actions?.canDraw ?? false}
+        onDraw={() => handleAction({ type: ActionType.Draw, playerIndex: gameState.myIndex })}
+        kongTileIds={getKongTileIds(actions)}
+        onAnGang={(tileInstanceId) => {
+          const tile = gameState.myHand.find(t => t.id === tileInstanceId);
+          if (tile) handleAction({ type: ActionType.AnGang, playerIndex: gameState.myIndex, tile });
+        }}
+        onBuGang={(tileInstanceId) => {
+          const tile = gameState.myHand.find(t => t.id === tileInstanceId);
+          if (tile) handleAction({ type: ActionType.BuGang, playerIndex: gameState.myIndex, tile });
+        }}
       />
-      <ActionBar
-        actions={actions}
-        selectedTileId={selectedTileId}
-        gameState={gameState}
-        onAction={handleAction}
-      />
+      {isClaimWindow && actions && (
+        <ClaimOverlay actions={actions} gameState={gameState} onAction={handleAction} />
+      )}
       <TileCounter gameState={gameState} />
     </div>
   );
