@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import type { RoomListItem, RoomState } from "@fuzhou-mahjong/shared";
 import { socket } from "../socket";
+import { Button } from "../components/Button";
 
 interface LobbyProps {
   onJoined: (roomState: RoomState) => void;
@@ -56,8 +57,8 @@ export function Lobby({ onJoined }: LobbyProps) {
   return (
     <div className="lobby-page" style={{ maxWidth: 560, margin: "0 auto", padding: "40px 20px", display: "flex", flexDirection: "column", gap: 20 }}>
       <div style={{ textAlign: "center", marginBottom: 8 }}>
-        <h1 style={{ fontSize: 36, color: "#eee", marginBottom: 4 }}>福州麻将</h1>
-        <h2 style={{ fontSize: 16, color: "#8fbc8f", fontWeight: 400 }}>Fuzhou Mahjong</h2>
+        <h1 style={{ fontSize: 36, color: "var(--color-text-primary)", marginBottom: 4 }}>福州麻将</h1>
+        <h2 style={{ fontSize: 16, color: "var(--color-text-secondary)", fontWeight: 400 }}>Fuzhou Mahjong</h2>
       </div>
 
       <div>
@@ -70,44 +71,48 @@ export function Lobby({ onJoined }: LobbyProps) {
         />
       </div>
 
-      <button
+      <Button
+        variant="gold"
+        size="lg"
         onClick={handleQuickStart}
         disabled={!name.trim() || quickStarting}
         className="lobby-create-btn"
-        style={{ width: "100%", padding: "16px 12px", fontSize: 20, fontWeight: 700, border: "2px solid rgba(212, 160, 23, 0.8)", background: "linear-gradient(135deg, #1a5c3a 0%, #2a6f4a 100%)", boxShadow: "0 0 12px rgba(212, 160, 23, 0.3)" }}
+        style={{ width: "100%", background: "linear-gradient(135deg, var(--color-bg-button) 0%, #2a6f4a 100%)", border: "2px solid rgba(212, 160, 23, 0.8)", boxShadow: "0 0 12px rgba(212, 160, 23, 0.3)" }}
       >
         {quickStarting ? "启动中... / Starting..." : "⚡ 快速开始 / Quick Start"}
-      </button>
-      <p style={{ color: "#8fbc8f", fontSize: 13, textAlign: "center", marginTop: -12 }}>
+      </Button>
+      <p style={{ color: "var(--color-text-secondary)", fontSize: 13, textAlign: "center", marginTop: -12 }}>
         一键开局，自动匹配 3 个机器人
       </p>
 
-      <button
+      <Button
+        variant="gold"
+        size="lg"
         onClick={handleCreate}
         disabled={!name.trim()}
         className="lobby-create-btn"
-        style={{ width: "100%", padding: "14px 12px", fontSize: 18, fontWeight: 600, border: "2px solid rgba(184, 134, 11, 0.4)", background: "#1a5c3a" }}
+        style={{ width: "100%" }}
       >
         创建房间 / Create Room
-      </button>
-      <p style={{ color: "#8fbc8f", fontSize: 13, textAlign: "center", marginTop: -12 }}>
+      </Button>
+      <p style={{ color: "var(--color-text-secondary)", fontSize: 13, textAlign: "center", marginTop: -12 }}>
         创建房间后可邀请朋友或添加机器人
       </p>
 
       <hr />
 
-      <h3 style={{ color: "#d4a017", fontSize: 15, letterSpacing: 1 }}>可用房间 / Available Rooms</h3>
+      <h3 style={{ color: "var(--color-text-gold)", fontSize: 15, letterSpacing: 1 }}>可用房间 / Available Rooms</h3>
       {rooms.length === 0 ? (
-        <p style={{ color: "#8fbc8f", textAlign: "center", padding: "20px 0" }}>暂无房间 / No rooms available</p>
+        <p style={{ color: "var(--color-text-secondary)", textAlign: "center", padding: "20px 0" }}>暂无房间 / No rooms available</p>
       ) : (
         <div className="room-card-list">
           {rooms.map((room) => (
             <div key={room.roomId} className="room-card">
               <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                <span style={{ fontFamily: "monospace", fontSize: 22, fontWeight: "bold", color: "#eee", letterSpacing: 4 }}>
+                <span style={{ fontFamily: "monospace", fontSize: 22, fontWeight: "bold", color: "var(--color-text-primary)", letterSpacing: 4 }}>
                   {room.roomId}
                 </span>
-                <span className="room-status-badge" style={{ background: room.playerCount >= room.maxPlayers ? "rgba(255,82,82,0.2)" : "rgba(46,125,80,0.3)", color: room.playerCount >= room.maxPlayers ? "#ff8a80" : "#8fbc8f", border: `1px solid ${room.playerCount >= room.maxPlayers ? "rgba(255,82,82,0.3)" : "rgba(46,125,80,0.5)"}`, padding: "2px 10px", borderRadius: 12, fontSize: 12 }}>
+                <span className="room-status-badge" style={{ background: room.playerCount >= room.maxPlayers ? "rgba(255,82,82,0.2)" : "rgba(46,125,80,0.3)", color: room.playerCount >= room.maxPlayers ? "var(--color-error)" : "var(--color-text-secondary)", border: `1px solid ${room.playerCount >= room.maxPlayers ? "rgba(255,82,82,0.3)" : "rgba(46,125,80,0.5)"}`, padding: "2px 10px", borderRadius: 12, fontSize: 12 }}>
                   {room.playerCount >= room.maxPlayers ? "已满 / Full" : "等待中 / Waiting"}
                 </span>
               </div>
@@ -115,20 +120,19 @@ export function Lobby({ onJoined }: LobbyProps) {
                 <div>
                   <div style={{ display: "flex", gap: 6, marginBottom: 4 }}>
                     {Array.from({ length: room.maxPlayers }).map((_, i) => (
-                      <span key={i} style={{ width: 10, height: 10, borderRadius: "50%", background: i < room.playerCount ? "#2e7d50" : "rgba(184, 134, 11, 0.15)", border: "1px solid rgba(184, 134, 11, 0.3)", display: "inline-block" }} />
+                      <span key={i} style={{ width: 10, height: 10, borderRadius: "50%", background: i < room.playerCount ? "var(--color-bg-button-hover)" : "rgba(184, 134, 11, 0.15)", border: "1px solid rgba(184, 134, 11, 0.3)", display: "inline-block" }} />
                     ))}
                   </div>
-                  <span style={{ color: "#8fbc8f", fontSize: 13 }}>
+                  <span style={{ color: "var(--color-text-secondary)", fontSize: 13 }}>
                     {room.players.join(", ")}
                   </span>
                 </div>
-                <button
+                <Button
                   onClick={() => handleJoin(room.roomId)}
                   disabled={!name.trim() || room.playerCount >= room.maxPlayers}
-                  style={{ padding: "12px 20px", fontSize: 14 }}
                 >
                   加入 / Join
-                </button>
+                </Button>
               </div>
             </div>
           ))}
@@ -137,7 +141,7 @@ export function Lobby({ onJoined }: LobbyProps) {
 
       <hr />
 
-      <h3 style={{ color: "#d4a017", fontSize: 15, letterSpacing: 1 }}>手动加入 / Join by Code</h3>
+      <h3 style={{ color: "var(--color-text-gold)", fontSize: 15, letterSpacing: 1 }}>手动加入 / Join by Code</h3>
       <div style={{ display: "flex", gap: 10 }}>
         <input
           type="text"
@@ -147,13 +151,12 @@ export function Lobby({ onJoined }: LobbyProps) {
           maxLength={4}
           style={{ flex: 1, padding: "10px 12px", fontSize: 16, textTransform: "uppercase", letterSpacing: 4, textAlign: "center" }}
         />
-        <button
+        <Button
           onClick={() => handleJoin(roomCode.trim())}
           disabled={!name.trim() || !roomCode.trim()}
-          style={{ padding: "10px 24px", fontSize: 16 }}
         >
           加入 / Join
-        </button>
+        </Button>
       </div>
 
       {error && <p className="error-msg">{error}</p>}

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { socket } from "../socket";
 import type { RoomState } from "@fuzhou-mahjong/shared";
+import { Button } from "../components/Button";
 
 interface RoomProps {
   initialRoomState: RoomState | null;
@@ -46,7 +47,7 @@ export function Room({ initialRoomState }: RoomProps) {
 
   return (
     <div className="room-page" style={{ maxWidth: 480, margin: "0 auto", padding: "40px 20px" }}>
-      <h2 style={{ textAlign: "center", color: "#8fbc8f", fontSize: 15, fontWeight: 400, marginBottom: 20 }}>房间 / Room</h2>
+      <h2 style={{ textAlign: "center", color: "var(--color-text-secondary)", fontSize: 15, fontWeight: 400, marginBottom: 20 }}>房间 / Room</h2>
 
       {/* Mahjong table seat layout */}
       <div className="seat-layout">
@@ -60,11 +61,11 @@ export function Room({ initialRoomState }: RoomProps) {
         </div>
         {/* Center: room ID */}
         <div className="table-center" style={{ gridArea: "center" }}>
-          <div style={{ fontSize: 11, color: "#8fbc8f", marginBottom: 4 }}>ROOM</div>
-          <div style={{ fontSize: 28, fontWeight: "bold", fontFamily: "monospace", letterSpacing: 6, color: "#d4a017" }}>
+          <div style={{ fontSize: 11, color: "var(--color-text-secondary)", marginBottom: 4 }}>ROOM</div>
+          <div style={{ fontSize: 28, fontWeight: "bold", fontFamily: "monospace", letterSpacing: 6, color: "var(--color-text-gold)" }}>
             {room.roomId}
           </div>
-          <div style={{ fontSize: 12, color: "#8fbc8f", marginTop: 6 }}>
+          <div style={{ fontSize: 12, color: "var(--color-text-secondary)", marginTop: 6 }}>
             {room.players.length}/4 玩家
           </div>
         </div>
@@ -80,36 +81,38 @@ export function Room({ initialRoomState }: RoomProps) {
 
       {/* Action buttons */}
       <div style={{ marginTop: 24, display: "flex", gap: 10, flexWrap: "wrap", justifyContent: "center" }}>
-        <button
+        <Button
           onClick={() => socket.emit("addBot")}
           disabled={room.players.length >= 4}
-          style={{ flex: 1, minWidth: 120, padding: 12, fontSize: 15 }}
+          style={{ flex: 1, minWidth: 120 }}
         >
           +机器人 / +Bot
-        </button>
-        <button
+        </Button>
+        <Button
+          variant="secondary"
           onClick={() => socket.emit("removeBot")}
           disabled={!room.players.some((p) => p.isBot)}
-          style={{ padding: 12, fontSize: 15 }}
         >
           -机器人
-        </button>
+        </Button>
       </div>
       <div style={{ marginTop: 10, display: "flex", gap: 10 }}>
-        <button
+        <Button
+          variant="gold"
+          size="lg"
           onClick={handleStart}
           disabled={room.players.length < 4}
           className="lobby-create-btn"
-          style={{ flex: 1, padding: 14, fontSize: 16, fontWeight: 600, border: "2px solid rgba(184, 134, 11, 0.4)" }}
+          style={{ flex: 1 }}
         >
           开始游戏 / Start
-        </button>
-        <button
+        </Button>
+        <Button
+          variant="danger"
           onClick={handleLeave}
-          style={{ padding: 12, fontSize: 15, background: "rgba(255,82,82,0.15)", border: "1px solid rgba(255,82,82,0.3)", color: "#ff8a80" }}
         >
           离开 / Leave
-        </button>
+        </Button>
       </div>
     </div>
   );
@@ -121,13 +124,13 @@ function SeatCard({ seat }: { seat: { index: number; player: { name: string; isB
 
   return (
     <div className={`seat-card ${isEmpty ? "seat-empty" : "seat-filled"}`}>
-      <div style={{ fontSize: 11, color: "#d4a017", marginBottom: 4, letterSpacing: 1 }}>{wind}</div>
+      <div style={{ fontSize: 11, color: "var(--color-text-gold)", marginBottom: 4, letterSpacing: 1 }}>{wind}</div>
       {player ? (
         <>
-          <div style={{ fontSize: 15, fontWeight: 600, color: "#eee" }}>
+          <div style={{ fontSize: 15, fontWeight: 600, color: "var(--color-text-primary)" }}>
             {player.name}
           </div>
-          {player.isBot && <div style={{ fontSize: 11, color: "#8fbc8f", marginTop: 2 }}>🤖 Bot</div>}
+          {player.isBot && <div style={{ fontSize: 11, color: "var(--color-text-secondary)", marginTop: 2 }}>🤖 Bot</div>}
         </>
       ) : (
         <div style={{ fontSize: 13, color: "rgba(143,188,143,0.5)" }}>空位 / Empty</div>
