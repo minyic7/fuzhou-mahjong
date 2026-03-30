@@ -319,7 +319,7 @@ export function handlePlayerAction(
   const state = game.state;
   if (state.currentTurn !== playerIndex) {
     if (botPlayerIndex !== undefined) {
-      console.warn(`Bot ${playerIndex} action rejected: not their turn (current: ${state.currentTurn})`);
+      console.warn(`Bot ${playerIndex} action rejected: not their turn (current: ${state.currentTurn}). Watchdog active — will handle if stuck.`);
     } else {
       const socket = io.sockets.sockets.get(socketIdOrRoomId);
       socket?.emit('actionError', { message: 'Not your turn', code: 'WRONG_TURN' });
@@ -348,7 +348,7 @@ export function handlePlayerAction(
       advanceToNextPlayer(io, game, playerIndex);
       break;
     default:
-      console.warn(`[GameEngine] Unhandled action type in handlePlayerAction: ${action.type}`);
+      console.warn(`[GameEngine] Unhandled action type in handlePlayerAction: ${action.type}${botPlayerIndex !== undefined ? '. Watchdog active — will handle if stuck.' : ''}`);
       return false;
   }
   return true;
@@ -526,11 +526,17 @@ function handleAnGang(
   // Draw replacement from tail
   gangDraw(io, game, playerIndex);
   // Safety timeout: if gangDraw leaves game stuck, force advance
+  const anGangBotVersion = getBotVersion(game.roomId, playerIndex);
   const anGangSafetyTimer = setTimeout(() => {
     // Self-cleanup
     const timers = gangSafetyTimeouts.get(game.roomId);
     if (timers) {
       gangSafetyTimeouts.set(game.roomId, timers.filter(t => t !== anGangSafetyTimer));
+    }
+    // Skip if bot version changed — emitOrBotAction already handled this bot
+    if (getBotVersion(game.roomId, playerIndex) !== anGangBotVersion) {
+      console.log(`[GameEngine] AnGang safety timeout skipped — bot version changed (had=${anGangBotVersion}, now=${getBotVersion(game.roomId, playerIndex)})`);
+      return;
     }
     if (game.state.currentTurn === playerIndex && game.state.phase === GamePhase.Playing) {
       const player = game.state.players[playerIndex];
@@ -643,11 +649,17 @@ function executeBuGang(
 
   gangDraw(io, game, playerIndex);
   // Safety timeout: if gangDraw leaves game stuck, force advance
+  const buGangBotVersion = getBotVersion(game.roomId, playerIndex);
   const buGangSafetyTimer = setTimeout(() => {
     // Self-cleanup
     const timers = gangSafetyTimeouts.get(game.roomId);
     if (timers) {
       gangSafetyTimeouts.set(game.roomId, timers.filter(t => t !== buGangSafetyTimer));
+    }
+    // Skip if bot version changed — emitOrBotAction already handled this bot
+    if (getBotVersion(game.roomId, playerIndex) !== buGangBotVersion) {
+      console.log(`[GameEngine] BuGang safety timeout skipped — bot version changed (had=${buGangBotVersion}, now=${getBotVersion(game.roomId, playerIndex)})`);
+      return;
     }
     if (game.state.currentTurn === playerIndex && game.state.phase === GamePhase.Playing) {
       const player = game.state.players[playerIndex];
@@ -844,11 +856,17 @@ function resolveActionWindow(
         const gangPlayerIdx = winner.playerIndex;
         gangDraw(io, game, gangPlayerIdx);
         // Safety timeout: if gangDraw leaves game stuck, force advance
+        const mingGangBotVersion = getBotVersion(game.roomId, gangPlayerIdx);
         const mingGangSafetyTimer = setTimeout(() => {
           // Self-cleanup
           const timers = gangSafetyTimeouts.get(game.roomId);
           if (timers) {
             gangSafetyTimeouts.set(game.roomId, timers.filter(t => t !== mingGangSafetyTimer));
+          }
+          // Skip if bot version changed — emitOrBotAction already handled this bot
+          if (getBotVersion(game.roomId, gangPlayerIdx) !== mingGangBotVersion) {
+            console.log(`[GameEngine] MingGang safety timeout skipped — bot version changed (had=${mingGangBotVersion}, now=${getBotVersion(game.roomId, gangPlayerIdx)})`);
+            return;
           }
           if (game.state.currentTurn === gangPlayerIdx && game.state.phase === GamePhase.Playing) {
             const player = game.state.players[gangPlayerIdx];
@@ -1238,7 +1256,8 @@ export function emitOrBotAction(
       }
       const currentV = getBotVersion(game.roomId, playerIndex);
       if (currentV !== version) {
-        console.log(`${tag} Safety timer STALE — bailing (had=${version}, now=${currentV}) ts=${Date.now()}`);
+        clearTimeout(mainTimer);
+        console.log(`${tag} Safety timer STALE — bailing (had=${version}, now=${currentV}), cleared mainTimer ts=${Date.now()}`);
         // Re-trigger if game is stuck
         if (game.state.phase === GamePhase.Playing) {
           const window = activeWindows.get(game.roomId);
@@ -1291,7 +1310,7 @@ export function emitOrBotAction(
       }
     }, 5_000);
 
-    setTimeout(() => {
+    const mainTimer = setTimeout(() => {
       try {
       const currentV = getBotVersion(game.roomId, playerIndex);
       console.log(`${tag} Callback fired (version=${version}, current=${currentV}, phase=${game.state.phase}) ts=${Date.now()}`);
