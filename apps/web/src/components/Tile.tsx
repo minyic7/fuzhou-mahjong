@@ -38,13 +38,13 @@ function getTileDisplay(tile: Tile): { value: string; suit: string; color: strin
     return { value: cn[tile.value], suit: SUIT_CHARS[tile.suit], color: SUIT_COLORS[tile.suit] };
   }
   switch (tile.kind) {
-    case "wind": return { value: FLOWER_CHARS.wind[tile.windType], suit: "", color: "#1a237e" };
+    case "wind": return { value: FLOWER_CHARS.wind[tile.windType], suit: "", color: "var(--suit-color-wind)" };
     case "dragon": {
-      const colors: Record<string, string> = { red: "var(--suit-color-wan)", green: "#1b5e20", white: "#37474f" };
+      const colors: Record<string, string> = { red: "var(--suit-color-wan)", green: "var(--suit-color-tiao)", white: "var(--suit-color-dragon-white)" };
       return { value: FLOWER_CHARS.dragon[tile.dragonType], suit: "", color: colors[tile.dragonType] };
     }
-    case "season": return { value: FLOWER_CHARS.season[tile.seasonType], suit: "", color: "#e65100" };
-    case "plant": return { value: FLOWER_CHARS.plant[tile.plantType], suit: "", color: "#4a148c" };
+    case "season": return { value: FLOWER_CHARS.season[tile.seasonType], suit: "", color: "var(--suit-color-season)" };
+    case "plant": return { value: FLOWER_CHARS.plant[tile.plantType], suit: "", color: "var(--suit-color-plant)" };
   }
 }
 
@@ -98,20 +98,20 @@ export function TileView({ tile, faceUp = true, selected, claimable, onClick, on
       style={{
         flex: `0 1 ${w}`, height: "auto", aspectRatio: "44/60", minWidth: 0,
         background: selected
-          ? "linear-gradient(180deg, #fff8e1 0%, #ffe082 100%)"
+          ? "var(--tile-bg-selected)"
           : claimable
-          ? "linear-gradient(180deg, #e8f5e9 0%, #c8e6c9 100%)"
-          : "linear-gradient(180deg, #fafaf0 0%, #e8e4d4 100%)",
+          ? "var(--tile-bg-claimable)"
+          : "var(--tile-bg-default)",
         border: selected
-          ? "2px solid #ff8f00"
+          ? "2px solid var(--tile-border-selected)"
           : isGold
-          ? "2px solid #ffd700"
+          ? "2px solid var(--tile-border-gold)"
           : claimable
-          ? "2px solid #00e676"
-          : "1px solid #bbb",
+          ? "2px solid var(--tile-border-claimable)"
+          : "1px solid var(--tile-border-default)",
         borderRadius: "var(--radius-sm)",
-        borderBottom: selected ? "2px solid #ff8f00" : "3px solid #a09880",
-        borderRight: selected ? "2px solid #ff8f00" : "2px solid #b0a890",
+        borderBottom: selected ? "2px solid var(--tile-border-selected)" : "3px solid var(--tile-border-bottom)",
+        borderRight: selected ? "2px solid var(--tile-border-selected)" : "2px solid var(--tile-border-right)",
         display: "inline-flex",
         flexDirection: "column",
         alignItems: "center",

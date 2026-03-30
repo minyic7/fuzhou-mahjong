@@ -117,6 +117,23 @@ body {
   --suit-color-wan: #b71c1c;
   --suit-color-tong: #0d47a1;
   --suit-color-tiao: #1b5e20;
+  --suit-color-wind: #1a237e;
+  --suit-color-dragon-white: #37474f;
+  --suit-color-season: #e65100;
+  --suit-color-plant: #4a148c;
+
+  /* Tile backgrounds */
+  --tile-bg-default: linear-gradient(180deg, #fafaf0 0%, #e8e4d4 100%);
+  --tile-bg-selected: linear-gradient(180deg, #fff8e1 0%, #ffe082 100%);
+  --tile-bg-claimable: linear-gradient(180deg, #e8f5e9 0%, #c8e6c9 100%);
+
+  /* Tile borders */
+  --tile-border-gold: var(--color-gold-bright);
+  --tile-border-selected: #ff8f00;
+  --tile-border-claimable: #00e676;
+  --tile-border-default: #bbb;
+  --tile-border-bottom: #a09880;
+  --tile-border-right: #b0a890;
 
   /* Action button colors */
   --color-action-peng: #1e6ec4;
