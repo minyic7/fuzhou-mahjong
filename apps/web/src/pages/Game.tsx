@@ -723,7 +723,9 @@ export function Game({ initialGameState, onLeave }: GameProps) {
         condensed={tutorialCondensed}
       />
       {/* Game-over modal overlay — shows on top of the game table */}
-      {gameOver && (
+      {gameOver && (() => {
+        const go = gameOver!;
+        return (
         <div style={{
           position: "fixed", inset: 0, zIndex: 100,
           background: "rgba(0,0,0,0.7)",
@@ -741,34 +743,34 @@ export function Game({ initialGameState, onLeave }: GameProps) {
             animation: "overlayScaleIn 0.3s ease-out",
           }}>
             <h2 style={{ fontSize: 24, marginBottom: 8 }}>
-              {gameOver.winnerId !== null
-                ? `🎉 ${(() => { if (!gameState) return ''; if (gameOver.winnerId === gameState.myIndex) return gameState.myName || '我'; const o = gameState.otherPlayers.find((_, i) => (gameState.myIndex + i + 1) % 4 === gameOver.winnerId); return o?.name || ''; })()} 胡了!`
+              {go.winnerId !== null
+                ? `🎉 ${(() => { if (!gameState) return ''; if (go.winnerId === gameState.myIndex) return gameState.myName || '我'; const o = gameState.otherPlayers.find((_, i) => (gameState.myIndex + i + 1) % 4 === go.winnerId); return o?.name || ''; })()} 胡了!`
                 : "流局 / Draw"}
             </h2>
             <p style={{ fontSize: 16, color: "var(--color-text-gold)", marginBottom: 12 }}>
-              {winTypeNames[gameOver.winType] || gameOver.winType}
+              {winTypeNames[go.winType] || go.winType}
             </p>
 
             {/* Score breakdown */}
-            {gameOver.breakdown && gameOver.winnerId !== null && (
+            {go.breakdown && go.winnerId !== null && (
               <div className="score-breakdown">
                 <div style={{ fontSize: 12, color: "var(--color-text-secondary)", marginBottom: 4 }}>得分明细</div>
                 <div style={{ display: "flex", flexWrap: "wrap", gap: "4px 12px", justifyContent: "center", fontSize: 13, color: "var(--color-text-primary)" }}>
-                  <span>花分: {gameOver.breakdown.flowerScore}</span>
-                  <span>金: {gameOver.breakdown.goldScore}</span>
-                  <span>连庄: {gameOver.breakdown.lianZhuangCount}</span>
-                  <span>特殊: {gameOver.breakdown.specialMultiplier}x</span>
+                  <span>花分: {go.breakdown.flowerScore}</span>
+                  <span>金: {go.breakdown.goldScore}</span>
+                  <span>连庄: {go.breakdown.lianZhuangCount}</span>
+                  <span>特殊: {go.breakdown.specialMultiplier}x</span>
                 </div>
                 <div style={{ fontSize: 14, color: "var(--color-text-gold)", marginTop: 4 }}>
-                  总分: {gameOver.breakdown.totalScore}
+                  总分: {go.breakdown.totalScore}
                 </div>
               </div>
             )}
 
             {/* Round scores */}
             <div style={{ marginBottom: 12 }}>
-              {gameOver.scores
-                .map((score, i) => ({ name: (gameOver.playerNames ?? [])[i] || `玩家${i}`, score, i }))
+              {go.scores
+                .map((score, i) => ({ name: (go.playerNames ?? [])[i] || `玩家${i}`, score, i }))
                 .sort((a, b) => b.score - a.score)
                 .map((p, rank) => (
                   <div key={p.i} className={`score-row${p.score > 0 ? " positive" : p.score < 0 ? " negative" : ""}${rank === 0 && p.score > 0 ? " top-positive" : ""}`}
@@ -788,10 +790,10 @@ export function Game({ initialGameState, onLeave }: GameProps) {
               </Button>
               {onLeave && (
                 <Button variant="secondary" onClick={() => {
-                  const cum = gameOver.cumulative;
+                  const cum = go.cumulative;
                   if (cum && cum.roundsPlayed > 0) {
                     setSessionSummary({
-                      playerNames: gameOver.playerNames ?? [],
+                      playerNames: go.playerNames ?? [],
                       cumulativeScores: cum.scores,
                       roundsPlayed: cum.roundsPlayed,
                       roundHistory,
@@ -817,7 +819,8 @@ export function Game({ initialGameState, onLeave }: GameProps) {
             />
           )}
         </div>
-      )}
+        );
+      })()}
     </div>
   );
 }
