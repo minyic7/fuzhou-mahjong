@@ -482,6 +482,13 @@ function handleDraw(
   const inFinalDraws = isInFinalDraws(state.wall.length, state.wallTail.length, state.retainCount);
 
   const actions = getPostDrawActions(game, playerIndex, inFinalDraws);
+
+  // During final draws, if human can't hu, auto-pass immediately instead of waiting for input
+  if (inFinalDraws && !actions.canHu && !game.isBot(playerIndex)) {
+    handlePlayerAction(io, game.roomId, { type: ActionType.Pass, playerIndex }, playerIndex);
+    return;
+  }
+
   emitOrBotAction(io, game, playerIndex, actions);
 }
 
@@ -617,7 +624,7 @@ function handleBuGang(
     }
     const window = new ActionWindow(canRob, playerIndex, (winner) => {
       if (winner && winner.action.type === ActionType.Hu) {
-        endGameWin(io, game, winner.playerIndex, tile, false);
+        endGameWin(io, game, winner.playerIndex, tile, false, true);
       } else {
         // No one robbed, proceed with bu gang
         executeBuGang(io, game, playerIndex, tile, meldIdx);
@@ -1075,6 +1082,7 @@ function endGameWin(
   winnerIndex: number,
   winningTile: TileInstance,
   isSelfDraw: boolean,
+  isRobbingKong = false,
 ): void {
   const state = game.state;
   state.phase = GamePhase.Finished;
@@ -1091,7 +1099,7 @@ function endGameWin(
     isSelfDraw,
     isFirstAction: !game.firstActionTaken,
     isDealer: winner.isDealer,
-    isRobbingKong: false,
+    isRobbingKong,
     totalFlowers: winner.flowers.length,
     totalGangs: winner.melds.filter(
       (m) => m.type === MeldType.MingGang || m.type === MeldType.AnGang || m.type === MeldType.BuGang,
