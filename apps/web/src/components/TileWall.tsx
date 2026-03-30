@@ -265,8 +265,8 @@ export function TileWall({ wallRemaining, wallDrawCount, wallSupplementCount, go
   return (
     <div className="tile-wall-container" style={{
       position: "relative",
-      width: "calc(var(--wall-tw) * 18 + 2 * var(--wall-th) + 26px)",
-      height: "calc(var(--wall-tw) * 18 + 2 * var(--wall-th) + 26px)",
+      width: "calc(var(--wall-tw) * 18 + 2 * var(--wall-th) + max(4px, calc(var(--wall-th) * 1.7)))",
+      height: "calc(var(--wall-tw) * 18 + 2 * var(--wall-th) + max(4px, calc(var(--wall-th) * 1.7)))",
       margin: "0 auto",
       flexShrink: 0,
     }}>
