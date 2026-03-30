@@ -246,8 +246,8 @@ body {
     --compact-info-font: 11px;
     --fp-tile-w: 38px;
     --fp-tile-h: 56px;
-    --fp-opponent-tile-w: 18px;
-    --fp-opponent-tile-h: 26px;
+    --fp-opponent-tile-w: 20px;
+    --fp-opponent-tile-h: 28px;
     --fp-hand-gap: 2px;
     --lobby-title-font: 24px;
     --lobby-subtitle-font: 13px;
@@ -284,8 +284,8 @@ body {
     --compact-info-font: 9px;
     --fp-tile-w: 32px;
     --fp-tile-h: 46px;
-    --fp-opponent-tile-w: 16px;
-    --fp-opponent-tile-h: 22px;
+    --fp-opponent-tile-w: 20px;
+    --fp-opponent-tile-h: 28px;
     --fp-hand-gap: 1px;
     --grid-side-col: 50px;
     --wall-progress-w: 60px;
