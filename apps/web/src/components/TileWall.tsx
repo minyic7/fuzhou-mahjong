@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import type { GoldState } from "@fuzhou-mahjong/shared";
 import { TileView } from "./Tile";
 import { TILE_BACK_URL } from "../tileSvg";
@@ -176,6 +176,22 @@ export function TileWall({ wallRemaining, wallDrawCount, wallSupplementCount, go
   const sides = useMemo(() => computeWallStacks(wallDrawCount, wallSupplementCount), [wallDrawCount, wallSupplementCount]);
   const drawIndex = useMemo(() => findDrawStackIndex(sides), [sides]);
 
+  const [goldFlip, setGoldFlip] = useState(false);
+  const prevGoldRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (gold) {
+      const key = gold.indicatorTile.id;
+      if (prevGoldRef.current !== key) {
+        prevGoldRef.current = key;
+        setGoldFlip(true);
+      }
+    } else {
+      prevGoldRef.current = null;
+      setGoldFlip(false);
+    }
+  }, [gold]);
+
   return (
     <div className="tile-wall-container" style={{
       position: "relative",
@@ -209,7 +225,7 @@ export function TileWall({ wallRemaining, wallDrawCount, wallSupplementCount, go
         {gold && (
           <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
             <div style={{ fontSize: 10, color: "#ffd700", marginBottom: 2 }}>金</div>
-            <TileView tile={gold.indicatorTile} faceUp gold={null} small />
+            <TileView tile={gold.indicatorTile} faceUp gold={null} small className={goldFlip ? "gold-flip-reveal" : undefined} />
           </div>
         )}
         {wallRemaining <= 10 && (

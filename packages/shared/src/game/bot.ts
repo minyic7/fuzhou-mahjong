@@ -10,6 +10,79 @@ import { isGoldTile } from './gold.js';
 import { findTenpaiTiles } from './hand.js';
 import { isValidHand } from './winning.js';
 
+// ─── Bot context for defensive play ──────────────────────────────
+
+export interface BotContext {
+  wallRemaining: number;
+  opponentMelds: Meld[][];
+  opponentDiscards: TileInstance[][];
+}
+
+type GamePhaseBot = 'early' | 'mid' | 'late';
+
+function getGamePhase(wallRemaining: number): GamePhaseBot {
+  if (wallRemaining > 50) return 'early';
+  if (wallRemaining > 30) return 'mid';
+  return 'late';
+}
+
+// ─── Danger score ────────────────────────────────────────────────
+
+/**
+ * Estimate how dangerous a tile is to discard based on opponent melds.
+ * Higher score = more dangerous.
+ */
+function dangerScore(
+  tile: TileInstance,
+  opponentMelds: Meld[][],
+  gold: GoldState | null,
+): number {
+  if (!isSuitedTile(tile.tile)) return 0;
+  if (gold && isGoldTile(tile, gold)) return 0;
+
+  const suited = tile.tile as SuitedTile;
+  let danger = 0;
+
+  for (const melds of opponentMelds) {
+    // Track how many melds per suit this opponent has
+    const suitMeldCount = new Map<string, number>();
+
+    for (const meld of melds) {
+      const meldTiles = meld.tiles.filter(t => isSuitedTile(t.tile));
+      if (meldTiles.length === 0) continue;
+      const meldSuit = (meldTiles[0].tile as SuitedTile).suit;
+      suitMeldCount.set(meldSuit, (suitMeldCount.get(meldSuit) ?? 0) + 1);
+
+      if (meldSuit !== suited.suit) continue;
+
+      if (meld.type === MeldType.Peng) {
+        // Peng: tiles within ±2 of peng value are dangerous (sequence potential)
+        const pengValue = (meldTiles[0].tile as SuitedTile).value;
+        const diff = Math.abs(suited.value - pengValue);
+        if (diff > 0 && diff <= 2) danger += 5;
+      } else if (meld.type === MeldType.Chi) {
+        // Chi: tiles that extend the sequence are dangerous
+        const values = meldTiles
+          .map(t => (t.tile as SuitedTile).value)
+          .sort((a, b) => a - b);
+        const minVal = values[0];
+        const maxVal = values[values.length - 1];
+        // Adjacent to either end of the sequence
+        if (suited.value === minVal - 1 || suited.value === maxVal + 1) {
+          danger += 3;
+        }
+      }
+    }
+
+    // If opponent has 2+ melds in same suit as this tile, extra danger
+    if ((suitMeldCount.get(suited.suit) ?? 0) >= 2) {
+      danger += 2;
+    }
+  }
+
+  return danger;
+}
+
 // ─── Shanten estimation ──────────────────────────────────────────
 
 /**
@@ -237,6 +310,7 @@ function discardScore(
   melds: Meld[],
   gold: GoldState | null,
   isTenpai: boolean,
+  context?: BotContext,
 ): number {
   if (gold && isGoldTile(tile, gold)) return 1000; // Never discard gold
 
@@ -257,6 +331,26 @@ function discardScore(
     }
   }
 
+  // Defensive play: factor in danger based on opponent melds and game phase
+  if (context) {
+    const phase = getGamePhase(context.wallRemaining);
+    const danger = dangerScore(tile, context.opponentMelds, gold);
+
+    const dangerWeight = phase === 'late' ? 3 : phase === 'mid' ? 1.5 : 0.5;
+    score += danger * dangerWeight; // Higher score = keep it (don't discard dangerous tiles)
+
+    // Prefer tiles opponents already discarded (safe)
+    if (isSuitedTile(tile.tile)) {
+      const suited = tile.tile as SuitedTile;
+      const isSafe = context.opponentDiscards.flat().some(d => {
+        if (!isSuitedTile(d.tile)) return false;
+        const ds = d.tile as SuitedTile;
+        return ds.suit === suited.suit && ds.value === suited.value;
+      });
+      if (isSafe) score -= 5; // Good discard candidate
+    }
+  }
+
   return score;
 }
 
@@ -270,6 +364,7 @@ function chooseBotDiscard(
   hand: TileInstance[],
   melds: Meld[],
   gold: GoldState | null,
+  context?: BotContext,
 ): TileInstance {
   if (hand.length === 0) throw new Error("Bot has no tiles to discard");
   if (hand.length === 1) return hand[0];
@@ -284,7 +379,7 @@ function chooseBotDiscard(
     // Never discard gold
     if (gold && isGoldTile(tile, gold)) continue;
 
-    const score = discardScore(tile, hand, melds, gold, isTenpai);
+    const score = discardScore(tile, hand, melds, gold, isTenpai, context);
     if (score < bestScore) {
       bestScore = score;
       bestTile = tile;
@@ -306,6 +401,7 @@ function shouldClaim(
   gold: GoldState | null,
   tilesToRemove: TileInstance[],
   newMeld: Meld,
+  context?: BotContext,
 ): boolean {
   // Always claim if already tenpai (claiming may win or maintain tenpai)
   const currentTenpai = findTenpaiTiles(hand, melds, gold);
@@ -325,6 +421,11 @@ function shouldClaim(
   // Check if claim brings us to tenpai
   const newTenpai = findTenpaiTiles(remaining, newMelds, gold);
   if (newTenpai.length > 0) return true;
+
+  // Late game: only claim if it directly reaches tenpai (already checked above)
+  if (context && getGamePhase(context.wallRemaining) === 'late') {
+    return false;
+  }
 
   // Compare shanten
   const currentShanten = estimateShanten(hand, melds, gold);
@@ -354,6 +455,7 @@ function evaluateChiOptions(
   gold: GoldState | null,
   chiOptions: TileInstance[][],
   targetTile: TileInstance,
+  context?: BotContext,
 ): TileInstance[] | null {
   let bestOption: TileInstance[] | null = null;
   let bestScore = -Infinity;
@@ -367,7 +469,7 @@ function evaluateChiOptions(
     };
 
     // Check if this chi should be claimed at all
-    if (!shouldClaim(hand, melds, gold, tiles, newMeld)) continue;
+    if (!shouldClaim(hand, melds, gold, tiles, newMeld, context)) continue;
 
     // Score the remaining hand after this chi
     const remaining = hand.filter(t => !tiles.some(r => r.id === t.id));
@@ -402,6 +504,7 @@ export function decideBotAction(
   playerIndex: number,
   gold: GoldState | null,
   lastDiscardTile?: TileInstance,
+  context?: BotContext,
 ): GameAction {
   // Priority 1: Always hu
   if (actions.canHu) {
@@ -413,15 +516,21 @@ export function decideBotAction(
     return { type: ActionType.Draw, playerIndex };
   }
 
-  // Priority 3: Gang (always accept — extra flowers are valuable)
-  if (actions.canMingGang && lastDiscardTile) {
-    return { type: ActionType.MingGang, playerIndex, targetTile: lastDiscardTile };
-  }
-  if (actions.anGangOptions.length > 0) {
-    return { type: ActionType.AnGang, playerIndex, tile: actions.anGangOptions[0][0] };
-  }
-  if (actions.buGangOptions.length > 0) {
-    return { type: ActionType.BuGang, playerIndex, tile: actions.buGangOptions[0].tile };
+  // Priority 3: Gang (phase-aware — skip in late game when close to winning)
+  const skipKong = context
+    && getGamePhase(context.wallRemaining) === 'late'
+    && estimateShanten(hand, melds, gold) <= 1;
+
+  if (!skipKong) {
+    if (actions.canMingGang && lastDiscardTile) {
+      return { type: ActionType.MingGang, playerIndex, targetTile: lastDiscardTile };
+    }
+    if (actions.anGangOptions.length > 0) {
+      return { type: ActionType.AnGang, playerIndex, tile: actions.anGangOptions[0][0] };
+    }
+    if (actions.buGangOptions.length > 0) {
+      return { type: ActionType.BuGang, playerIndex, tile: actions.buGangOptions[0].tile };
+    }
   }
 
   // Priority 4: Peng (evaluate whether it improves the hand)
@@ -442,7 +551,7 @@ export function decideBotAction(
         sourceTile: lastDiscardTile,
       };
 
-      if (shouldClaim(hand, melds, gold, matchingTiles, newMeld)) {
+      if (shouldClaim(hand, melds, gold, matchingTiles, newMeld, context)) {
         return { type: ActionType.Peng, playerIndex, targetTile: lastDiscardTile };
       }
     }
@@ -450,7 +559,7 @@ export function decideBotAction(
 
   // Priority 5: Chi (evaluate all options, pick best)
   if (actions.chiOptions.length > 0 && lastDiscardTile) {
-    const bestChi = evaluateChiOptions(hand, melds, gold, actions.chiOptions, lastDiscardTile);
+    const bestChi = evaluateChiOptions(hand, melds, gold, actions.chiOptions, lastDiscardTile, context);
     if (bestChi) {
       return {
         type: ActionType.Chi,
@@ -463,7 +572,7 @@ export function decideBotAction(
 
   // Priority 6: Discard
   if (actions.canDiscard) {
-    const tile = chooseBotDiscard(hand, melds, gold);
+    const tile = chooseBotDiscard(hand, melds, gold, context);
     return { type: ActionType.Discard, playerIndex, tile };
   }
 
