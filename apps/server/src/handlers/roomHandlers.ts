@@ -1,5 +1,6 @@
 import type { Server, Socket } from "socket.io";
 import type { ClientEvents, ServerEvents } from "@fuzhou-mahjong/shared";
+import { ActionType } from "@fuzhou-mahjong/shared";
 import {
   createRoom,
   findRoom,
@@ -299,10 +300,19 @@ function triggerDealerAction(io: GameServer, game: import("../gameState.js").Ser
   const dealerIdx = game.state.dealerIndex;
   if (game.isBot(dealerIdx)) {
     setTimeout(() => {
-      const actions = game.getInitialDealerActions();
-      const player = game.state.players[dealerIdx];
-      const botAction = decideBotAction(player.hand, player.melds, actions, dealerIdx, game.state.gold);
-      handlePlayerAction(io, game.roomId, botAction, dealerIdx);
+      try {
+        const actions = game.getInitialDealerActions();
+        const player = game.state.players[dealerIdx];
+        const botAction = decideBotAction(player.hand, player.melds, actions, dealerIdx, game.state.gold);
+        handlePlayerAction(io, game.roomId, botAction, dealerIdx);
+      } catch (err) {
+        console.error(`Dealer bot ${dealerIdx} action error:`, err);
+        try {
+          handlePlayerAction(io, game.roomId, { type: ActionType.Pass, playerIndex: dealerIdx }, dealerIdx);
+        } catch (e) {
+          console.error(`Dealer bot ${dealerIdx} fallback also failed:`, e);
+        }
+      }
     }, 500);
   } else if (room.players[dealerIdx].socketId) {
     io.to(room.players[dealerIdx].socketId!).emit("actionRequired", game.getInitialDealerActions());

@@ -886,7 +886,12 @@ function emitOrBotAction(
       try {
         // Check if game state is still valid for this bot action
         if (game.state.phase !== GamePhase.Playing) {
-          console.warn(`Bot ${playerIndex} action skipped: game phase is ${game.state.phase}`);
+          console.warn(`Bot ${playerIndex} action skipped: game phase is ${game.state.phase}, attempting Pass fallback`);
+          try {
+            handlePlayerAction(io, game.roomId, { type: ActionType.Pass, playerIndex }, playerIndex);
+          } catch (e) {
+            console.error(`Bot ${playerIndex} phase-check Pass fallback failed:`, e);
+          }
           return;
         }
         const player = game.state.players[playerIndex];
