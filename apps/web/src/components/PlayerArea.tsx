@@ -373,8 +373,8 @@ export function PlayerArea({
                   flexWrap: ultraCompact ? "wrap" : "nowrap",
                   gap: 8,
                   zIndex: "var(--z-tile-anim)" as any,
-                  maxHeight: ultraCompact ? undefined : "40dvh",
-                  overflowY: ultraCompact ? undefined : "auto",
+                  maxHeight: ultraCompact ? "clamp(60px, 40dvh, 160px)" : "40dvh",
+                  overflowY: "auto",
                   animation: "bubbleFadeIn 0.15s ease-out",
                 }}>
                   {canHu && (
