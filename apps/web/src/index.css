@@ -71,6 +71,7 @@ body {
   --color-text-primary: #eee;
   --color-text-secondary: #8fbc8f;
   --color-text-gold: #d4a017;
+  --color-success: #4caf50;
   --color-error: #ff8a80;
   --color-error-bg: rgba(255, 82, 82, 0.15);
   --color-focus: #4fc3f7;

@@ -11,6 +11,7 @@ const WIND_LABELS = ["东 East", "南 South", "西 West", "北 North"];
 
 export function Room({ initialRoomState }: RoomProps) {
   const [room, setRoom] = useState<RoomState | null>(initialRoomState);
+  const [showLeaveConfirm, setShowLeaveConfirm] = useState(false);
 
   useEffect(() => {
     const onRoomJoined = (state: RoomState) => setRoom(state);
@@ -110,11 +111,22 @@ export function Room({ initialRoomState }: RoomProps) {
         </Button>
         <Button
           variant="danger"
-          onClick={handleLeave}
+          onClick={() => setShowLeaveConfirm(true)}
         >
           离开 / Leave
         </Button>
       </div>
+      {showLeaveConfirm && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50 }}>
+          <div style={{ background: 'rgba(15,30,25,0.97)', border: '2px solid rgba(184,134,11,0.4)', borderRadius: 12, padding: '24px', maxWidth: 360, textAlign: 'center' }}>
+            <p style={{ fontSize: 18, marginBottom: 16 }}>确定要离开房间吗？</p>
+            <div style={{ display: 'flex', gap: 12, justifyContent: 'center' }}>
+              <Button variant='secondary' onClick={() => setShowLeaveConfirm(false)}>取消</Button>
+              <Button variant='danger' onClick={handleLeave}>离开</Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
     </div>
   );
