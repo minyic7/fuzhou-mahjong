@@ -162,9 +162,9 @@ export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTile
           onAnGang={onAnGang}
           onBuGang={onBuGang}
           hasDiscardedGold={myHasDiscardedGold}
-          lastDrawnTileId={(state as any).lastDrawnTileId}
+          lastDrawnTileId={state.lastDrawnTileId}
           lastDiscardedTileId={lastDiscardPlayerIndex === myIndex ? lastDiscardTileId : null}
-          tenpaiTiles={(state as any).tenpaiTiles}
+          tenpaiTiles={state.tenpaiTiles}
           cumulativeScore={roundsPlayed > 0 ? cumulativeScores[myIndex] : undefined}
         />
       </div>
