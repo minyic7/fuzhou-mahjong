@@ -532,6 +532,9 @@ function handleAnGang(
       console.warn(`[GameEngine] Bot ${playerIndex} AnGang failed: only ${matching.length} matching tiles — forcing emergency discard`);
       const fallback = emergencyDiscard(player.hand, playerIndex, state.gold);
       handlePlayerAction(io, game.roomId, fallback, playerIndex);
+    } else {
+      const socket = io.sockets.sockets.get(game.getSocketId(playerIndex));
+      socket?.emit('actionError', { message: 'Invalid AnGang - not enough matching tiles', code: 'INVALID_ANGANG' });
     }
     return;
   }
@@ -606,6 +609,9 @@ function handleBuGang(
       console.warn(`[GameEngine] Bot ${playerIndex} BuGang failed: no matching Peng meld — forcing emergency discard`);
       const fallback = emergencyDiscard(player.hand, playerIndex, state.gold);
       handlePlayerAction(io, game.roomId, fallback, playerIndex);
+    } else {
+      const socket = io.sockets.sockets.get(game.getSocketId(playerIndex));
+      socket?.emit('actionError', { message: 'Invalid BuGang - no matching Peng meld', code: 'INVALID_BUGANG' });
     }
     return;
   }
@@ -746,6 +752,9 @@ function handleSelfDrawHu(
     console.warn(`[GameEngine] Bot ${playerIndex} Hu failed: win check returned false — forcing emergency discard`);
     const fallback = emergencyDiscard(player.hand, playerIndex, game.state.gold);
     handlePlayerAction(io, game.roomId, fallback, playerIndex);
+  } else {
+    const socket = io.sockets.sockets.get(game.getSocketId(playerIndex));
+    socket?.emit('actionError', { message: 'Invalid Hu - winning conditions not met', code: 'INVALID_HU' });
   }
 }
 
