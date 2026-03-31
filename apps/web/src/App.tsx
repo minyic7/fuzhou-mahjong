@@ -5,7 +5,9 @@ import type { RoomState, ClientGameState, CumulativeData } from "@fuzhou-mahjong
 import { Lobby } from "./pages/Lobby";
 import { Room } from "./pages/Room";
 import { Game } from "./pages/Game";
+import { MobileGame } from "./pages/MobileGame";
 import { ConnectionStatus } from "./components/ConnectionStatus";
+import { useIsMobileDevice } from "./hooks/useIsMobileDevice";
 
 type View = "lobby" | "room" | "game";
 
@@ -13,6 +15,7 @@ const PLAYER_ID_KEY = "fuzhou-mahjong-playerId";
 
 export function App() {
   const { connected, connectionState, reconnectAttempt } = useSocket();
+  const isMobile = useIsMobileDevice();
   const [view, setView] = useState<View>("lobby");
   const [reconnecting, setReconnecting] = useState(false);
   const [disconnectedAt, setDisconnectedAt] = useState<number | null>(null);
@@ -104,8 +107,12 @@ export function App() {
         return <Lobby onJoined={(roomState) => { setInitialRoomState(roomState); setView("room"); }} />;
       case "room":
         return <Room initialRoomState={initialRoomState} sessionScores={sessionScores} />;
-      case "game":
-        return <Game initialGameState={initialGameState} onLeave={() => { localStorage.removeItem(PLAYER_ID_KEY); setInitialGameState(null); setSessionScores(null); setView("lobby"); }} />;
+      case "game": {
+        const handleLeave = () => { localStorage.removeItem(PLAYER_ID_KEY); setInitialGameState(null); setSessionScores(null); setView("lobby"); };
+        return isMobile
+          ? <MobileGame initialGameState={initialGameState} onLeave={handleLeave} />
+          : <Game initialGameState={initialGameState} onLeave={handleLeave} />;
+      }
     }
   })();
 
