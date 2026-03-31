@@ -525,11 +525,67 @@ export function decideBotAction(
     if (actions.canMingGang && lastDiscardTile) {
       return { type: ActionType.MingGang, playerIndex, targetTile: lastDiscardTile };
     }
-    if (actions.anGangOptions.length > 0) {
-      return { type: ActionType.AnGang, playerIndex, tile: actions.anGangOptions[0][0] };
+    if (actions.anGangOptions.length > 0 && actions.anGangOptions[0]?.length > 0) {
+      const currentShanten = estimateShanten(hand, melds, gold);
+      let bestAnGang: TileInstance | null = null;
+      let bestAnGangShanten = Infinity;
+
+      for (const option of actions.anGangOptions) {
+        if (!option || option.length === 0) continue;
+        const gangTile = option[0];
+        // Simulate removing 4 tiles of this type from hand
+        const remaining = hand.filter(t => !option.some(o => o.id === t.id));
+        const newMelds: Meld[] = [...melds, { type: MeldType.AnGang, tiles: option, sourceTile: gangTile }];
+        const newShanten = estimateShanten(remaining, newMelds, gold);
+
+        if (currentShanten === 0 && newShanten > 0) {
+          // AnGang would break tenpai — skip this option
+          continue;
+        }
+        if (newShanten < bestAnGangShanten) {
+          bestAnGangShanten = newShanten;
+          bestAnGang = gangTile;
+        }
+      }
+
+      if (bestAnGang) {
+        return { type: ActionType.AnGang, playerIndex, tile: bestAnGang };
+      }
     }
-    if (actions.buGangOptions.length > 0) {
-      return { type: ActionType.BuGang, playerIndex, tile: actions.buGangOptions[0].tile };
+    if (actions.buGangOptions.length > 0 && actions.buGangOptions[0]?.tile) {
+      const currentShanten = estimateShanten(hand, melds, gold);
+      let bestBuGang: TileInstance | null = null;
+      let bestBuGangShanten = Infinity;
+
+      for (const option of actions.buGangOptions) {
+        if (!option?.tile) continue;
+        // BuGang converts a Peng meld to Gang — the tile leaves hand
+        const remaining = hand.filter(t => t.id !== option.tile.id);
+        const newMelds = melds.map(m =>
+          m.type === MeldType.Peng && m.tiles.some(t => {
+            if (!isSuitedTile(t.tile) || !isSuitedTile(option.tile.tile)) return false;
+            const a = t.tile as SuitedTile;
+            const b = option.tile.tile as SuitedTile;
+            return a.suit === b.suit && a.value === b.value;
+          })
+            ? { ...m, type: MeldType.BuGang, tiles: [...m.tiles, option.tile] }
+            : m,
+        );
+        const newShanten = estimateShanten(remaining, newMelds, gold);
+
+        if (currentShanten === 0 && newShanten > 0) {
+          // BuGang would break tenpai — skip this option
+          continue;
+        }
+        if (newShanten < bestBuGangShanten) {
+          bestBuGangShanten = newShanten;
+          bestBuGang = option.tile;
+        }
+      }
+
+      if (bestBuGang) {
+        return { type: ActionType.BuGang, playerIndex, tile: bestBuGang };
+      }
     }
   }
 
@@ -543,6 +599,10 @@ export function decideBotAction(
       const b = lastDiscardTile.tile as SuitedTile;
       return a.suit === b.suit && a.value === b.value;
     }).slice(0, 2);
+
+    if (matchingTiles.length < 2) {
+      console.warn(`[Bot:decision] Player ${playerIndex} canPeng but only ${matchingTiles.length} matching tiles found`);
+    }
 
     if (matchingTiles.length >= 2) {
       const newMeld: Meld = {
@@ -560,7 +620,7 @@ export function decideBotAction(
   // Priority 5: Chi (evaluate all options, pick best)
   if (actions.chiOptions.length > 0 && lastDiscardTile) {
     const bestChi = evaluateChiOptions(hand, melds, gold, actions.chiOptions, lastDiscardTile, context);
-    if (bestChi) {
+    if (bestChi && bestChi.length === 2) {
       return {
         type: ActionType.Chi,
         playerIndex,
