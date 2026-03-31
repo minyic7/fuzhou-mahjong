@@ -3,8 +3,6 @@ import type { TileInstance, Meld, GoldState } from "@fuzhou-mahjong/shared";
 import { MeldType } from "@fuzhou-mahjong/shared";
 import { TileView } from "./Tile";
 import { useLongPress } from "./TileTooltip";
-import { useSwipeGesture } from "../hooks/useSwipeGesture";
-import { useIsCompactLandscape } from "../hooks/useIsMobile";
 
 interface PlayerAreaProps {
   isMe: boolean;
@@ -34,9 +32,6 @@ interface PlayerAreaProps {
   departingTileId?: number | null;
   hasDiscardedGold?: boolean;
   isDisconnected?: boolean;
-  compact?: boolean;
-  ultraCompact?: boolean;
-  firstPerson?: boolean;
   cumulativeScore?: number;
   claimActive?: boolean;
 }
@@ -53,7 +48,7 @@ export function PlayerArea({
   isCurrentTurn, isDealer, gold, selectedTileId, onTileClick, label,
   claimableTileIds, onTileDoubleClick, lastDrawnTileId, lastDiscardedTileId, tenpaiTiles,
   canDiscard, onDiscard, canHu, onHu, kongTileIds, onAnGang, onBuGang, departingTileId, hasDiscardedGold,
-  isDisconnected, compact, ultraCompact, firstPerson, cumulativeScore, claimActive,
+  isDisconnected, cumulativeScore, claimActive,
 }: PlayerAreaProps) {
   const { onTouchStart: lpTouchStart, onTouchEnd: lpTouchEnd, onTouchCancel: lpTouchCancel, onMouseEnter, onMouseLeave, Tooltip, dismiss } = useLongPress(gold);
 
@@ -61,63 +56,13 @@ export function PlayerArea({
   useEffect(() => {
     if (claimActive) dismiss();
   }, [claimActive, dismiss]);
-  const isCompactLandscape = useIsCompactLandscape();
 
-  // Auto-scroll compact discards to the end when new tiles are added
+  // Auto-scroll discards to the end when new tiles are added
   const discardScrollRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
     const el = discardScrollRef.current;
     if (el) el.scrollLeft = el.scrollWidth;
   }, [discards.length]);
-
-  // Double-tap detection for reliable mobile double-tap
-  const lastTapRef = useRef<{ id: number; time: number } | null>(null);
-  const handleTap = (t: TileInstance) => {
-    const now = Date.now();
-    if (lastTapRef.current?.id === t.id && now - lastTapRef.current.time < 450) {
-      // Double-tap detected
-      lastTapRef.current = null;
-      onTileDoubleClick?.(t);
-    } else {
-      lastTapRef.current = { id: t.id, time: now };
-      onTileClick?.(t);
-    }
-  };
-
-  // Swipe-to-discard discovery hint
-  const [showSwipeHint, setShowSwipeHint] = useState(false);
-  const swipeHintDismissed = useRef(false);
-
-  useEffect(() => {
-    if (isMe && canDiscard && isCurrentTurn && !swipeHintDismissed.current && !localStorage.getItem("swipeHintShown")) {
-      setShowSwipeHint(true);
-      const timer = setTimeout(() => setShowSwipeHint(false), 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [isMe, canDiscard, isCurrentTurn]);
-
-  // Swipe-to-discard gesture
-  const swipe = useSwipeGesture({
-    onSwipeUp: (tileId: number) => {
-      const tile = hand?.find((t) => t.id === tileId);
-      if (!tile) return;
-      // Dismiss swipe hint permanently on first successful swipe
-      if (!swipeHintDismissed.current) {
-        swipeHintDismissed.current = true;
-        setShowSwipeHint(false);
-        localStorage.setItem("swipeHintShown", "1");
-      }
-      const tileIsGold = !!(gold && tile.tile.kind === "suited" && tile.tile.suit === gold.wildTile.suit && tile.tile.value === gold.wildTile.value);
-      if (tileIsGold) {
-        // Gold tile safety: select tile to show warning bubble instead of auto-discarding
-        onTileClick?.(tile);
-      } else {
-        onDiscard?.(tileId);
-      }
-    },
-    enabled: !!canDiscard,
-    threshold: 40,
-  });
 
   // Track newest meld index for entrance animation
   const [newestMeldIdx, setNewestMeldIdx] = useState<number | null>(null);
@@ -131,141 +76,6 @@ export function PlayerArea({
     }
     prevMeldCountRef.current = melds.length;
   }, [melds.length]);
-
-  // Ultra-compact layout for opponents in first-person mobile mode
-  if (ultraCompact) {
-    return (
-      <div
-        className={`player-area-card${isCurrentTurn ? " current-turn" : ""} compact-opponent ultra-compact-opponent`}
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: 1,
-          padding: "2px",
-          background: isCurrentTurn ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.3)",
-          border: isCurrentTurn ? "1px solid var(--color-gold-bright)" : undefined,
-          borderRadius: 3,
-          opacity: isDisconnected ? 0.5 : 1,
-          overflow: "hidden",
-          minHeight: 0,
-          fontSize: "var(--font-uc-label)",
-        }}
-      >
-        <div style={{ display: "flex", alignItems: "center", gap: 2 }}>
-          <span style={{ fontSize: "var(--font-uc-label)", fontWeight: "bold", color: "var(--color-text-warm)", whiteSpace: "nowrap" }}>{label}</span>
-          {isDealer && <span style={{ fontSize: "var(--font-uc-badge)", background: "var(--color-dealer-bg)", color: "var(--color-gold-bright)", padding: "0 2px", borderRadius: 2, fontWeight: "bold" }}>庄</span>}
-          {isCurrentTurn && <span style={{ fontSize: "var(--font-uc-badge)", background: "rgba(255,215,0,0.2)", color: "var(--color-gold-bright)", padding: "0 2px", borderRadius: 2 }}>出牌</span>}
-          <span style={{ fontSize: "var(--font-uc-label)", color: "var(--color-text-secondary)", marginLeft: "auto" }}>{handCount ?? 0}张 🌸{flowers.length}</span>
-        </div>
-        {melds.length > 0 && (
-          <div style={{ display: "flex", gap: 1, flexWrap: "wrap" }}>
-            {melds.map((m, mi) => (
-              <div key={mi} className={newestMeldIdx === mi ? "meld-new" : undefined} style={{ display: "flex", gap: 0 }}>
-                {m.tiles.map((t, ti) => (
-                  <TileView key={ti} tile={t} faceUp={m.type !== MeldType.AnGang} gold={gold} small
-                    className={newestMeldIdx === mi && m.type === MeldType.AnGang ? "angang-flip-reveal" : undefined}
-                    style={{ width: "var(--fp-opponent-tile-w)", height: "var(--fp-opponent-tile-h)", fontSize: "var(--font-uc-tile)" }}
-                  />
-                ))}
-              </div>
-            ))}
-          </div>
-        )}
-        {discards.length > 0 && (
-          <div ref={discardScrollRef} className="compact-discards" style={{ display: "flex", gap: 0, overflowX: "auto", overflowY: "hidden", minWidth: 0, alignItems: "center", scrollSnapType: "x mandatory", WebkitOverflowScrolling: "touch" }}>
-            {discards.map((d) => (
-              <TileView key={d.id} tile={d} faceUp gold={gold} small
-                style={{ width: "var(--fp-opponent-tile-w)", height: "var(--fp-opponent-tile-h)", fontSize: "var(--font-uc-tile)", scrollSnapAlign: "start" }}
-                className={lastDiscardedTileId === d.id ? "discard-arrive last-discard" : undefined}
-              />
-            ))}
-          </div>
-        )}
-      </div>
-    );
-  }
-
-  // Compact single-row layout for opponents on mobile landscape
-  if (compact) {
-    return (
-      <div
-        className={`player-area-card${isCurrentTurn ? " current-turn" : ""} compact-opponent`}
-        style={{
-          display: "flex",
-          alignItems: "center",
-          gap: "var(--compact-gap, 6px)",
-          padding: "var(--compact-padding, 2px 8px)",
-          background: isCurrentTurn ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.3)",
-          border: isCurrentTurn ? "2px solid var(--color-gold-bright)" : undefined,
-          borderRadius: 4,
-          borderLeft: isCurrentTurn ? "3px solid var(--color-gold-bright)" : "3px solid transparent",
-          opacity: isDisconnected ? 0.5 : 1,
-          overflow: "hidden",
-          minHeight: 0,
-        }}
-      >
-        {/* Name + badges */}
-        <span style={{ fontSize: "var(--compact-label-font, 12px)", fontWeight: "bold", color: "var(--color-text-warm)", whiteSpace: "nowrap", flexShrink: 0 }}>
-          {label}
-        </span>
-        {isDealer && <span style={{ fontSize: "var(--font-xs)", background: "var(--color-dealer-bg)", color: "var(--color-gold-bright)", padding: "0 4px", borderRadius: 3, fontWeight: "bold", flexShrink: 0 }}>庄</span>}
-        {isDisconnected && <span style={{ fontSize: "var(--font-xs)", background: "var(--color-disconnect)", color: "#fff", padding: "0 4px", borderRadius: 3, fontWeight: "bold", flexShrink: 0 }}>断线</span>}
-        {hasDiscardedGold && <span style={{ fontSize: "var(--font-xs)", background: "var(--color-action-hu)", color: "#fff", padding: "0 4px", borderRadius: 3, fontWeight: "bold", flexShrink: 0 }}>弃金</span>}
-        {isCurrentTurn && <span className="your-turn-prompt" style={{ fontSize: "var(--font-xs)", background: "rgba(255,215,0,0.2)", color: "var(--color-gold-bright)", padding: "0 4px", borderRadius: 3, border: "1px solid var(--color-gold-bright)", flexShrink: 0 }}>出牌</span>}
-
-        {/* Hand count */}
-        <span style={{ fontSize: "var(--compact-info-font, 11px)", color: "var(--color-text-secondary)", flexShrink: 0 }}>{handCount ?? 0}张</span>
-
-        {/* Melds (small tiles inline) */}
-        {melds.length > 0 && (
-          <div style={{ display: "flex", gap: 4, flexShrink: 0 }}>
-            {melds.map((m, mi) => (
-              <div key={mi} className={newestMeldIdx === mi ? "meld-new" : undefined} style={{ display: "flex", gap: 0 }}>
-                {m.tiles.map((t, ti) => (
-                  <TileView key={ti} tile={t} faceUp={m.type !== MeldType.AnGang} gold={gold} small
-                    className={newestMeldIdx === mi && m.type === MeldType.AnGang ? "angang-flip-reveal" : undefined}
-                  />
-                ))}
-              </div>
-            ))}
-          </div>
-        )}
-
-        {/* Discards (tiny, single row, scrollable) */}
-        {discards.length > 0 && (
-          <div ref={discardScrollRef} className="compact-discards" style={{
-            display: "flex",
-            gap: 1,
-            overflowX: "auto",
-            overflowY: "hidden",
-            flex: 1,
-            minWidth: 0,
-            scrollSnapType: "x mandatory",
-            WebkitOverflowScrolling: "touch",
-          }}>
-            {discards.map((d) => (
-              <TileView key={d.id} tile={d} faceUp gold={gold} small
-                style={{ scrollSnapAlign: "start" }}
-                className={lastDiscardedTileId === d.id ? "discard-arrive last-discard" : undefined}
-              />
-            ))}
-          </div>
-        )}
-
-        {/* Flower count */}
-        <span style={{ fontSize: "var(--compact-info-font, 11px)", color: "var(--color-text-secondary)", flexShrink: 0, marginLeft: "auto" }}>🌸{flowers.length}</span>
-        {cumulativeScore != null && (
-          <span className="cumulative-score-badge" style={{
-            fontSize: "var(--compact-info-font, 11px)", fontWeight: "bold",
-            color: cumulativeScore > 0 ? "var(--color-gold-bright)" : cumulativeScore < 0 ? "var(--color-error)" : "var(--color-text-secondary)",
-            padding: "1px 6px", borderRadius: 3, background: "rgba(0,0,0,0.3)",
-          }}>
-            {cumulativeScore > 0 ? "+" : ""}{cumulativeScore}
-          </span>
-        )}
-      </div>
-    );
-  }
 
   return (
     <>
@@ -310,55 +120,34 @@ export function PlayerArea({
       </div>
 
       {/* Hand */}
-      <div ref={(el) => { swipe.containerRef.current = el; }} style={{
-        display: "flex", flexWrap: "nowrap", gap: firstPerson ? "var(--fp-hand-gap)" : 1, marginBottom: 4, alignItems: "flex-end",
+      <div style={{
+        display: "flex", flexWrap: "nowrap", gap: 1, marginBottom: 4, alignItems: "flex-end",
         justifyContent: isMe ? "center" : undefined,
         paddingTop: isMe ? "var(--hand-padding-top)" : 0, overflow: "visible", clipPath: "inset(-9999px 0px -9999px 0px)", position: "relative",
-        touchAction: "manipulation",
-        ...(firstPerson ? { "--tile-w": "var(--fp-tile-w)", "--tile-h": "var(--fp-tile-h)" } as React.CSSProperties : {}),
       }}>
         {isMe && hand ? (
-          hand.map((t, idx) => {
+          hand.map((t) => {
             const isSelected = selectedTileId === t.id;
             const isKong = kongTileIds?.has(t.id);
             const showBubble = isSelected && (canDiscard || canHu || isKong);
             const isGoldTile = !!(gold && t.tile.kind === "suited" && t.tile.suit === gold.wildTile.suit && t.tile.value === gold.wildTile.value);
             const isAnGang = !!(isKong && onAnGang);
             const isBuGang = !!(isKong && onBuGang);
-            const isSwiping = swipe.swipingTileId === t.id;
-            const tileSwipeOffset = isSwiping ? swipe.swipeOffset : 0;
-            const swipeReady = isSwiping && swipe.swipeOffset < -40;
             return (
             <div
               key={t.id}
-              onTouchStart={(e) => swipe.onTouchStart(t.id, e)}
-              onTouchEnd={() => { swipe.onTouchEnd(); }}
-              onTouchCancel={() => { swipe.onTouchCancel(); }}
               style={{
                 display: "inline-flex",
                 marginLeft: lastDrawnTileId === t.id ? "var(--hand-new-tile-margin)" : 0,
                 position: "relative",
-                transform: tileSwipeOffset < 0 ? `translateY(${Math.max(-80, Math.min(0, tileSwipeOffset))}px)` : undefined,
-                opacity: isSwiping ? 1 - Math.min(0.5, Math.abs(tileSwipeOffset) / 100) : 1,
-                touchAction: "manipulation",
-                transition: isSwiping ? "none" : "transform 0.2s ease, opacity 0.2s ease, margin 0.15s ease",
-                boxShadow: swipeReady ? "0 0 12px rgba(0,184,148,0.6)" : undefined,
+                transition: "transform 0.2s ease, opacity 0.2s ease, margin 0.15s ease",
               }}
             >
-              {lastDrawnTileId === t.id && !isCompactLandscape && (
+              {lastDrawnTileId === t.id && (
                 <div style={{
                   position: "absolute", top: "clamp(-8px, -3.5dvh, -14px)", left: "50%", transform: "translateX(-50%)",
                   fontSize: "var(--font-xs)", color: "#4fc3f7", whiteSpace: "nowrap",
                 }}>新牌</div>
-              )}
-              {idx === 0 && showSwipeHint && (
-                <div className="swipe-hint" style={{
-                  position: "absolute", bottom: "100%", left: "50%",
-                  transform: "translateX(-50%)", marginBottom: "clamp(2px, 1.5dvh, 6px)",
-                  fontSize: "var(--font-xs)", color: "var(--color-gold-bright)",
-                  whiteSpace: "nowrap", zIndex: "var(--z-swipe-hint)",
-                  textShadow: "0 1px 4px rgba(0,0,0,0.8)",
-                }}>↑ 上滑出牌</div>
               )}
               {/* Discard / Kong bubble */}
               {showBubble && (
@@ -368,11 +157,11 @@ export function PlayerArea({
                   left: "max(8px, 50%)",
                   transform: "translateX(max(-50%, calc(-100% + 8px)))",
                   display: "flex",
-                  flexDirection: ultraCompact ? "row" : "column",
-                  flexWrap: ultraCompact ? "wrap" : "nowrap",
+                  flexDirection: "column",
+                  flexWrap: "nowrap",
                   gap: 8,
                   zIndex: "var(--z-tile-anim)" as any,
-                  maxHeight: ultraCompact ? "clamp(60px, 40dvh, 160px)" : "40dvh",
+                  maxHeight: "40dvh",
                   overflowY: "auto",
                   animation: "bubbleFadeIn 0.15s ease-out",
                 }}>
@@ -428,7 +217,7 @@ export function PlayerArea({
                 onTouchCancel={lpTouchCancel}
                 onMouseEnter={(e) => onMouseEnter(t, e)}
                 onMouseLeave={onMouseLeave}
-                onClick={() => handleTap(t)}
+                onClick={() => onTileClick?.(t)}
               />
             </div>
             );
@@ -480,7 +269,7 @@ export function PlayerArea({
         </div>
       )}
 
-      {/* Discards - always single row */}
+      {/* Discards */}
       {discards.length > 0 && (
         <div ref={discardScrollRef} className="compact-discards" style={{
           display: "flex",
@@ -490,12 +279,9 @@ export function PlayerArea({
           padding: "var(--game-padding)",
           background: isMe ? "rgba(0,100,200,0.08)" : "rgba(255,255,255,0.03)",
           borderRadius: 4,
-          scrollSnapType: "x mandatory",
-          WebkitOverflowScrolling: "touch",
         }}>
           {discards.map((d) => (
             <TileView key={d.id} tile={d} faceUp gold={gold} small
-              style={{ scrollSnapAlign: "start" }}
               className={lastDiscardedTileId === d.id ? "discard-arrive last-discard" : undefined}
             />
           ))}
