@@ -464,7 +464,7 @@ export function Game({ initialGameState, onLeave }: GameProps) {
         <ClaimOverlay actions={actions} gameState={gameState} onAction={handleAction} />
       )}
       {/* Floating tile counter overlay */}
-      <div style={{ position: "fixed", bottom: "calc(12px + env(safe-area-inset-bottom, 0px))", left: "calc(12px + env(safe-area-inset-left, 0px))", zIndex: 15 }}>
+      <div style={{ position: "fixed", bottom: "calc(12px + env(safe-area-inset-bottom, 0px))", left: "calc(12px + env(safe-area-inset-left, 0px))", zIndex: "var(--z-tile-counter)" }}>
         <TileCounter gameState={gameState} />
       </div>
       {/* Settings gear button + dropdown */}
