@@ -74,7 +74,7 @@ export function PlayerArea({
   const lastTapRef = useRef<{ id: number; time: number } | null>(null);
   const handleTap = (t: TileInstance) => {
     const now = Date.now();
-    if (lastTapRef.current?.id === t.id && now - lastTapRef.current.time < 300) {
+    if (lastTapRef.current?.id === t.id && now - lastTapRef.current.time < 450) {
       // Double-tap detected
       lastTapRef.current = null;
       onTileDoubleClick?.(t);
