@@ -46,8 +46,20 @@ export function useCenterAction() {
 }
 
 export function CenterAction({ display, gold }: { display: ActionDisplay | null; gold: GoldState | null }) {
-  const { height } = useWindowSize();
+  const { width, height } = useWindowSize();
   if (!display) return null;
+
+  const isCompact = height <= BREAKPOINTS.COMPACT_HEIGHT;
+  const tileCount = display.tiles.length;
+  // Base tile width mirrors CSS --tile-w breakpoints
+  const baseTileW = width <= 360 ? 30 : width <= 480 ? 34 : 44;
+  const gap = 4;
+  const maxMeldWidth = width * 0.9;
+  // scale applies per-tile via transform (doesn't affect layout), so visual width =
+  // tileCount * baseTileW * scale + (tileCount - 1) * gap
+  // Solve for max scale: scale <= (maxMeldWidth - (tileCount - 1) * gap) / (tileCount * baseTileW)
+  const maxScale = (maxMeldWidth - (tileCount - 1) * gap) / (tileCount * baseTileW);
+  const scale = isCompact ? 1.2 : Math.min(1.8, maxScale);
 
   return (
     <div
@@ -71,7 +83,7 @@ export function CenterAction({ display, gold }: { display: ActionDisplay | null;
         boxShadow: "0 4px 12px rgba(0,0,0,0.5)",
       }}>
         {display.tiles.map((t) => (
-          <div key={t.id} style={{ transform: `scale(${height <= BREAKPOINTS.COMPACT_HEIGHT ? 1.2 : 1.8})` }}>
+          <div key={t.id} style={{ transform: `scale(${scale})` }}>
             <TileView tile={t} faceUp gold={gold} />
           </div>
         ))}
