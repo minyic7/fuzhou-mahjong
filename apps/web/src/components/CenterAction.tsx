@@ -55,9 +55,11 @@ export function CenterAction({ display, gold }: { display: ActionDisplay | null;
   const baseTileW = width <= 360 ? 30 : width <= 480 ? 34 : 44;
   const gap = 4;
   const maxMeldWidth = width * 0.9;
-  const totalBaseWidth = tileCount * baseTileW + (tileCount - 1) * gap;
-  const desiredScale = isCompact ? 1.2 : 1.8;
-  const scale = isCompact ? 1.2 : Math.min(desiredScale, maxMeldWidth / totalBaseWidth);
+  // scale applies per-tile via transform (doesn't affect layout), so visual width =
+  // tileCount * baseTileW * scale + (tileCount - 1) * gap
+  // Solve for max scale: scale <= (maxMeldWidth - (tileCount - 1) * gap) / (tileCount * baseTileW)
+  const maxScale = (maxMeldWidth - (tileCount - 1) * gap) / (tileCount * baseTileW);
+  const scale = isCompact ? 1.2 : Math.min(1.8, maxScale);
 
   return (
     <div
