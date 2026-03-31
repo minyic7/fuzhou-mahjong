@@ -307,6 +307,9 @@ export function registerRoomHandlers(io: GameServer, socket: GameSocket): void {
         room.disconnectTimers.delete(player.playerId);
         console.log(`Reconnect timeout for ${player.name} in room ${room.id}`);
 
+        // Clean up this player's room mapping regardless of whether others remain
+        unregisterPlayerRoom(player.playerId);
+
         // If no humans left connected, clean up room and game
         if (!room.hasConnectedPlayers()) {
           deleteGame(room.id);

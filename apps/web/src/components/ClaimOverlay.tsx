@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { ActionType } from "@fuzhou-mahjong/shared";
-import type { AvailableActions, ClientGameState, GameAction, TileInstance } from "@fuzhou-mahjong/shared";
+import { ActionType, isSuitedTile, suitedTilesMatch } from "@fuzhou-mahjong/shared";
+import type { AvailableActions, ClientGameState, GameAction, TileInstance, SuitedTile } from "@fuzhou-mahjong/shared";
 import { TileView } from "./Tile";
 import { BREAKPOINTS } from "../hooks/useIsMobile";
 import { useWindowSize } from "../hooks/useWindowSize";
@@ -30,6 +30,20 @@ const BTN = {
   chi: { background: "var(--color-action-chi)", color: "#fff" },
   pass: { background: "var(--color-action-pass-bg)", color: "var(--color-action-pass-text)" },
 };
+
+const HIGHLIGHT_STYLE: React.CSSProperties = {
+  border: "2px solid var(--color-accent-orange)",
+  borderRadius: 4,
+  padding: 1,
+  boxShadow: "0 0 6px rgba(255,165,0,0.4)",
+};
+
+function findMatchingHandTiles(hand: TileInstance[], discard: TileInstance, count: number): TileInstance[] {
+  if (!isSuitedTile(discard.tile)) return [];
+  return hand
+    .filter(t => isSuitedTile(t.tile) && suitedTilesMatch(t.tile as SuitedTile, discard.tile as SuitedTile))
+    .slice(0, count);
+}
 
 export function ClaimOverlay({ actions, gameState, onAction }: ClaimOverlayProps) {
   const { height } = useWindowSize();
@@ -105,41 +119,71 @@ export function ClaimOverlay({ actions, gameState, onAction }: ClaimOverlayProps
             </button>
           )}
 
-          {actions.canMingGang && gameState.lastDiscard && (
-            <button
-              style={{ ...BTN.base, ...BTN.gang }}
-              onClick={() => {
-                if (!gameState.lastDiscard) return;
-                handleAction({
-                  type: ActionType.MingGang,
-                  playerIndex: myIndex,
-                  targetTile: gameState.lastDiscard.tile,
-                });
-              }}
-            >
-              杠
-            </button>
-          )}
+          {actions.canMingGang && gameState.lastDiscard && (() => {
+            const gangTiles = findMatchingHandTiles(gameState.myHand, gameState.lastDiscard!.tile, 3);
+            return (
+              <button
+                style={{ ...BTN.base, ...BTN.gang, display: "flex", flexDirection: "column", alignItems: "center", gap: 2, padding: isCompact ? "6px 10px" : "10px 16px" }}
+                onClick={() => {
+                  if (!gameState.lastDiscard) return;
+                  handleAction({
+                    type: ActionType.MingGang,
+                    playerIndex: myIndex,
+                    targetTile: gameState.lastDiscard.tile,
+                  });
+                }}
+              >
+                {gangTiles.length === 3 ? (
+                  <>
+                    <div style={{ display: "flex", gap: 2, alignItems: "center" }}>
+                      {gangTiles.map(t => <TileView key={t.id} tile={t} faceUp small />)}
+                      <div style={HIGHLIGHT_STYLE}>
+                        <TileView tile={gameState.lastDiscard!.tile} faceUp small />
+                      </div>
+                    </div>
+                    <span style={{ fontSize: "var(--label-font, 11px)" }}>杠</span>
+                  </>
+                ) : "杠"}
+              </button>
+            );
+          })()}
 
-          {actions.canPeng && gameState.lastDiscard && (
-            <button
-              style={{ ...BTN.base, ...BTN.peng }}
-              onClick={() => {
-                if (!gameState.lastDiscard) return;
-                handleAction({
-                  type: ActionType.Peng,
-                  playerIndex: myIndex,
-                  targetTile: gameState.lastDiscard.tile,
-                });
-              }}
-            >
-              碰
-            </button>
-          )}
+          {actions.canPeng && gameState.lastDiscard && (() => {
+            const pengTiles = findMatchingHandTiles(gameState.myHand, gameState.lastDiscard!.tile, 2);
+            return (
+              <button
+                style={{ ...BTN.base, ...BTN.peng, display: "flex", flexDirection: "column", alignItems: "center", gap: 2, padding: isCompact ? "6px 10px" : "10px 16px" }}
+                onClick={() => {
+                  if (!gameState.lastDiscard) return;
+                  handleAction({
+                    type: ActionType.Peng,
+                    playerIndex: myIndex,
+                    targetTile: gameState.lastDiscard.tile,
+                  });
+                }}
+              >
+                {pengTiles.length === 2 ? (
+                  <>
+                    <div style={{ display: "flex", gap: 2, alignItems: "center" }}>
+                      {pengTiles.map(t => <TileView key={t.id} tile={t} faceUp small />)}
+                      <div style={HIGHLIGHT_STYLE}>
+                        <TileView tile={gameState.lastDiscard!.tile} faceUp small />
+                      </div>
+                    </div>
+                    <span style={{ fontSize: "var(--label-font, 11px)" }}>碰</span>
+                  </>
+                ) : "碰"}
+              </button>
+            );
+          })()}
 
           {actions.chiOptions.length > 0 && !showChiPicker && (
             <button
-              style={{ ...BTN.base, ...BTN.chi }}
+              style={{
+                ...BTN.base, ...BTN.chi,
+                display: "flex", flexDirection: "column", alignItems: "center", gap: 2,
+                padding: isCompact ? "6px 10px" : "10px 16px",
+              }}
               onClick={() => {
                 if (actions.chiOptions.length === 1 && gameState.lastDiscard) {
                   handleAction({
@@ -153,7 +197,19 @@ export function ClaimOverlay({ actions, gameState, onAction }: ClaimOverlayProps
                 }
               }}
             >
-              吃
+              {actions.chiOptions.length === 1 && gameState.lastDiscard ? (
+                <>
+                  <div style={{ display: "flex", gap: 2, alignItems: "center" }}>
+                    {actions.chiOptions[0].map(t => <TileView key={t.id} tile={t} faceUp small />)}
+                    <div style={HIGHLIGHT_STYLE}>
+                      <TileView tile={gameState.lastDiscard.tile} faceUp small />
+                    </div>
+                  </div>
+                  <span style={{ fontSize: "var(--label-font, 11px)" }}>吃</span>
+                </>
+              ) : (
+                <>吃 ×{actions.chiOptions.length}</>
+              )}
             </button>
           )}
 
@@ -189,6 +245,7 @@ export function ClaimOverlay({ actions, gameState, onAction }: ClaimOverlayProps
               padding: "4px 4px",
               scrollSnapType: "x mandatory",
               WebkitOverflowScrolling: "touch",
+              touchAction: "pan-x",
               justifyContent: actions.chiOptions.length <= 2 ? "center" : undefined,
               maxHeight: isUltraCompact ? "min(45dvh, calc(100dvh - 160px))" : "60dvh",
               overflowY: "auto",

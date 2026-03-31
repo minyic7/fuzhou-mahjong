@@ -258,6 +258,12 @@ setOnGameDeleted((roomId) => {
     for (const t of gangTimers) clearTimeout(t);
     gangSafetyTimeouts.delete(roomId);
   }
+  // Clear disconnect timers to prevent stale callbacks after game ends
+  const room = findRoom(roomId);
+  if (room) {
+    for (const t of room.disconnectTimers.values()) clearTimeout(t);
+    room.disconnectTimers.clear();
+  }
 });
 
 /** Pick first non-gold tile to discard as emergency fallback. Returns Pass if hand is empty. */
