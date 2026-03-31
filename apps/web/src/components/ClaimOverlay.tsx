@@ -120,7 +120,7 @@ export function ClaimOverlay({ actions, gameState, onAction }: ClaimOverlayProps
           )}
 
           {actions.canMingGang && gameState.lastDiscard && (() => {
-            const gangTiles = findMatchingHandTiles(gameState.players[myIndex].hand, gameState.lastDiscard!.tile, 3);
+            const gangTiles = findMatchingHandTiles(gameState.myHand, gameState.lastDiscard!.tile, 3);
             return (
               <button
                 style={{ ...BTN.base, ...BTN.gang, display: "flex", flexDirection: "column", alignItems: "center", gap: 2, padding: isCompact ? "6px 10px" : "10px 16px" }}
@@ -149,7 +149,7 @@ export function ClaimOverlay({ actions, gameState, onAction }: ClaimOverlayProps
           })()}
 
           {actions.canPeng && gameState.lastDiscard && (() => {
-            const pengTiles = findMatchingHandTiles(gameState.players[myIndex].hand, gameState.lastDiscard!.tile, 2);
+            const pengTiles = findMatchingHandTiles(gameState.myHand, gameState.lastDiscard!.tile, 2);
             return (
               <button
                 style={{ ...BTN.base, ...BTN.peng, display: "flex", flexDirection: "column", alignItems: "center", gap: 2, padding: isCompact ? "6px 10px" : "10px 16px" }}
