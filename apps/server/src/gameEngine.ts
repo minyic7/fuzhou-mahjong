@@ -148,6 +148,14 @@ function addGangSafetyTimeout(roomId: string, timer: NodeJS.Timeout): void {
   timers.push(timer);
 }
 
+function clearGangSafetyTimeouts(roomId: string): void {
+  const timers = gangSafetyTimeouts.get(roomId);
+  if (timers) {
+    for (const t of timers) clearTimeout(t);
+    gangSafetyTimeouts.delete(roomId);
+  }
+}
+
 // ─── Bot Watchdog Timer ──────────────────────────────────────────
 const BOT_WATCHDOG_MS = 10_000;
 const botWatchdogs = new Map<string, NodeJS.Timeout>();
@@ -253,11 +261,7 @@ setOnGameDeleted((roomId) => {
     activeWindows.delete(roomId);
   }
   // Clear gang safety timeouts
-  const gangTimers = gangSafetyTimeouts.get(roomId);
-  if (gangTimers) {
-    for (const t of gangTimers) clearTimeout(t);
-    gangSafetyTimeouts.delete(roomId);
-  }
+  clearGangSafetyTimeouts(roomId);
   // Clear disconnect timers to prevent stale callbacks after game ends
   const room = findRoom(roomId);
   if (room) {
@@ -1155,6 +1159,10 @@ function endGameWin(
   const state = game.state;
   state.phase = GamePhase.Finished;
 
+  // Clean up all pending timers to prevent stale callbacks after game ends
+  clearGangSafetyTimeouts(game.roomId);
+  for (let i = 0; i < 4; i++) clearBotWatchdog(game.roomId, i);
+
   const staleWindow = activeWindows.get(game.roomId);
   if (staleWindow) {
     console.warn("[ActionWindow] Cleaning up leaked window for room", game.roomId, "(endGameWin)");
@@ -1230,6 +1238,10 @@ function endGameWin(
 function endGameDraw(io: GameServer, game: ServerGameState): void {
   const state = game.state;
   state.phase = GamePhase.Draw;
+
+  // Clean up all pending timers to prevent stale callbacks after game ends
+  clearGangSafetyTimeouts(game.roomId);
+  for (let i = 0; i < 4; i++) clearBotWatchdog(game.roomId, i);
 
   const staleWindow = activeWindows.get(game.roomId);
   if (staleWindow) {
@@ -1392,6 +1404,8 @@ export function emitOrBotAction(
         console.log(`${tag} Safety timer skipped — not this bot's turn (currentTurn=${game.state.currentTurn}) ts=${Date.now()}`);
         return;
       }
+      // Clear mainTimer to prevent double-action if safety timer acts first
+      if (mainTimer) { clearTimeout(mainTimer); mainTimer = null; }
       const safetyWindow = activeWindows.get(game.roomId);
       if (safetyWindow) {
         if (!safetyWindow.isPending(playerIndex)) {
@@ -1455,12 +1469,7 @@ export function emitOrBotAction(
         game.lastDrawnTileIds[playerIndex] = snapshotDrawnTileId;
         // Check if game state is still valid for this bot action
         if (game.state.phase !== GamePhase.Playing) {
-          console.warn(`${tag} Action skipped: phase=${game.state.phase}, attempting Pass fallback ts=${Date.now()}`);
-          try {
-            handlePlayerAction(io, game.roomId, { type: ActionType.Pass, playerIndex }, playerIndex);
-          } catch (e) {
-            console.error(`${tag} Phase-check Pass fallback failed:`, e);
-          }
+          console.warn(`${tag} Action skipped: game ended (phase=${game.state.phase}) ts=${Date.now()}`);
           return;
         }
         const player = game.state.players[playerIndex];
