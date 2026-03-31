@@ -177,7 +177,7 @@ export function ClaimOverlay({ actions, gameState, onAction }: ClaimOverlayProps
             );
           })()}
 
-          {actions.chiOptions.length > 0 && !showChiPicker && (
+          {actions.chiOptions.length === 1 && !showChiPicker && gameState.lastDiscard && (
             <button
               style={{
                 ...BTN.base, ...BTN.chi,
@@ -185,31 +185,61 @@ export function ClaimOverlay({ actions, gameState, onAction }: ClaimOverlayProps
                 padding: isCompact ? "6px 10px" : "10px 16px",
               }}
               onClick={() => {
-                if (actions.chiOptions.length === 1 && gameState.lastDiscard) {
-                  handleAction({
-                    type: ActionType.Chi,
-                    playerIndex: myIndex,
-                    tiles: actions.chiOptions[0] as [TileInstance, TileInstance],
-                    targetTile: gameState.lastDiscard.tile,
-                  });
-                } else {
-                  handleShowChiPicker();
-                }
+                handleAction({
+                  type: ActionType.Chi,
+                  playerIndex: myIndex,
+                  tiles: actions.chiOptions[0] as [TileInstance, TileInstance],
+                  targetTile: gameState.lastDiscard!.tile,
+                });
               }}
             >
-              {actions.chiOptions.length === 1 && gameState.lastDiscard ? (
-                <>
-                  <div style={{ display: "flex", gap: 2, alignItems: "center" }}>
-                    {actions.chiOptions[0].map(t => <TileView key={t.id} tile={t} faceUp small />)}
-                    <div style={HIGHLIGHT_STYLE}>
-                      <TileView tile={gameState.lastDiscard.tile} faceUp small />
-                    </div>
-                  </div>
-                  <span style={{ fontSize: "var(--label-font, 11px)" }}>吃</span>
-                </>
-              ) : (
-                <>吃 ×{actions.chiOptions.length}</>
-              )}
+              <div style={{ display: "flex", gap: 2, alignItems: "center" }}>
+                {actions.chiOptions[0].map(t => <TileView key={t.id} tile={t} faceUp small />)}
+                <div style={HIGHLIGHT_STYLE}>
+                  <TileView tile={gameState.lastDiscard.tile} faceUp small />
+                </div>
+              </div>
+              <span style={{ fontSize: "var(--label-font, 11px)" }}>吃</span>
+            </button>
+          )}
+
+          {actions.chiOptions.length === 2 && !showChiPicker && gameState.lastDiscard && actions.chiOptions.map((combo, i) => (
+            <button
+              key={i}
+              style={{
+                ...BTN.base, ...BTN.chi,
+                display: "flex", flexDirection: "column", alignItems: "center", gap: 2,
+                padding: isCompact ? "6px 10px" : "10px 16px",
+              }}
+              onClick={() => {
+                handleAction({
+                  type: ActionType.Chi,
+                  playerIndex: myIndex,
+                  tiles: combo as [TileInstance, TileInstance],
+                  targetTile: gameState.lastDiscard!.tile,
+                });
+              }}
+            >
+              <div style={{ display: "flex", gap: 2, alignItems: "center" }}>
+                {combo.map(t => <TileView key={t.id} tile={t} faceUp small />)}
+                <div style={HIGHLIGHT_STYLE}>
+                  <TileView tile={gameState.lastDiscard!.tile} faceUp small />
+                </div>
+              </div>
+              <span style={{ fontSize: "var(--label-font, 11px)" }}>吃</span>
+            </button>
+          ))}
+
+          {actions.chiOptions.length >= 3 && !showChiPicker && (
+            <button
+              style={{
+                ...BTN.base, ...BTN.chi,
+                display: "flex", flexDirection: "column", alignItems: "center", gap: 2,
+                padding: isCompact ? "6px 10px" : "10px 16px",
+              }}
+              onClick={() => handleShowChiPicker()}
+            >
+              吃 ×{actions.chiOptions.length}
             </button>
           )}
 
