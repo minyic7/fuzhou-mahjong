@@ -5,7 +5,6 @@ import { GameInfo } from "./GameInfo";
 import { TileWall } from "./TileWall";
 import { TILE_BACK_URL } from "../tileSvg";
 import { TileView } from "./Tile";
-import { useIsCompactLandscape, useIsFirstPersonMobile } from "../hooks/useIsMobile";
 
 export type DrawAnimationSeat = "bottom" | "top" | "left" | "right";
 
@@ -40,9 +39,6 @@ interface GameTableProps {
 }
 
 export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTileId, claimableTileIds, canDiscard, onDiscard, canHu, onHu, canDraw, onDraw, kongTileIds, onAnGang, onBuGang, onBackgroundClick, disconnectedPlayers, drawAnimation, claimAnimation, departingTile, revealedHands, claimActive }: GameTableProps) {
-  const isCompact = useIsCompactLandscape();
-  const isFirstPersonMobile = useIsFirstPersonMobile();
-
   // Discard fly overlay — triggered when a tile departs the hand
   const [discardFlyKey, setDiscardFlyKey] = useState<number | null>(null);
   const discardFlyKeyRef = useRef(0);
@@ -67,13 +63,9 @@ export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTile
   return (
     <div className="game-table" onClick={(e) => { if (e.target === e.currentTarget) onBackgroundClick?.(); }} style={{
       display: "grid",
-      gridTemplateAreas: isFirstPersonMobile
-        ? `"left top right" "left center right" "bottom bottom bottom"`
-        : isCompact
-        ? `". top ." "left center right" ". bottom ."`
-        : `". top ." "left center right" "bottom bottom bottom"`,
-      gridTemplateColumns: isFirstPersonMobile ? "var(--fp-side-col) 1fr var(--fp-side-col)" : isCompact ? "var(--grid-side-col) 1fr var(--grid-side-col)" : "1fr 2fr 1fr",
-      gridTemplateRows: isFirstPersonMobile ? "var(--fp-top-row) 1fr minmax(min(55%, 45dvh), 65%)" : isCompact ? "var(--grid-top-row) var(--grid-center-row) 1fr" : "auto 1fr auto",
+      gridTemplateAreas: `". top ." "left center right" "bottom bottom bottom"`,
+      gridTemplateColumns: "1fr 2fr 1fr",
+      gridTemplateRows: "auto 1fr auto",
       flex: 1,
       minHeight: 0,
       gap: "var(--game-gap)",
@@ -97,8 +89,6 @@ export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTile
           lastDiscardedTileId={lastDiscardPlayerIndex === (myIndex + 2) % 4 ? lastDiscardTileId : null}
           hasDiscardedGold={otherPlayers[1]?.hasDiscardedGold}
           isDisconnected={disconnectedPlayers?.has((myIndex + 2) % 4)}
-          compact={isCompact}
-          ultraCompact={isFirstPersonMobile}
           cumulativeScore={roundsPlayed > 0 ? cumulativeScores[(myIndex + 2) % 4] : undefined}
         />
       </div>
@@ -119,17 +109,12 @@ export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTile
           lastDiscardedTileId={lastDiscardPlayerIndex === (myIndex + 3) % 4 ? lastDiscardTileId : null}
           hasDiscardedGold={otherPlayers[2]?.hasDiscardedGold}
           isDisconnected={disconnectedPlayers?.has((myIndex + 3) % 4)}
-          compact={isCompact}
-          ultraCompact={isFirstPersonMobile}
           cumulativeScore={roundsPlayed > 0 ? cumulativeScores[(myIndex + 3) % 4] : undefined}
         />
       </div>
 
       {/* Center - game info */}
-      <div className="table-center-area" style={{ gridArea: "center", display: "flex", flexDirection: isCompact ? "column" : "row", alignItems: "center", justifyContent: "center", position: "relative", zIndex: "var(--z-game-table-cell)", overflow: "hidden", padding: isCompact ? 0 : "12px" }}>
-        {isCompact && (
-          <TileWall wallRemaining={wallRemaining} wallDrawCount={state.wallDrawCount} wallSupplementCount={state.wallSupplementCount} gold={gold} canDraw={canDraw} onDraw={onDraw} compact />
-        )}
+      <div className="table-center-area" style={{ gridArea: "center", display: "flex", flexDirection: "row", alignItems: "center", justifyContent: "center", position: "relative", zIndex: "var(--z-game-table-cell)", overflow: "hidden", padding: "12px" }}>
         <GameInfo
           gold={gold}
           wallRemaining={wallRemaining}
@@ -138,29 +123,24 @@ export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTile
           myIndex={myIndex}
           lastDiscard={state.lastDiscard}
           playerNames={[myName || "我", ...otherPlayers.map(p => p.name || "")]}
-          compact={isCompact}
         />
       </div>
 
-      {/* Wall segments along table edges (non-compact only) */}
-      {!isCompact && (
-        <>
-          <div style={{ gridArea: "center", alignSelf: "start", justifySelf: "center", zIndex: "var(--z-wall-segment)", marginTop: "clamp(8%, 10dvh, 18%)" }}>
-            <TileWall segment="top" wallRemaining={wallRemaining} wallDrawCount={state.wallDrawCount} wallSupplementCount={state.wallSupplementCount} gold={gold} canDraw={canDraw} onDraw={onDraw} />
-          </div>
-          <div style={{ gridArea: "center", alignSelf: "center", justifySelf: "start", zIndex: "var(--z-wall-segment)", marginLeft: "clamp(8%, 10dvw, 18%)" }}>
-            <TileWall segment="left" wallRemaining={wallRemaining} wallDrawCount={state.wallDrawCount} wallSupplementCount={state.wallSupplementCount} gold={gold} canDraw={canDraw} onDraw={onDraw} />
-          </div>
-          <div style={{ gridArea: "center", alignSelf: "center", justifySelf: "end", zIndex: "var(--z-wall-segment)", marginRight: "clamp(8%, 10dvw, 18%)" }}>
-            <TileWall segment="right" wallRemaining={wallRemaining} wallDrawCount={state.wallDrawCount} wallSupplementCount={state.wallSupplementCount} gold={gold} canDraw={canDraw} onDraw={onDraw} />
-          </div>
-          {!isFirstPersonMobile && (
-            <div style={{ gridArea: "center", alignSelf: "end", justifySelf: "center", zIndex: "var(--z-wall-segment)", marginBottom: "clamp(8%, 10dvh, 18%)" }}>
-              <TileWall segment="bottom" wallRemaining={wallRemaining} wallDrawCount={state.wallDrawCount} wallSupplementCount={state.wallSupplementCount} gold={gold} canDraw={canDraw} onDraw={onDraw} />
-            </div>
-          )}
-        </>
-      )}
+      {/* Wall segments along table edges */}
+      <>
+        <div style={{ gridArea: "center", alignSelf: "start", justifySelf: "center", zIndex: "var(--z-wall-segment)", marginTop: "clamp(8%, 10dvh, 18%)" }}>
+          <TileWall segment="top" wallRemaining={wallRemaining} wallDrawCount={state.wallDrawCount} wallSupplementCount={state.wallSupplementCount} gold={gold} canDraw={canDraw} onDraw={onDraw} />
+        </div>
+        <div style={{ gridArea: "center", alignSelf: "center", justifySelf: "start", zIndex: "var(--z-wall-segment)", marginLeft: "clamp(8%, 10dvw, 18%)" }}>
+          <TileWall segment="left" wallRemaining={wallRemaining} wallDrawCount={state.wallDrawCount} wallSupplementCount={state.wallSupplementCount} gold={gold} canDraw={canDraw} onDraw={onDraw} />
+        </div>
+        <div style={{ gridArea: "center", alignSelf: "center", justifySelf: "end", zIndex: "var(--z-wall-segment)", marginRight: "clamp(8%, 10dvw, 18%)" }}>
+          <TileWall segment="right" wallRemaining={wallRemaining} wallDrawCount={state.wallDrawCount} wallSupplementCount={state.wallSupplementCount} gold={gold} canDraw={canDraw} onDraw={onDraw} />
+        </div>
+        <div style={{ gridArea: "center", alignSelf: "end", justifySelf: "center", zIndex: "var(--z-wall-segment)", marginBottom: "clamp(8%, 10dvh, 18%)" }}>
+          <TileWall segment="bottom" wallRemaining={wallRemaining} wallDrawCount={state.wallDrawCount} wallSupplementCount={state.wallSupplementCount} gold={gold} canDraw={canDraw} onDraw={onDraw} />
+        </div>
+      </>
 
       {/* Right player — rotated 90° counter-clockwise to face right */}
       <div style={{ gridArea: "right", position: "relative", zIndex: "var(--z-game-table-cell)", transform: "rotate(-90deg)", transformOrigin: "center center", display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -178,8 +158,6 @@ export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTile
           lastDiscardedTileId={lastDiscardPlayerIndex === (myIndex + 1) % 4 ? lastDiscardTileId : null}
           hasDiscardedGold={otherPlayers[0]?.hasDiscardedGold}
           isDisconnected={disconnectedPlayers?.has((myIndex + 1) % 4)}
-          compact={isCompact}
-          ultraCompact={isFirstPersonMobile}
           cumulativeScore={roundsPlayed > 0 ? cumulativeScores[(myIndex + 1) % 4] : undefined}
         />
       </div>
@@ -212,7 +190,6 @@ export function GameTable({ state, onTileSelect, onTileDoubleClick, selectedTile
           lastDiscardedTileId={lastDiscardPlayerIndex === myIndex ? lastDiscardTileId : null}
           departingTileId={departingTile?.id ?? null}
           tenpaiTiles={state.tenpaiTiles}
-          firstPerson={isFirstPersonMobile}
           cumulativeScore={roundsPlayed > 0 ? cumulativeScores[myIndex] : undefined}
           claimActive={claimActive}
         />
