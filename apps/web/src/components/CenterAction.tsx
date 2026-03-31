@@ -8,7 +8,7 @@ interface CenterActionProps {
   gold: GoldState | null;
 }
 
-interface ActionDisplay {
+export interface ActionDisplay {
   tiles: TileInstance[];
   label: string;
   color: string;
