@@ -52,7 +52,7 @@ export function CenterAction({ display, gold }: { display: ActionDisplay | null;
   const isCompact = height <= BREAKPOINTS.COMPACT_HEIGHT;
   const tileCount = display.tiles.length;
   // Base tile width mirrors CSS --tile-w breakpoints
-  const baseTileW = width <= 360 ? 30 : width <= 480 ? 34 : 44;
+  const baseTileW = width <= BREAKPOINTS.TINY_WIDTH ? 30 : width <= BREAKPOINTS.PHONE_WIDTH ? 34 : 44;
   const gap = 4;
   const maxMeldWidth = width * 0.9;
   // scale applies per-tile via transform (doesn't affect layout), so visual width =

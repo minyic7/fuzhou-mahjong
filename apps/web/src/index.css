@@ -514,7 +514,7 @@ body {
   top: 0; left: 0; right: 0; bottom: 0;
   background: url("data:image/svg+xml,%3Csvg width='20' height='20' xmlns='http://www.w3.org/2000/svg'%3E%3Crect width='20' height='20' fill='none'/%3E%3Ccircle cx='1' cy='1' r='0.8' fill='rgba(255,255,255,0.04)'/%3E%3Ccircle cx='10' cy='12' r='0.6' fill='rgba(255,255,255,0.03)'/%3E%3Ccircle cx='15' cy='5' r='0.5' fill='rgba(255,255,255,0.035)'/%3E%3C/svg%3E");
   pointer-events: none;
-  z-index: 0;
+  z-index: 0; /* Literal 0: pseudo-element base layer, below all content — not part of component z-index scale */
 }
 
 /* Vignette (darker edges) */
@@ -524,7 +524,7 @@ body {
   top: 0; left: 0; right: 0; bottom: 0;
   background: radial-gradient(ellipse at center, transparent 40%, rgba(0,0,0,0.35) 100%);
   pointer-events: none;
-  z-index: 0;
+  z-index: 0; /* Literal 0: pseudo-element base layer, below all content — not part of component z-index scale */
 }
 
 /* ─── Player area card background ─── */
@@ -792,12 +792,12 @@ hr {
   top: 0; left: 0; right: 0; bottom: 0;
   background: radial-gradient(ellipse at center, transparent 50%, rgba(0,0,0,0.25) 100%);
   pointer-events: none;
-  z-index: 0;
+  z-index: 0; /* Literal 0: pseudo-element base layer, below all content — not part of component z-index scale */
 }
 
 .lobby-page > *, .room-page > * {
   position: relative;
-  z-index: 1;
+  z-index: 1; /* Literal 1: elevate content above ::before pseudo-element — not part of component z-index scale */
 }
 
 /* Page transition wrapper */

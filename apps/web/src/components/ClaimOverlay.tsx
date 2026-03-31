@@ -48,7 +48,7 @@ function findMatchingHandTiles(hand: TileInstance[], discard: TileInstance, coun
 export function ClaimOverlay({ actions, gameState, onAction }: ClaimOverlayProps) {
   const { height } = useWindowSize();
   const isCompact = height <= BREAKPOINTS.COMPACT_HEIGHT;
-  const isUltraCompact = height <= 390;
+  const isUltraCompact = height <= BREAKPOINTS.SMALL_PHONE_HEIGHT;
   const [showChiPicker, setShowChiPicker] = useState(false);
   const [exiting, setExiting] = useState(false);
   const [exitingChi, setExitingChi] = useState(false);
